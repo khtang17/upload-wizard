@@ -1,6 +1,7 @@
 led / optimized / DLL files
 __pycache__/
 *.py[cod]
+.DS_Store
 
 # C extensions
 *.so
@@ -56,4 +57,4 @@ docs/_build/
 # PyBuilder
 target
 
-.DS_Store
+
