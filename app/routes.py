@@ -2,12 +2,14 @@ from flask import render_template, flash, redirect, url_for
 from app import app
 from flask_login import current_user, login_user, login_required
 from flask_login import logout_user
-from app.data.models import User
+from app.data.models.user import User
 from app import db
-from app.data.forms import LoginForm
-from app.data.forms import RegistrationForm
+from app.data.forms.login_form import LoginForm
+from app.data.forms.registration_form import RegistrationForm
+from app.data.forms.upload_form import UploadForm
 from flask import request
 from werkzeug.urls import url_parse
+from werkzeug.utils import secure_filename
 
 @app.route('/')
 @app.route('/index')
@@ -24,13 +26,13 @@ def index():
             'body': 'The Avengers movie was so cool!'
         }
     ]
-    return render_template('index.html', title='Home Page', posts=posts, user=user)
+    return render_template('index.html', title='Home Page')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('user/index'))
+        return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -66,6 +68,23 @@ def register():
     return render_template('user/register.html', title='Register', form=form)
 
 
-@app.route('/file_upload', methods=['GET', 'POST'])
-def file_upload():
-    return render_template('file_upload.html', title='File Upload')
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    form = UploadForm()
+
+    if form.validate_on_submit():
+        filename = secure_filename(form.file.data.filename)
+        file = form.file.data
+        lineNumber = 0
+        for line in file.stream:
+            lineNumber += 1
+            cols = line.decode().strip().split('\t')
+            print(line)
+            print(cols[0])
+            if len(cols) >= 2 and isinstance(cols[0], int) and isinstance(cols[1], str):
+                flash('Invalid username or password')
+                return redirect(url_for('upload'))
+        # form.file.data.save('uploads/' + filename)
+        return redirect(url_for('upload'))
+
+    return render_template('upload.html', title='Upload File', form=form)
