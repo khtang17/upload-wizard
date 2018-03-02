@@ -7,4 +7,4 @@ class Company(db.Model):
     users = db.relationship('User', backref='company', lazy='dynamic')
 
     def __repr__(self):
-        return '<Company {}>'.format(self.name)
+        return '<Company {}>'.at(self.name)

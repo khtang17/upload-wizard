@@ -3,6 +3,7 @@ from app import app
 from flask_login import current_user, login_user, login_required
 from flask_login import logout_user
 from app.data.models.user import User
+from app.data.models.format import FileFormat
 from app import db
 from app.data.forms.login_form import LoginForm
 from app.data.forms.registration_form import RegistrationForm
@@ -10,6 +11,7 @@ from app.data.forms.upload_form import UploadForm
 from flask import request
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
+from app.validation import validate
 
 @app.route('/')
 @app.route('/index')
@@ -71,19 +73,22 @@ def register():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     form = UploadForm()
-
     if form.validate_on_submit():
         filename = secure_filename(form.file.data.filename)
         file = form.file.data
-        lineNumber = 0
-        for line in file.stream:
-            lineNumber += 1
-            cols = line.decode().strip().split('\t')
-            print(line)
-            print(cols[0])
-            if len(cols) >= 2 and isinstance(cols[0], int) and isinstance(cols[1], str):
-                flash('Invalid username or password')
-                return redirect(url_for('upload'))
+        # file_format = FileFormat(title='smiles', col_type="str", order=2)
+        # db.session.add(file_format)
+        # db.session.commit()
+        print(validate(file))
+        # line_number = 0
+        # for line in file.stream:
+        #     line_number += 1
+        #     cols = line.decode().strip().split('\t')
+        #     print(line)
+        #     print(cols[0])
+        #     if len(cols) >= 2 and isinstance(cols[0], int) and isinstance(cols[1], str):
+        #         flash('Please check line #{}'.format(line_number))
+        #         return redirect(url_for('upload'))
         # form.file.data.save('uploads/' + filename)
         return redirect(url_for('upload'))
 

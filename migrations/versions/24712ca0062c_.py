@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e92b59bb1737
+Revision ID: 24712ca0062c
 Revises: 
-Create Date: 2018-02-28 12:46:37.207805
+Create Date: 2018-03-01 23:43:26.471162
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e92b59bb1737'
+revision = '24712ca0062c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,10 +27,11 @@ def upgrade():
     op.create_table('file_format',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=100), nullable=True),
-    sa.Column('type', sa.String(length=100), nullable=True),
-    sa.Column('mandatory', sa.Boolean(), nullable=True),
+    sa.Column('col_type', sa.String(length=100), nullable=True),
+    sa.Column('order', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_file_format_order'), 'file_format', ['order'], unique=False)
     op.create_index(op.f('ix_file_format_title'), 'file_format', ['title'], unique=True)
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -63,6 +64,7 @@ def downgrade():
     op.drop_index(op.f('ix_user_email'), table_name='user')
     op.drop_table('user')
     op.drop_index(op.f('ix_file_format_title'), table_name='file_format')
+    op.drop_index(op.f('ix_file_format_order'), table_name='file_format')
     op.drop_table('file_format')
     op.drop_index(op.f('ix_company_name'), table_name='company')
     op.drop_table('company')

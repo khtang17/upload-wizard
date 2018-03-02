@@ -2,6 +2,7 @@ from app import login
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 from flask_login import UserMixin
+from app.data.models.history import UploadHistory
 
 
 @login.user_loader
@@ -14,7 +15,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    upload_histories = db.relationship('UploadHistory', backref='user', lazy='dynamic')
+    upload_histories = db.relationship(UploadHistory, backref='user', lazy='dynamic')
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
 
     def set_password(self, password):
