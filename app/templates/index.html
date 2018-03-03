@@ -4,24 +4,23 @@
     <h1>Hi, {{ current_user.username }}!</h1>
     <br/>
     <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Date</th>
-                    <th>File Name</th>
-                </tr>
-              </thead>
-              <tbody>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>File Name</th>
+            </tr>
+          </thead>
+          <tbody>
             {% for history in histories %}
-                <tr valign="top">
-                        <td>{{ loop.index }}</td>
-                        <td>{{ history.date_uploaded }}</td>
-                        <td>{{ history.file_name }}</td>
-
-                </tr>
-             {% endfor %}
-              </tbody>
-            </table>
+            <tr valign="top">
+                <td>{{ loop.index }}</td>
+                <td>{{ history.date_uploaded }}</td>
+                <td><a href="{{ url_for('static', filename='files/'+history.file_name) }}">{{ history.file_name }}</a> </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
     </div>
 {% endblock %}

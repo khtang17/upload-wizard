@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for
+from flask import Blueprint, render_template, flash, redirect, url_for, send_from_directory
 from app import app
 from flask_login import current_user, login_user, login_required
 from flask_login import logout_user
@@ -12,6 +12,12 @@ from app.data.forms.upload_form import UploadForm
 from flask import request
 from werkzeug.urls import url_parse
 from app.validation import validate
+
+
+@app.route('/<path:path>', methods=['GET'])
+def static_proxy(path):
+    return send_from_directory(app.static_folder, path)
+
 
 @app.route('/')
 @app.route('/index')

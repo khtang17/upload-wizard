@@ -8,4 +8,5 @@ class UploadForm(FlaskForm):
         FileRequired(),
         FileAllowed(['txt', 'png'], 'Please upload only allowed files! (.txt, .)')
     ])
+    # separator =
     submit = SubmitField('Upload File')
