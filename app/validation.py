@@ -33,7 +33,8 @@ def validate(file):
 
     history = UploadHistoryModel(current_user.id, secure_filename(file.filename))
     history.save_to_db()
-    file.save(os.path.join(
-        app.config['STATIC_FOLDER'], 'files', history.file_name
-    ))
+    print('***************************************************************************')
+    print(os.path.join(app.instance_path, history.file_name))
+    print('***************************************************************************')
+    file.save(os.path.join(app.instance_path, history.file_name))
     return "File Uploaded. Total line(s): {}".format(line_number)
