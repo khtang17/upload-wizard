@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for
 from app import app
 from flask_login import current_user, login_user, login_required
 from flask_login import logout_user
@@ -11,19 +11,33 @@ from app.data.forms.registration_form import RegistrationForm
 from app.data.forms.upload_form import UploadForm
 from flask import request
 from werkzeug.urls import url_parse
-from app.validation import validate
+
+from app.exception import InvalidUsage
+from app.helpers.validation import validate
 from flask import send_from_directory
+
+from flask import jsonify
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.instance_path, filename)
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    histories = UploadHistoryModel.find_by_user_id(current_user.id)
-    return render_template('index.html', title='Home Page', histories=histories)
+    page = request.args.get('page', 1, type=int)
+    histories = current_user.upload_histories.paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('index', page=histories.next_num) \
+        if histories.has_next else None
+    prev_url = url_for('index', page=histories.prev_num) \
+        if histories.has_prev else None
+    pagestart = (page-1)*app.config['POSTS_PER_PAGE']
+    return render_template('index.html', title='Home Page', histories=histories.items,
+                           next_url=next_url,
+                           prev_url=prev_url,
+                           pagestart=pagestart)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -73,5 +87,14 @@ def register():
 def upload():
     form = UploadForm()
     if form.validate_on_submit():
+        print('validated')
         flash(validate(form.file.data))
+        raise InvalidUsage('File uploaded', status_code=200)
     return render_template('upload.html', title='Upload File', form=form)
+
+
+@app.errorhandler(InvalidUsage)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response

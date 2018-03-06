@@ -15,12 +15,18 @@
           <tbody>
             {% for history in histories %}
             <tr valign="top">
-                <td>{{ loop.index }}</td>
+                <td>{{ pagestart+loop.index }}</td>
                 <td>{{ history.date_uploaded }}</td>
-                <td><a href="{{ url_for('uploaded_file', filename=history.file_name) }}">{{ history.file_name }}</a> </td>
+                <td>{{ history.file_name }}</td>
             </tr>
             {% endfor %}
           </tbody>
+            {% if prev_url %}
+            <a href="{{ prev_url }}"> Prev </a>
+            {% endif %}
+            {% if next_url %}
+            <a href="{{ next_url }}"> Next </a>
+            {% endif %}
         </table>
     </div>
 {% endblock %}

@@ -15,6 +15,9 @@ def validate(file):
         lines = lines[0].split(b'\r')
     for line in lines:
         line_number += 1
+        if line_number > 100:
+            break
+
         try:
             cols = line.decode('windows-1252').strip().split('\t')
             if len(cols) >= len(formats):
@@ -34,7 +37,7 @@ def validate(file):
     history = UploadHistoryModel(current_user.id, secure_filename(file.filename))
     history.save_to_db()
     print('***************************************************************************')
-    print(os.path.join(app.instance_path, history.file_name))
+    print(os.path.join(app.config['UPLOAD_FOLDER'], history.file_name))
     print('***************************************************************************')
-    file.save(os.path.join(app.instance_path, history.file_name))
-    return "File Uploaded. Total line(s): {}".format(line_number)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], history.file_name))
+    return "File Uploaded"
