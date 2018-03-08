@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 67eb10b6bb49
+Revision ID: 4ad51533db61
 Revises: 
-Create Date: 2018-03-02 11:45:45.006310
+Create Date: 2018-03-07 14:33:17.987224
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '67eb10b6bb49'
+revision = '4ad51533db61'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,9 +21,26 @@ def upgrade():
     op.create_table('companies',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=True),
+    sa.Column('description', sa.String(length=400), nullable=True),
+    sa.Column('logo', sa.String(length=400), nullable=True),
+    sa.Column('address', sa.String(length=100), nullable=True),
+    sa.Column('telephone_number', sa.String(length=40), nullable=True),
+    sa.Column('toll_free_number', sa.String(length=40), nullable=True),
+    sa.Column('fax_number', sa.String(length=40), nullable=True),
+    sa.Column('website', sa.String(length=100), nullable=True),
+    sa.Column('sales_email', sa.String(length=100), nullable=True),
+    sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index(op.f('ix_companies_address'), 'companies', ['address'], unique=True)
+    op.create_index(op.f('ix_companies_date_created'), 'companies', ['date_created'], unique=False)
+    op.create_index(op.f('ix_companies_description'), 'companies', ['description'], unique=True)
+    op.create_index(op.f('ix_companies_fax_number'), 'companies', ['fax_number'], unique=True)
     op.create_index(op.f('ix_companies_name'), 'companies', ['name'], unique=True)
+    op.create_index(op.f('ix_companies_sales_email'), 'companies', ['sales_email'], unique=True)
+    op.create_index(op.f('ix_companies_telephone_number'), 'companies', ['telephone_number'], unique=True)
+    op.create_index(op.f('ix_companies_toll_free_number'), 'companies', ['toll_free_number'], unique=True)
+    op.create_index(op.f('ix_companies_website'), 'companies', ['website'], unique=True)
     op.create_table('file_formats',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=100), nullable=True),
@@ -66,6 +83,14 @@ def downgrade():
     op.drop_index(op.f('ix_file_formats_title'), table_name='file_formats')
     op.drop_index(op.f('ix_file_formats_order'), table_name='file_formats')
     op.drop_table('file_formats')
+    op.drop_index(op.f('ix_companies_website'), table_name='companies')
+    op.drop_index(op.f('ix_companies_toll_free_number'), table_name='companies')
+    op.drop_index(op.f('ix_companies_telephone_number'), table_name='companies')
+    op.drop_index(op.f('ix_companies_sales_email'), table_name='companies')
     op.drop_index(op.f('ix_companies_name'), table_name='companies')
+    op.drop_index(op.f('ix_companies_fax_number'), table_name='companies')
+    op.drop_index(op.f('ix_companies_description'), table_name='companies')
+    op.drop_index(op.f('ix_companies_date_created'), table_name='companies')
+    op.drop_index(op.f('ix_companies_address'), table_name='companies')
     op.drop_table('companies')
     # ### end Alembic commands ###
