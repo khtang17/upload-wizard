@@ -1,8 +1,9 @@
 from flask import render_template, flash, redirect, url_for
-from app import app
+from app import app, db
 from flask_login import current_user, login_user, login_required
 from flask_login import logout_user
 
+from app.data.models.format import FileFormatModel
 from app.data.models.history import UploadHistoryModel
 from app.data.models.user import UserModel
 from app.data.models.company import CompanyModel
@@ -72,7 +73,14 @@ def register():
     if form.validate_on_submit():
         company = CompanyModel.find_by_name(form.company_name.data)
         if not company:
-            company = CompanyModel(name=form.company_name.data)
+            company = CompanyModel(name=form.company_name.data,
+                                   description=form.company_description.data,
+                                   address=form.company_address.data,
+                                   telephone_number=form.company_telephone_number.data,
+                                   toll_free_number=form.company_toll_free_number.data,
+                                   fax_number=form.company_fax_number.data,
+                                   website=form.company_website.data,
+                                   sales_email=form.company_email.data)
             company.save_to_db()
         user = UserModel(username=form.username.data, email=form.email.data, company_id=company.id)
         user.set_password(form.password.data)
@@ -81,20 +89,32 @@ def register():
         return redirect(url_for('login'))
     return render_template('user/register.html', title='Register', form=form)
 
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('user/profilehtml')
 
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload():
+    # file_format = FileFormatModel(title='smiles', col_type="str", order=1)
+    # file_format.save_to_db()
+    # file_format = FileFormatModel(title='product_id', col_type="str", order=2)
+    # file_format.save_to_db()
+    # file_format = FileFormatModel(title='cas_number', col_type="str", order=3)
+    # file_format.save_to_db()
     form = UploadForm()
+    formats = FileFormatModel.find_all()
     if form.validate_on_submit():
-        print('validated')
-        flash(validate(form.file.data))
-        raise InvalidUsage('File uploaded', status_code=200)
-    return render_template('upload.html', title='Upload File', form=form)
+        return_msg = validate(form.file.data)
+        print(form.file)
+        #flash(validate(form.file.data))
+        return jsonify(return_msg)
+    return render_template('upload.html', title='Upload File', form=form, formats=formats)
 
 
-@app.errorhandler(InvalidUsage)
-def handle_invalid_usage(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
+# @app.errorhandler(InvalidUsage)
+# def handle_invalid_usage(error):
+#     response = jsonify(error.to_dict())
+#     response.status_code = error.status_code
+#     return response

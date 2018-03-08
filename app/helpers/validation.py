@@ -28,16 +28,20 @@ def validate(file):
                     elif input_format.col_type.lower().startswith("float"):
                         obj = float
                     if not isinstance(cols[idx], obj):
-                        return "Type error on the line #{}".format(line_number)
+                        return {'message': "Type error on the line #{}".format(line_number)}, 400
             else:
-                return "Columns must be at least {}".format(len(formats))
+                return {'message': "Columns must be at least {}".format(len(formats))}, 400
         except:
-            return "Type error on the line #{}".format(line_number)
+            return {'message': "Type error on the line #{}".format(line_number)}, 400
 
-    history = UploadHistoryModel(current_user.id, secure_filename(file.filename))
-    history.save_to_db()
-    print('***************************************************************************')
-    print(os.path.join(app.config['UPLOAD_FOLDER'], history.file_name))
-    print('***************************************************************************')
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], history.file_name))
-    return "File Uploaded"
+    try:
+        history = UploadHistoryModel(current_user.id, secure_filename(file.filename))
+        history.save_to_db()
+        print('***************************************************************************')
+        print(os.path.join(app.config['UPLOAD_FOLDER'], history.file_name))
+        print('***************************************************************************')
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], history.file_name))
+    except:
+        return {"message": "An error occured inserting the file."}, 500
+
+    return {'message': "File Uploaded!"}, 200
