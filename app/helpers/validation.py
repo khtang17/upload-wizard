@@ -37,10 +37,8 @@ def validate(file):
     try:
         history = UploadHistoryModel(current_user.id, secure_filename(file.filename))
         history.save_to_db()
-        print('***************************************************************************')
-        print(os.path.join(app.config['UPLOAD_FOLDER'], history.file_name))
-        print('***************************************************************************')
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], history.file_name))
+        file_dir = os.path.realpath(os.path.dirname(app.config['UPLOAD_FOLDER']))
+        file.save(os.path.join(file_dir, history.file_name))
     except:
         return {"message": "An error occured inserting the file."}, 500
 
