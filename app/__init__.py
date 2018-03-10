@@ -1,11 +1,17 @@
 # import logging
 # from logging.handlers import SMTPHandler
-from flask import Flask
+from flask import Flask, url_for
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
+
+from app.data.models.custom_model_view import MyModelView
+
+from flask_admin import Admin
+from flask_admin import helpers as admin_helpers
+from flask_security import Security, SQLAlchemyUserDatastore
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -14,6 +20,31 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
 bootstrap = Bootstrap(app)
+
+
+from app.data.models.user import UserModel
+from app.data.models.user import RoleModel
+
+# Setup Flask-Security
+user_datastore = SQLAlchemyUserDatastore(db, UserModel, RoleModel)
+security = Security(app, user_datastore)
+
+admin = Admin(app, name='microblog', base_template='base.html', template_mode='bootstrap3')
+# Add model views
+admin.add_view(MyModelView(RoleModel, db.session))
+admin.add_view(MyModelView(UserModel, db.session))
+
+
+# define a context processor for merging flask-admin's template context into the
+# flask-security views.
+@security.context_processor
+def security_context_processor():
+    return dict(
+        admin_base_template=admin.base_template,
+        admin_view=admin.index_view,
+        h=admin_helpers,
+        get_url=url_for
+    )
 
 from app import routes, errors
 from app.data import models

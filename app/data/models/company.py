@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class CompanyModel(db.Model):
-    __tablename__ = 'companies'
+    __tablename__ = 'company'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), index=True, unique=True)
