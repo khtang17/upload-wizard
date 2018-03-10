@@ -2,7 +2,7 @@ from app import db
 
 
 class FileFormatModel(db.Model):
-    __tablename__ = 'file_formats'
+    __tablename__ = 'file_format'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), index=True, unique=True)
