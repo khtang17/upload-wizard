@@ -6,9 +6,9 @@ from flask_security import UserMixin, RoleMixin
 from app.data.models.history import UploadHistoryModel
 from datetime import datetime
 
-@login.user_loader
-def load_user(id):
-    return UserModel.query.get(int(id))
+# @login.user_loader
+# def load_user(id):
+#     return UserModel.query.get(int(id))
 
 
 # Define models
@@ -20,6 +20,7 @@ roles_users = db.Table(
 
 
 class RoleModel(db.Model, RoleMixin):
+    __tablename__ = 'role'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
@@ -34,7 +35,7 @@ class UserModel(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
+    password = db.Column(db.String(128))
     active = db.Column(db.Boolean(), default=False)
     confirmed_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     upload_histories = db.relationship(UploadHistoryModel, backref='user', lazy='dynamic')
@@ -42,16 +43,33 @@ class UserModel(db.Model, UserMixin):
     roles = db.relationship('RoleModel', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
-    def __init__(self, username, email, company_id):
-        self.username = username
-        self.email = email.lower()
-        self.company_id = company_id
+    # Flask-Login integration
+    def is_authenticated(self):
+        return True
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+    def is_active(self):
+        return True
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
+
+    # Required for administrative interface
+    def __unicode__(self):
+        return self.username
+
+    # def __init__(self, username, email, company_id):
+    #     self.username = username
+    #     self.email = email
+    #     self.company_id = company_id
+    #
+    # def set_password(self, password):
+    #     self.password_hash = generate_password_hash(password)
+    #
+    # def check_password(self, password):
+    #     return check_password_hash(self.password_hash, password)
 
     def save_to_db(self):
         db.session.add(self)
@@ -70,6 +88,4 @@ class UserModel(db.Model, UserMixin):
         return cls.query.filter_by(email=email.lower()).first()
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
-
-
+        return '<User {}>'.format(self.email)
