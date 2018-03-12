@@ -17,8 +17,8 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-login = LoginManager(app)
-login.login_view = 'login'
+# login = LoginManager(app)
+# login.login_view = 'login'
 bootstrap = Bootstrap(app)
 
 
@@ -29,7 +29,7 @@ from app.data.models.user import RoleModel
 user_datastore = SQLAlchemyUserDatastore(db, UserModel, RoleModel)
 security = Security(app, user_datastore)
 
-admin = Admin(app, name='microblog', base_template='base.html', template_mode='bootstrap3')
+admin = Admin(app, name='microblog', base_template='my_master.html', template_mode='bootstrap3',)
 # Add model views
 admin.add_view(MyModelView(RoleModel, db.session))
 admin.add_view(MyModelView(UserModel, db.session))
