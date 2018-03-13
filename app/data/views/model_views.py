@@ -3,13 +3,13 @@ from flask import url_for, redirect, request, abort
 from flask_admin.contrib import sqla
 
 
-class MyModelView(sqla.ModelView):
+class AdminModelView(sqla.ModelView):
 
     def is_accessible(self):
         if not current_user.is_active or not current_user.is_authenticated:
             return False
 
-        if current_user.has_role('superuser'):
+        if current_user.has_role('Admin'):
             return True
 
         return False
@@ -25,3 +25,7 @@ class MyModelView(sqla.ModelView):
             else:
                 # login
                 return redirect(url_for('security.login', next=request.url))
+
+
+class UserView(AdminModelView):
+    column_list = ['active', 'username', 'email']

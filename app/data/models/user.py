@@ -1,10 +1,13 @@
-from app import login
-from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
+# from app import login
+from werkzeug.security import generate_password_hash, check_password_hash
 # from flask_login import UserMixin
 from flask_security import UserMixin, RoleMixin
+from flask_user import UserMixin
 from app.data.models.history import UploadHistoryModel
 from datetime import datetime
+# from flask_user import UserManager
+
 
 # @login.user_loader
 # def load_user(id):
@@ -35,41 +38,24 @@ class UserModel(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    password = db.Column(db.String(128))
-    active = db.Column(db.Boolean(), default=False)
+    password = db.Column(db.String(255), nullable=False, server_default='')
+    active = db.Column('is_active', db.Boolean(), nullable=False, server_default='1')
     confirmed_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     upload_histories = db.relationship(UploadHistoryModel, backref='user', lazy='dynamic')
-    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
     roles = db.relationship('RoleModel', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
-    # Flask-Login integration
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return self.id
-
-    # Required for administrative interface
-    def __unicode__(self):
-        return self.username
-
     # def __init__(self, username, email, company_id):
-    #     self.username = username
     #     self.email = email
+    #     self.username = username
     #     self.company_id = company_id
-    #
-    # def set_password(self, password):
-    #     self.password_hash = generate_password_hash(password)
-    #
-    # def check_password(self, password):
-    #     return check_password_hash(self.password_hash, password)
+
+    def set_password(self, pwd):
+        self.password = generate_password_hash(pwd)
+
+    def check_password(self, pwd):
+        return check_password_hash(self.password, pwd)
 
     def save_to_db(self):
         db.session.add(self)
@@ -86,6 +72,9 @@ class UserModel(db.Model, UserMixin):
     @classmethod
     def find_by_email(cls, email):
         return cls.query.filter_by(email=email.lower()).first()
+
+    def __str__(self):
+        return self.email
 
     def __repr__(self):
         return '<User {}>'.format(self.email)

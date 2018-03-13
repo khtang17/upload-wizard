@@ -7,4 +7,5 @@ from app.data.models.company import CompanyModel
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'User': UserModel, 'UploadHistory': UploadHistoryModel, 'FileFormat': FileFormatModel, 'Company': CompanyModel}
+    return {'db': db, 'User': UserModel, 'UploadHistory': UploadHistoryModel, 'FileFormat': FileFormatModel,
+            'Company': CompanyModel}
