@@ -4,12 +4,11 @@ from flask import Flask, url_for
 from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager
+# from flask_login import LoginManager
 from flask_bootstrap import Bootstrap
+from app.data.views.model_views import AdminModelView, UserView
 
-from app.data.models.custom_model_view import MyModelView
-
-from flask_admin import Admin
+import flask_admin
 from flask_admin import helpers as admin_helpers
 from flask_security import Security, SQLAlchemyUserDatastore
 
@@ -19,20 +18,74 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 # login = LoginManager(app)
 # login.login_view = 'login'
+# from app.data.models.user import UserModel
+# db_adapter = SQLAlchemyAdapter(db, UserModel)
+# user_manager = UserManager(db_adapter, app)
+# user_manager.login_form = 'login'
 bootstrap = Bootstrap(app)
 
 
-from app.data.models.user import UserModel
-from app.data.models.user import RoleModel
 
-# Setup Flask-Security
+
+from app.data.models.company import CompanyModel
+from app.data.models.user import RoleModel
+from app.data.models.user import UserModel
+
+# Setup Flask-User and specify the User data-model
+
+# if not CompanyModel.query.filter(CompanyModel.name == 'test').first():
+#     company = CompanyModel(name='test',
+#                            description='test',
+#                            address='test',
+#                            telephone_number='test',
+#                            toll_free_number='test',
+#                            fax_number='test',
+#                            website='test',
+#                            sales_email='test@mail.com')
+#     db.session.add(company)
+#     db.session.commit()
+#
+# # Create 'member@example.com' user with no roles
+# if not UserModel.query.filter(UserModel.email == 'member@mail.com').first():
+#     user = UserModel(
+#         username='member',
+#         email='member@mail.com',
+#         company_id=1
+#     )
+#     user.set_password('member')
+#     db.session.add(user)
+#     db.session.commit()
+#
+# # Create 'admin@example.com' user with 'Admin' and 'Agent' roles
+# if not UserModel.query.filter(UserModel.email == 'admin@mail.com').first():
+#     user = UserModel(
+#         username='admin',
+#         email='admin@mail.com',
+#         company_id=1
+#     )
+#     user.set_password('admin')
+#     user.roles.append(RoleModel(name='Admin'))
+#     user.roles.append(RoleModel(name='Agent'))
+#     db.session.add(user)
+#     db.session.commit()
+
+
+# # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, UserModel, RoleModel)
 security = Security(app, user_datastore)
 
-admin = Admin(app, name='microblog', base_template='my_master.html', template_mode='bootstrap3',)
+
+
+# Create admin
+admin = flask_admin.Admin(
+    app,
+    'Vendor Upload v1.0',
+    base_template='my_master.html',
+    template_mode='bootstrap3',
+)
 # Add model views
-admin.add_view(MyModelView(RoleModel, db.session))
-admin.add_view(MyModelView(UserModel, db.session))
+admin.add_view(AdminModelView(RoleModel, db.session))
+admin.add_view(UserView(UserModel, db.session))
 
 
 # define a context processor for merging flask-admin's template context into the
