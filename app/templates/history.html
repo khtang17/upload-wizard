@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Hi, {{ current_user.username }}!</h1>
+    <br/>
+    <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>File Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for history in histories %}
+            <tr valign="top">
+                <td>{{ pagestart+loop.index }}</td>
+                <td>{{ history.date_uploaded }}</td>
+                <td>{{ history.file_name }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+            {% if prev_url %}
+            <a href="{{ prev_url }}"> Prev </a>
+            {% endif %}
+            {% if next_url %}
+            <a href="{{ next_url }}"> Next </a>
+            {% endif %}
+        </table>
+    </div>
+
+{% endblock %}

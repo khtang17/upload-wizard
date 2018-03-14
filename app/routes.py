@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for
 from app import app, db
-from flask_security import login_user, login_required, roles_required, logout_user
-from flask_login import current_user
+# from flask_security import login_user, login_required, roles_required, logout_user
+from flask_user import current_user, roles_required
 
 from app.data.models.format import FileFormatModel
 from app.data.models.history import UploadHistoryModel
@@ -11,43 +11,24 @@ from app.data.forms.login_form import LoginForm
 from app.data.forms.registration_form import RegistrationForm
 from app.data.forms.upload_form import UploadForm
 from flask import request
-from werkzeug.urls import url_parse
-
+# from werkzeug.urls import url_parse
+#
 from app.exception import InvalidUsage
 from app.helpers.validation import validate
-from flask import send_from_directory
+# from flask import send_from_directory
 
 from flask import jsonify
 
+from flask_user import login_required
+
 # from flask_user import current_user, login_required, roles_required
 
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.instance_path, filename)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-# @app.route('/', methods=['GET', 'POST'])
-# @app.route('/index', methods=['GET', 'POST'])
-# @login_required
-# def index():
-#     page = request.args.get('page', 1, type=int)
-#     histories = current_user.upload_histories.paginate(
-#         page, app.config['POSTS_PER_PAGE'], False)
-#     next_url = url_for('index', page=histories.next_num) \
-#         if histories.has_next else None
-#     prev_url = url_for('index', page=histories.prev_num) \
-#         if histories.has_prev else None
-#     pagestart = (page-1)*app.config['POSTS_PER_PAGE']
-#     return render_template('index.html', title='Home Page', histories=histories.items,
-#                            next_url=next_url,
-#                            prev_url=prev_url,
-#                            pagestart=pagestart)
 #
-#
+# @app.route('/uploads/<filename>')
+# def uploaded_file(filename):
+#     return send_from_directory(app.instance_path, filename)
+
+
 # @app.route('/login', methods=['GET', 'POST'])
 # def login():
 #     if current_user.is_authenticated:
@@ -96,15 +77,41 @@ def index():
 #         return redirect(url_for('login'))
 #     return render_template('user/register.html', title='Register', form=form)
 
-
 @app.route('/profile')
 @login_required
+@roles_required('Vendor')
 def profile():
-    return render_template('user/profilehtml')
+    return '<h1>This is the protected profile page!</h1>'
+
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+@login_required
+def index():
+    return '<h1>Welcome</h1>'
+
+
+@app.route('/history', methods=['GET', 'POST'])
+@login_required
+@roles_required('Vendor')
+def history():
+    page = request.args.get('page', 1, type=int)
+    histories = current_user.upload_histories.paginate(
+        page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('history', page=histories.next_num) \
+        if histories.has_next else None
+    prev_url = url_for('history', page=histories.prev_num) \
+        if histories.has_prev else None
+    pagestart = (page-1)*app.config['POSTS_PER_PAGE']
+    return render_template('history.html', title='Home Page', histories=histories.items,
+                           next_url=next_url,
+                           prev_url=prev_url,
+                           pagestart=pagestart)
 
 
 @app.route('/upload', methods=['GET', 'POST'])
 @login_required
+@roles_required('Vendor')
 def upload():
     # file_format = FileFormatModel(title='smiles', col_type="str", order=1)
     # file_format.save_to_db()
@@ -129,8 +136,8 @@ def upload():
 #     return response
 
 
-@app.route('/admin/', methods=['GET', 'POST'])
-@login_required
-@roles_required('Admin')    # Use of @roles_required decorator
-def admin_page():
-    return render_template('admin/index.html', title='Upload File')
+# @app.route('/admin/', methods=['GET', 'POST'])
+# @login_required
+# @roles_required('Admin')    # Use of @roles_required decorator
+# def admin_page():
+#     return render_template('admin/index.html', title='Upload File')
