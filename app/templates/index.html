@@ -1,7 +1,4 @@
-<html>
-    <body>
-        <div>
-            <a href="{{ url_for('admin.index') }}">Go to admin!</a>
-        </div>
-    </body>
-</html>
+{% extends 'admin/master.html' %}
+{% block body %}
+  <p>Here I'm going to display some data.</p>
+{% endblock %}

@@ -1,4 +1,4 @@
-from flask_security import current_user
+from flask_user import current_user
 from flask import url_for, redirect, request, abort
 from flask_admin.contrib import sqla
 
@@ -28,4 +28,17 @@ class AdminModelView(sqla.ModelView):
 
 
 class UserView(AdminModelView):
-    column_list = ['active', 'username', 'email']
+    column_list = ['active', 'username', 'roles', 'email', 'confirmed_at', 'company']
+    form_columns = ('active', 'roles', 'username', 'email', 'company')
+    column_searchable_list = ('username', 'email')
+    column_editable_list = ('active', 'username', 'email', 'company')
+
+
+class RoleView(AdminModelView):
+    column_list = ['name', 'description']
+    form_columns = ('name', 'description')
+
+
+class CompanyView(AdminModelView):
+    column_exclude_list = ['name', 'description', 'telephone_number', 'toll_free_number', 'address']
+    form_excluded_columns = ('users',)
