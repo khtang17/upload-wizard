@@ -39,9 +39,8 @@ class UserModel(db.Model, UserMixin):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password = db.Column(db.String(255), nullable=False, server_default='')
-    active = db.Column(db.Boolean(), nullable=False, server_default='1')
-    confirmed_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    # created_at = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    active = db.Column(db.Boolean(), nullable=False, default=False)
+    confirmed_at = db.Column(db.DateTime, index=True)
     upload_histories = db.relationship(UploadHistoryModel, backref='user', lazy='dynamic')
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
     roles = db.relationship('RoleModel', secondary=roles_users,

@@ -88,7 +88,17 @@ def profile():
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    return '<h1>Welcome</h1>'
+    if current_user.has_role('Admin'):
+        return redirect(url_for('admin.index'))
+    elif current_user.has_role('Vendor'):
+        return redirect(url_for('history'))
+    else:
+        return redirect(url_for('welcome'))
+
+
+@app.route('/welcome')
+def welcome():
+    return render_template('welcome.html', title='Welcome')
 
 
 @app.route('/history', methods=['GET', 'POST'])
@@ -97,12 +107,12 @@ def index():
 def history():
     page = request.args.get('page', 1, type=int)
     histories = current_user.upload_histories.paginate(
-        page, app.config['POSTS_PER_PAGE'], False)
+        page, app.config['LISTS_PER_PAGE'], False)
     next_url = url_for('history', page=histories.next_num) \
         if histories.has_next else None
     prev_url = url_for('history', page=histories.prev_num) \
         if histories.has_prev else None
-    pagestart = (page-1)*app.config['POSTS_PER_PAGE']
+    pagestart = (page-1)*app.config['LISTS_PER_PAGE']
     return render_template('history.html', title='Home Page', histories=histories.items,
                            next_url=next_url,
                            prev_url=prev_url,
