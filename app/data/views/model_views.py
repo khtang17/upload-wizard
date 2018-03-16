@@ -32,13 +32,26 @@ class UserView(AdminModelView):
     form_columns = ('active', 'roles', 'username', 'email', 'company')
     column_searchable_list = ('username', 'email')
     column_editable_list = ('active', 'username', 'email', 'company')
+    page_size = 20
 
 
 class RoleView(AdminModelView):
     column_list = ['name', 'description']
     form_columns = ('name', 'description')
+    can_create = False
+    can_delete = False
+    page_size = 20
 
 
 class CompanyView(AdminModelView):
     column_exclude_list = ['name', 'description', 'telephone_number', 'toll_free_number', 'address']
-    form_excluded_columns = ('users',)
+    form_excluded_columns = ('users', 'logo')
+    page_size = 20
+
+
+class HistoryView(AdminModelView):
+    column_list = ['date_uploaded', 'file_name', 'user']
+    column_searchable_list = ('date_uploaded', 'file_name')
+    can_create = False
+    can_edit = False
+    page_size = 20
