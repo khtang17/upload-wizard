@@ -10,6 +10,7 @@
                 <th>#</th>
                 <th>Date</th>
                 <th>File Name</th>
+                <th>File Size</th>
             </tr>
           </thead>
           <tbody>
@@ -18,6 +19,7 @@
                 <td>{{ pagestart+loop.index }}</td>
                 <td>{{ history.date_uploaded }}</td>
                 <td>{{ history.file_name }}</td>
+                <td>{{ history.file_size }}</td>
             </tr>
             {% endfor %}
           </tbody>

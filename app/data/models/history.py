@@ -10,10 +10,17 @@ class UploadHistoryModel(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     date_uploaded = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     file_name = db.Column(db.String(200))
+    file_size = db.Column(db.String(200))
 
-    def __init__(self, user_id, file_name):
+    def __init__(self, user_id, file_name, file_size):
         self.user_id = user_id
-        self.file_name = "{}_{}".format(md5(str.encode(str(datetime.utcnow))).hexdigest(), file_name)
+        self.file_name = "{}_{}".format(self.get_miliseconds(), file_name)
+        self.file_size = file_size
+
+    def get_miliseconds(self):
+        (dt, micro) = datetime.utcnow().strftime('%Y%m%d%H%M%S.%f').split('.')
+        dt = "%s%03d" % (dt, int(micro) / 1000)
+        return dt
 
     def save_to_db(self):
         db.session.add(self)
