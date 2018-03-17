@@ -1,13 +1,16 @@
 import os
+from hurry.filesize import size, alternative
 
 from app import app
 from app.data.models.format import FileFormatModel
 from werkzeug.utils import secure_filename
 from flask_login import current_user
 from app.data.models.history import UploadHistoryModel
+import pathlib
 
 
 def validate(file):
+    file_size = 0
     if file.mimetype.startswith('text/plain'):
         formats = FileFormatModel.find_all()
         line_number = 0
@@ -36,11 +39,15 @@ def validate(file):
                 return {'message': "Type error on the line #{}".format(line_number)}, 400
 
     try:
-        history = UploadHistoryModel(current_user.id, secure_filename(file.filename))
+        file.seek(0, os.SEEK_END)
+        file_length = file.tell()
+        file_size = size(file_length, system=alternative)
+        history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
         history.save_to_db()
-        file_dir = os.path.realpath(os.path.dirname(app.config['UPLOAD_FOLDER']))
-        file.save(os.path.join(file_dir, history.file_name))
+        file_dir = os.path.realpath(os.path.dirname(app.config['UPLOAD_FOLDER'] + "/" + current_user.username+"/"))
+        pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
+        file.save(os.path.join(file_dir, secure_filename(history.file_name)))
     except:
         return {"message": "An error occured inserting the file."}, 500
 
-    return {'message': "File Uploaded!"}, 200
+    return {'message': "File Uploaded! File Size:{}".format(file_size)}, 200
