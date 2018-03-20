@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>Hi, {{ current_user.username }}!</h1>
+    <h1>Upload History</h1>
     <br/>
     <div class="table-responsive">
         <table class="table table-striped">
@@ -10,6 +10,9 @@
                 <th>#</th>
                 <th>Date</th>
                 <th>File Name</th>
+                <th>Type</th>
+                <th>Purchasability</th>
+                <th>Natural Products</th>
                 <th>File Size</th>
             </tr>
           </thead>
@@ -19,6 +22,9 @@
                 <td>{{ pagestart+loop.index }}</td>
                 <td>{{ history.date_uploaded }}</td>
                 <td>{{ history.file_name }}</td>
+                <td>{{ history.type }}</td>
+                <td>{{ history.purchasability }}</td>
+                <td>{{ history.natural_products }}</td>
                 <td>{{ history.file_size }}</td>
             </tr>
             {% endfor %}
