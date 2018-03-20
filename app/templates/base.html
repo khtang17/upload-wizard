@@ -1,17 +1,20 @@
 {% extends 'bootstrap/base.html' %}
 
 {% block title %}
-    {% if title %}
-        {{ title }} - Microblog
-    {% else %}
-        Welcome to Microblog
-    {% endif %}
+
 {% endblock %}
 
-{%- block styles %}
+{% block styles %}
+<style>
+#footer {
+    position: absolute;
+    left: 0 ; right: 0;
+    height:45px;
+}
+</style>
 {{ super() }}
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-{%- endblock styles %}
+{% endblock styles %}
 
 {% block navbar %}
     <div class="navbar navbar-default">
@@ -32,12 +35,15 @@
                   <li><a href="{{ url_for('upload') }}">File Upload</a></li>
                   <li><a href="{{ url_for('company') }}">Company Profile</a></li>
                   <li><a href="{{ url_for('user.profile') }}">Change Password</a></li>
+                  <li><a href="{{ url_for('help_page') }}">Help</a></li>
                   {% else %}
                   <li><a href="{{ url_for('welcome') }}">Home</a></li>
+                  <li><a href="{{ url_for('help_page') }}">Help</a></li>
                   <li><a href="{{ url_for('user.logout') }}">Logout</a></li>
                   {% endif %}
                 </ul>
                 {% if current_user.is_anonymous %}
+
                 {% elif current_user.has_role('Vendor')  %}
                   <div class="navbar-text btn-group pull-right">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
@@ -85,5 +91,10 @@
 
 {% block scripts %}
      </div>
+         <div id="footer" class="my-5 pt-5 text-muted text-center text-small">
+            <div class="container">
+                 <p class="mb-1">© 2018 UC Reagents</p>
+            </div>
+         </div>
     {{ super() }}
 {% endblock %}

@@ -6,8 +6,8 @@ from wtforms.validators import ValidationError, DataRequired, Email
 class CompanyForm(FlaskForm):
     id = HiddenField('Company ID')
     name = StringField('Company Name', validators=[DataRequired()])
-    description = StringField('Company Description', validators=[DataRequired()])
-    address = StringField('Company Address', validators=[DataRequired()])
+    description = TextAreaField('Company Description', validators=[DataRequired()])
+    address = TextAreaField('Company Address', validators=[DataRequired()])
     telephone_number = StringField('Telephone Number', validators=[DataRequired()])
     toll_free_number = StringField('Toll Free Number')
     fax_number = StringField('Fax Number')

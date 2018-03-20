@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for
 from app import app
-from flask_user import current_user, roles_required
+from flask_user import current_user, roles_required, user_confirmed_email
 
 from app.data.models.format import FileFormatModel
 from app.data.forms.upload_form import UploadForm
@@ -16,11 +16,22 @@ from app.helpers.validation import validate
 from flask import jsonify
 from flask_user import login_required
 
+from app.email import notify_new_user_to_admin
 
 #
 # @app.route('/uploads/<filename>')
 # def uploaded_file(filename):
 #     return send_from_directory(app.instance_path, filename)
+
+
+@user_confirmed_email.connect_via(app)
+def _after_confirmed_hook(sender, user, **extra):
+    notify_new_user_to_admin(user)
+
+
+# @user_logged_in.connect_via(app)
+# def _after_login_hook(sender, user, **extra):
+#     sender.logger.info('user logged in')
 
 @app.route('/company', methods=['GET', 'POST'])
 @login_required
@@ -111,6 +122,12 @@ def index():
 @app.route('/welcome')
 def welcome():
     return render_template('welcome.html', title='Welcome')
+
+
+@app.route('/help')
+@login_required
+def help_page():
+    return render_template('help.html', title='Help')
 
 
 @app.route('/history', methods=['GET', 'POST'])
