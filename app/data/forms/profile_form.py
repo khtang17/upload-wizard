@@ -1,15 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.data.models.user import UserModel
 
 
-class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+class ProfileForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()], render_kw={'readonly': True})
+    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={'readonly': True})
+    company_id = HiddenField('Company ID')
     company_name = StringField('Company Name', validators=[DataRequired()])
     company_description = StringField('Company Description', validators=[DataRequired()])
     company_address = StringField('Company Address', validators=[DataRequired()])

@@ -1,9 +1,11 @@
 {% extends "base.html" %}
-
+{% import 'bootstrap/wtf.html' as wtf %}
 {% block app_content %}
     <div>
-        <div class="alert alert-danger" style="display: none" role="alert"></div>
-        <div class="alert alert-success" style="display: none" role="alert"></div>
+        <div class="alert alert-danger" style="display: none" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">
+                    <span aria-hidden="true" >&times;</span></button><div class="text"></div></div>
+        <div class="alert alert-success" style="display: none" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">
+            <span aria-hidden="true" >&times;</span></button><div class="text"></div></div>
     </div>
     <h1>File Upload</h1>
     <div class="row">
@@ -18,18 +20,7 @@
     </div>
     <div class="row">
         <div class="col-md-4">
-            <form method="post" enctype="multipart/form-data" action="/upload">
-                <p>
-                    {{ form.hidden_tag() }}
-                    {{ form.file.label }}<br>
-                    {{ form.file }}<br>
-                    {% for error in form.file.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                    {% endfor %}
-                </p>
-                <!--<button id="upload-file-btn" type="button">Upload</button>-->
-                <input type="submit">
-            </form>
+            {{ wtf.quick_form(form) }}
         </div>
     </div>
     <br/>
@@ -39,7 +30,7 @@
             <h5>Special requirements for the <strong>.TXT</strong> file:</h5>
             <ul>
                 <li>
-                    .TXT file maximum upload size limit: <span class="label label-success">100MB</span>
+                    .TXT file maximum upload size limit: <span class="label label-success">1GB</span>
                 </li>
                 <li> File mandatory columns must be separated by <span class="label label-default">
                     <strong>[TAB]</strong></span> and below orders and types.
@@ -105,17 +96,17 @@
                         // async: false,
                         success: function(data) {
                             if(data[1] == 200) {
-                                $('.alert-success').text(data[0].message);
+                                $('.alert-success .text').text(data[0].message);
                                 $('.alert-success').show();
                             }else{
                                 $('.progress').hide();
-                                $('.alert-danger').text(data[0].message);
+                                $('.alert-danger .text').text(data[0].message);
                                 $('.alert-danger').show();
                             }
                             console.log(data);
                         },error: function(jqXHR, status, err){
                              console.log(status);
-                            $('.alert-danger').text(err.toLowerCase()+'!');
+                            $('.alert-danger .text').text(err.toLowerCase()+'!');
                             $('.alert-danger').show();
                         }
                     });

@@ -50,8 +50,9 @@ class CompanyView(AdminModelView):
 
 
 class HistoryView(AdminModelView):
-    column_list = ['date_uploaded', 'file_name', 'user', 'file_size']
+    column_list = ['date_uploaded', 'user', 'file_name', 'type', 'purchasability',
+                   'natural_products', 'file_size', 'status']
     column_searchable_list = ('date_uploaded', 'file_name', 'file_size')
+    column_editable_list = ('status',)
     can_create = False
-    can_edit = False
     page_size = 20
