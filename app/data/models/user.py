@@ -66,6 +66,10 @@ class UserModel(db.Model, UserMixin):
         db.session.commit()
 
     @classmethod
+    def get_admins(cls):
+        return cls.query.filter(UserModel.roles.any(RoleModel.name.startswith('Admin'))).all()
+
+    @classmethod
     def find_by_username(cls, username):
         return cls.query.filter_by(username=username).first()
 

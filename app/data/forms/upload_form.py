@@ -10,12 +10,11 @@ class UploadForm(FlaskForm):
     ])
     type = SelectField(
         'Type',
-        choices=[('bb', 'Building block'), ('sc', 'SC'), ('mx', 'Mixed')]
+        choices=[('bb', 'Building Block'), ('sc', 'SC'), ('mx', 'Mixed')]
     )
     purchasability = SelectField(
         'Purchasability',
-        choices=[('ic', 'In Stock'), ('od', 'make on demand')]
+        choices=[('ic', 'In Stock'), ('od', 'Make on Demand')]
     )
     natural_products = BooleanField('Natural products')
-    # separator =
     submit = SubmitField('submit')

@@ -1,0 +1,12 @@
+Dear Admin,
+
+New vendor company user registered on system. Please see detailed information as below.
+
+Username: {{ user.username }}
+Email: {{ user.email }}
+
+If you do not want to give "Vendor" access simply ignore this message.
+
+Sincerely,
+
+Irwin and Shoichet Lab
