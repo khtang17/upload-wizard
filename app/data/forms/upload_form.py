@@ -6,15 +6,15 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 class UploadForm(FlaskForm):
     file = FileField('File', validators=[
         FileRequired(),
-        FileAllowed(['txt', 'gzip', 'zip'], 'Please upload only allowed files! (.txt, .)')
+        FileAllowed(['txt', 'gzip', 'zip'], 'Please upload only allowed files! (.txt, .gzip, .zip)')
     ])
     type = SelectField(
         'Type',
-        choices=[('bb', 'Building Block'), ('sc', 'SC'), ('mx', 'Mixed')]
+        choices=[('bb', 'Building Block'), ('sc', 'Screening Compounds'), ('both', 'Mixed')]
     )
     purchasability = SelectField(
         'Purchasability',
-        choices=[('ic', 'In Stock'), ('od', 'Make on Demand')]
+        choices=[('stock', 'In Stock'), ('demand', 'Make on Demand')]
     )
     natural_products = BooleanField('Natural products')
     submit = SubmitField('submit')

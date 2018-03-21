@@ -1,0 +1,7 @@
+Dear {{ user.username }},
+
+You have granted access to Irwin and Shoichet Lab uploading system.
+
+Sincerely,
+
+Irwin and Shoichet Lab

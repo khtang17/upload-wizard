@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, Blueprint
 from app import app
 from flask_user import current_user, roles_required, user_confirmed_email
 
@@ -18,10 +18,7 @@ from flask_user import login_required
 
 from app.email import notify_new_user_to_admin
 
-#
-# @app.route('/uploads/<filename>')
-# def uploaded_file(filename):
-#     return send_from_directory(app.instance_path, filename)
+# user_blueprint = Blueprint('user_blueprint', __name__, static_folder='/static')
 
 
 @user_confirmed_email.connect_via(app)
@@ -109,9 +106,10 @@ def company():
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
-@login_required
 def index():
-    if current_user.has_role('Admin'):
+    if current_user.is_anonymous:
+        return redirect(url_for('user.login'))
+    elif current_user.has_role('Admin'):
         return redirect(url_for('admin.index'))
     elif current_user.has_role('Vendor'):
         return redirect(url_for('history'))
@@ -120,6 +118,7 @@ def index():
 
 
 @app.route('/welcome')
+@login_required
 def welcome():
     return render_template('welcome.html', title='Welcome')
 
@@ -162,7 +161,8 @@ def upload():
     formats = FileFormatModel.find_all()
     if form.validate_on_submit():
         return_msg = validate(form.file.data, form)
-        #flash(validate(form.file.data))
+        print(return_msg[0]['message'])
+        print(return_msg[1])
         return jsonify(return_msg)
     return render_template('upload.html', title='Upload File', form=form, formats=formats)
 

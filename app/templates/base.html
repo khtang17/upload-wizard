@@ -1,100 +1,48 @@
 {% extends 'bootstrap/base.html' %}
 
 {% block title %}
-
+    {{ user_manager.USER_APP_NAME }}
 {% endblock %}
 
 {% block styles %}
-<style>
-#footer {
-    position: absolute;
-    left: 0 ; right: 0;
-    height:45px;
-}
-</style>
 {{ super() }}
+<link href="{{ url_for('static', filename='styles/sticky-footer-navbar.css')}}" rel="stylesheet">
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
 {% endblock styles %}
 
-{% block navbar %}
-    <div class="navbar navbar-default">
-        <nav class="container">
-          <div class="container-fluid">
-              <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                  <span class="sr-only">Toggle navigation</span>
-                </button>
-                <a class="navbar-brand" href="#">Vendor upload v1.0</a>
-              </div>
-              <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                  {% if current_user.is_anonymous %}
-                  <li><a href="{{ url_for('user.login') }}">Login</a></li>
-                  {% elif current_user.has_role('Vendor')  %}
-                  <li><a href="{{ url_for('history') }}">Home</a></li>
-                  <li><a href="{{ url_for('upload') }}">File Upload</a></li>
-                  <li><a href="{{ url_for('company') }}">Company Profile</a></li>
-                  <li><a href="{{ url_for('user.profile') }}">Change Password</a></li>
-                  <li><a href="{{ url_for('help_page') }}">Help</a></li>
-                  {% else %}
-                  <li><a href="{{ url_for('welcome') }}">Home</a></li>
-                  <li><a href="{{ url_for('help_page') }}">Help</a></li>
-                  <li><a href="{{ url_for('user.logout') }}">Logout</a></li>
-                  {% endif %}
-                </ul>
-                {% if current_user.is_anonymous %}
+{% block body %}
+    {% block navbar %}
+        {% include "navbar.html" %}
+    {% endblock %}
 
-                {% elif current_user.has_role('Vendor')  %}
-                  <div class="navbar-text btn-group pull-right">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                          <i class="glyphicon glyphicon-user"></i>
-                          {{ current_user.email }}
-                          <span class="caret"></span></a>
-                      <ul class="dropdown-menu" role="menu">
-                          <li><a href="{{ url_for('user.profile') }}">Change password</a></li>
-                          <li><a href="{{ url_for('company') }}">Company Profile</a></li>
-                          <li><a href="/user/sign-out">Log out</a></li>
-                      </ul>
-                  </div>
-                {% endif %}
-              </div>
-          </div>
-        </nav>
-    </div>
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
-          {% if messages %}
-            {% for category, message in messages %}
-                {% if category == 'error' %}
-                    <div class="alert alert-danger alert-dismissible" role="alert">
-                {% else %}
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                    {% if category=='error' %}
+                        {% set category='danger' %}
+                    {% endif %}
                     <div class="alert alert-{{ category }} alert-dismissible" role="alert">
-                {% endif %}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">
-                    <span aria-hidden="true" >&times;</span></button>
-                {{ message|safe }}{{ type }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-    </div>
-    <div class="container">
-{% endblock %}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">
+                        <span aria-hidden="true" >&times;</span></button>
+                    {{ message|safe }}{{ type }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+        {% block outer_content %}
+            {% block content %}
+                    {# application content needs to be provided in the app_content block #}
+                    {% block app_content %}{% endblock %}
+            {% endblock %}
+        {% endblock %}
+        </div>
 
-{% block content %}
+    <br/>
+    <br/>
 
-        {# application content needs to be provided in the app_content block #}
-        {% block app_content %}{% endblock %}
+    {% include "footer.html" %}
 
-{% endblock %}
-
-
-{% block scripts %}
-     </div>
-         <div id="footer" class="my-5 pt-5 text-muted text-center text-small">
-            <div class="container">
-                 <p class="mb-1">© 2018 UC Reagents</p>
-            </div>
-         </div>
+    {% block scripts %}
     {{ super() }}
+    {% endblock %}
 {% endblock %}

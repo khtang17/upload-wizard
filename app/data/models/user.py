@@ -1,17 +1,11 @@
 from app import db
-# from app import login
+
 from werkzeug.security import generate_password_hash, check_password_hash
-# from flask_login import UserMixin
+
 from flask_security import UserMixin, RoleMixin
 from flask_user import UserMixin
 from app.data.models.history import UploadHistoryModel
-from datetime import datetime
-# from flask_user import UserManager
-
-
-# @login.user_loader
-# def load_user(id):
-#     return UserModel.query.get(int(id))
+from sqlalchemy import event
 
 
 # Define models
@@ -39,17 +33,18 @@ class UserModel(db.Model, UserMixin):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password = db.Column(db.String(255), nullable=False, server_default='')
-    active = db.Column(db.Boolean(), nullable=False, default=False)
+    active = db.Column(db.Boolean(), default=False)
     confirmed_at = db.Column(db.DateTime, index=True)
     upload_histories = db.relationship(UploadHistoryModel, backref='user', lazy='dynamic')
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
     roles = db.relationship('RoleModel', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
-    # def __init__(self, username, email, company_id):
+    # def __init__(self, username, email, password, active):
     #     self.email = email
     #     self.username = username
-    #     self.company_id = company_id
+    #     self.password = password
+    #     self.active = False
 
     def set_password(self, pwd):
         self.password = generate_password_hash(pwd)
@@ -82,3 +77,16 @@ class UserModel(db.Model, UserMixin):
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
+
+
+def my_append_listener(target, value, initiator):
+    print(target)
+    print(target.email)
+    from app.email import notify_new_role_to_user
+    notify_new_role_to_user(target)
+    if str(value).startswith("Vendor"):
+        # notify_new_role_to_user()
+        pass
+
+
+event.listen(UserModel.roles, 'append', my_append_listener)
