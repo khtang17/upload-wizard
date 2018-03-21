@@ -1,10 +1,14 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField, HiddenField
+from wtforms import StringField, SubmitField, TextAreaField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email
+from flask_wtf.file import FileField, FileAllowed
 
 
 class CompanyForm(FlaskForm):
     id = HiddenField('Company ID')
+    logo = FileField('Company Logo', validators=[
+        FileAllowed(['png', 'jpeg', 'jpg'], 'Please upload only allowed files! (.txt, .jpeg, .jpg)')
+    ])
     name = StringField('Company Name', validators=[DataRequired()])
     description = TextAreaField('Company Description', validators=[DataRequired()])
     address = TextAreaField('Company Address', validators=[DataRequired()])

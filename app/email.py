@@ -29,3 +29,12 @@ def notify_new_user_to_admin(user):
                                          user=user),
                html_body=render_template('email/email_confirmation_notify.html',
                                          user=user))
+
+
+def notify_new_role_to_user(user):
+    print("hi {}".format(user.email))
+    send_email('You have granted access to system!',
+               sender=app.config['MAIL_DEFAULT_SENDER'],
+               recipients=[user.email],
+               text_body=render_template('email/user_role_notify.txt', user=user),
+               html_body=render_template('email/user_role_notify.html', user=user))
