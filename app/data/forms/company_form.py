@@ -6,9 +6,10 @@ from flask_wtf.file import FileField, FileAllowed
 
 class CompanyForm(FlaskForm):
     id = HiddenField('Company ID')
-    logo = FileField('Company Logo', validators=[
+    file = FileField('Company Logo', validators=[
         FileAllowed(['png', 'jpeg', 'jpg'], 'Please upload only allowed files! (.txt, .jpeg, .jpg)')
     ])
+    logo = HiddenField('Logo')
     name = StringField('Company Name', validators=[DataRequired()])
     description = TextAreaField('Company Description', validators=[DataRequired()])
     address = TextAreaField('Company Address', validators=[DataRequired()])

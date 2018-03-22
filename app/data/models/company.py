@@ -31,7 +31,6 @@ class CompanyModel(db.Model):
                  idnumber, cmpdname, cas, price):
         self.name = name.upper()
         self.description = description
-        self.logo = ""
         self.address = address
         self.telephone_number = telephone_number
         self.toll_free_number = toll_free_number
