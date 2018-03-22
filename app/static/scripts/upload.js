@@ -2,21 +2,31 @@
 function noPreview() {
   $('#image-preview-div').css("display", "none");
   $('#preview-img').attr('src', 'noimage');
-  // $('#submit').attr('disabled', '');
+  $('#submit').attr('disabled', '');
+}
+
+function preview() {
+  $('#image-preview-div').css("display", "block");
+  $('#preview-img').css('max-height', '250px');
 }
 
 function selectImage(e) {
-  $('#logo').css("color", "green");
+  $('#file').css("color", "green");
   $('#image-preview-div').css("display", "block");
   $('#preview-img').attr('src', e.target.result);
-  $('#preview-img').css('max-width', '550px');
+  $('#preview-img').css('max-height', '250px');
 }
 
 $(document).ready(function () {
    $(function() {
-       var maxsize = 500 * 1024; // 500 KB
+       var maxsize = 5 * 1024 * 1024; // 5 MB
 
-       $('#max-size').html((maxsize/1024).toFixed(2));
+       $('#max-size').html((maxsize/(1024 * 1024)).toFixed(2));
+
+       var img_src = $('#preview-img').attr('src');
+       var ext = img_src.substr(img_src.lastIndexOf('.') + 1);
+       if(ext.length > 0)
+           preview();
 
        $('form').on('submit', function(event) {
             event.preventDefault();
@@ -44,7 +54,7 @@ $(document).ready(function () {
                     return xhr;
                 },
                 type: 'POST',
-                url: '/upload',
+                url: '/company',
                 data: form_data,
                 contentType: false,
                 // cache: false,
@@ -69,7 +79,7 @@ $(document).ready(function () {
         });
 
 
-       $('#logo').change(function() {
+       $('#file').change(function() {
 
             $('#message').empty();
 
@@ -95,7 +105,7 @@ $(document).ready(function () {
             }
 
             // $('#upload-button').removeAttr("disabled");
-            // $('#submit').removeAttr("disabled");
+            $('#submit').removeAttr("disabled");
 
             var reader = new FileReader();
             reader.onload = selectImage;

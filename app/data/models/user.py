@@ -80,8 +80,6 @@ class UserModel(db.Model, UserMixin):
 
 
 def my_append_listener(target, value, initiator):
-    print(target)
-    print(target.email)
     from app.email import notify_new_role_to_user
     notify_new_role_to_user(target)
     if str(value).startswith("Vendor"):

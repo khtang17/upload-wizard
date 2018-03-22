@@ -38,6 +38,9 @@ def validate(file, form):
             except:
                 return {'message': "Type error on the line #{}".format(line_number)}, 400
 
+    elif not file.mimetype.startswith('application/zip') and not file.mimetype.startswith('application/gzip'):
+        return {"message": "Invalid file format!"}, 400
+
     try:
         file.seek(0, os.SEEK_END)
         file_length = file.tell()
@@ -47,11 +50,29 @@ def validate(file, form):
         history.purchasability = form.purchasability.data
         history.natural_products = form.natural_products.data
         history.save_to_db()
-        file_dir = os.path.realpath(os.path.dirname(app.config['UPLOAD_FOLDER'] + "/" + current_user.username+"/"))
-        pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
-        file.stream.seek(0)
-        file.save(os.path.join(file_dir, secure_filename(history.file_name)))
+        save_file(file, history.file_name)
     except:
         return {"message": "An error occured inserting the file."}, 500
 
     return {'message': "File Uploaded! File Size:{}".format(file_size)}, 200
+
+
+def check_img_type(file):
+    if file.mimetype.startswith('image/jpeg') or file.mimetype.startswith('image/png'):
+        return True
+    else:
+        return False
+
+
+def save_file(file, name):
+    folder = ''
+    if check_img_type(file):
+        folder = app.config['LOGO_UPLOAD_FOLDER']
+        name = name.replace(" ", "_") + os.path.splitext(file.filename)[1]
+    else:
+        folder = app.config['UPLOAD_FOLDER'] + "/_" + current_user.username+"/"
+    file_dir = os.path.realpath(os.path.dirname(folder))
+    pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
+    file.stream.seek(0)
+    file.save(os.path.join(file_dir, secure_filename(name)))
+    return name

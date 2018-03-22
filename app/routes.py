@@ -11,13 +11,10 @@ from flask import request
 # from werkzeug.urls import url_parse
 
 from app.exception import InvalidUsage
-from app.helpers.validation import validate
-
+from app.helpers.validation import validate, check_img_type, save_file
 from flask import jsonify
 from flask_user import login_required
-
 from app.email import notify_new_user_to_admin
-
 # user_blueprint = Blueprint('user_blueprint', __name__, static_folder='/static')
 
 
@@ -35,12 +32,16 @@ def _after_confirmed_hook(sender, user, **extra):
 @roles_required('Vendor')
 def company():
     form = CompanyForm()
+    print(1)
     if form.validate_on_submit():
+        print(2)
         company_name_duplication = CompanyModel.find_by_name(form.name.data)
         if not form.id.data:
+            print(3)
             if company_name_duplication:
                 flash('This company has already registered by other user', category="danger")
                 return redirect(url_for('company'))
+
             company = CompanyModel(name=form.name.data,
                                    description=form.description.data,
                                    address=form.address.data,
@@ -55,15 +56,30 @@ def company():
                                    cmpdname=form.cmpdname.data,
                                    cas=form.cas.data,
                                    price=form.price.data)
+
+            if form.file.data:
+                if check_img_type(form.file.data):
+                    company.logo = save_file(form.file.data, form.name.data)
+                else:
+                    return False
+
             company.save_to_db()
             user = UserModel.find_by_email(current_user.email)
             user.company_id = company.id
             user.save_to_db()
         else:
+            print(4)
             if company_name_duplication and company_name_duplication.id != int(form.id.data):
                 flash('This company has already registered by other user', category="danger")
                 return redirect(url_for('company'))
+
             company = CompanyModel.find_by_id(int(form.id.data))
+            if form.file.data:
+                if check_img_type(form.file.data):
+                    company.logo = save_file(form.file.data, form.name.data)
+                    print(company.logo)
+                else:
+                    return False
             company.name = form.name.data
             company.description = form.description.data
             company.address = form.address.data
@@ -74,19 +90,20 @@ def company():
             company.sales_email = form.sales_email.data
             company.personal_contact_name = form.personal_contact_name.data
             company.personal_contact_email = form.personal_contact_email.data
-            print(company.personal_contact_email)
-            print(form.personal_contact_email.data)
             company.idnumber = form.idnumber.data
             company.cmpdname = form.cmpdname.data
             company.cas = form.cas.data
             company.price = form.price.data
             company.save_to_db()
-        flash('Updated!', category="success")
-        return redirect(url_for('company'))
+        # flash('Updated!', category="success")
+        return jsonify({"message": "Updated!"}, 200)
+        # return redirect(url_for('company'))
     elif request.method == 'GET':
+        print(5)
         user = UserModel.find_by_email(current_user.email)
         if user.company:
             form.id.data = user.company_id
+            form.logo.data = user.company.logo
             form.name.data = user.company.name
             form.description.data = user.company.description
             form.address.data = user.company.address

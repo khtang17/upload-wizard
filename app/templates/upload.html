@@ -96,16 +96,15 @@
                         // async: false,
                         success: function(data) {
                             if(data[1] == 200) {
+                                $('#file').val("");
                                 $('.alert-success .text').text(data[0].message);
                                 $('.alert-success').show();
                             }else{
                                 $('.progress').hide();
-                                $('.alert-danger .text').text(data[0].message);
+                                $('.alert-danger .text').text('Please check input value!');
                                 $('.alert-danger').show();
                             }
-                            console.log(data);
                         },error: function(jqXHR, status, err){
-                             console.log(status);
                             $('.alert-danger .text').text(err.toLowerCase()+'!');
                             $('.alert-danger').show();
                         }
