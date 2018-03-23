@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, Blueprint
 from app import app
-from flask_user import current_user, roles_required, user_confirmed_email
+from flask_user import current_user, roles_required, user_confirmed_email, login_required
 
 from app.data.models.format import FileFormatModel
 from app.data.forms.upload_form import UploadForm
@@ -13,9 +13,7 @@ from flask import request
 from app.exception import InvalidUsage
 from app.helpers.validation import validate, check_img_type, save_file
 from flask import jsonify
-from flask_user import login_required
 from app.email import notify_new_user_to_admin
-# user_blueprint = Blueprint('user_blueprint', __name__, static_folder='/static')
 
 
 @user_confirmed_email.connect_via(app)
@@ -23,21 +21,14 @@ def _after_confirmed_hook(sender, user, **extra):
     notify_new_user_to_admin(user)
 
 
-# @user_logged_in.connect_via(app)
-# def _after_login_hook(sender, user, **extra):
-#     sender.logger.info('user logged in')
-
 @app.route('/company', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
 def company():
     form = CompanyForm()
-    print(1)
     if form.validate_on_submit():
-        print(2)
         company_name_duplication = CompanyModel.find_by_name(form.name.data)
         if not form.id.data:
-            print(3)
             if company_name_duplication:
                 flash('This company has already registered by other user', category="danger")
                 return redirect(url_for('company'))
@@ -68,7 +59,6 @@ def company():
             user.company_id = company.id
             user.save_to_db()
         else:
-            print(4)
             if company_name_duplication and company_name_duplication.id != int(form.id.data):
                 flash('This company has already registered by other user', category="danger")
                 return redirect(url_for('company'))
@@ -99,7 +89,6 @@ def company():
         return jsonify({"message": "Updated!"}, 200)
         # return redirect(url_for('company'))
     elif request.method == 'GET':
-        print(5)
         user = UserModel.find_by_email(current_user.email)
         if user.company:
             form.id.data = user.company_id
@@ -124,20 +113,20 @@ def company():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    if current_user.is_anonymous:
-        return redirect(url_for('user.login'))
-    elif current_user.has_role('Admin'):
-        return redirect(url_for('admin.index'))
-    elif current_user.has_role('Vendor'):
-        return redirect(url_for('history'))
+    if current_user.is_authenticated:
+        if current_user.has_role('Admin'):
+            return redirect(url_for('admin.index'))
+        else:
+            return redirect(url_for('welcome'))
     else:
-        return redirect(url_for('welcome'))
+        return redirect(url_for('user.login'))
 
 
 @app.route('/welcome')
 @login_required
 def welcome():
-    return render_template('welcome.html', title='Welcome')
+    user = UserModel.find_by_email(current_user.email)
+    return render_template('welcome.html', user=user, title='Welcome')
 
 
 @app.route('/help')
@@ -189,10 +178,3 @@ def upload():
 #     response = jsonify(error.to_dict())
 #     response.status_code = error.status_code
 #     return response
-
-
-# @app.route('/admin/', methods=['GET', 'POST'])
-# @login_required
-# @roles_required('Admin')    # Use of @roles_required decorator
-# def admin_page():
-#     return render_template('admin/index.html', title='Upload File')

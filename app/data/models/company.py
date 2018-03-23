@@ -44,6 +44,18 @@ class CompanyModel(db.Model):
         self.cas = cas
         self.pricae = price
 
+    @property
+    def url(self):
+        from app import app
+        return app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
+
+    @property
+    def filepath(self):
+        from app import app
+        if self.logo is None:
+            return
+        return app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
+
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()

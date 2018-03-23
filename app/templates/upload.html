@@ -60,7 +60,9 @@
     <script>
         $(document).ready(function () {
            $(function() {
-                // $('#upload-file').on('submit', function() {
+
+                var maxsize = 1024 * 1024 * 1024; // 1GB
+
                $('form').on('submit', function(event) {
                     event.preventDefault();
 
@@ -101,7 +103,7 @@
                                 $('.alert-success').show();
                             }else{
                                 $('.progress').hide();
-                                $('.alert-danger .text').text('Please check input value!');
+                                $('.alert-danger .text').text('Please upload only allowed files! (.txt, .gzip, .zip)');
                                 $('.alert-danger').show();
                             }
                         },error: function(jqXHR, status, err){
@@ -109,6 +111,37 @@
                             $('.alert-danger').show();
                         }
                     });
+                });
+
+                $('#file').change(function() {
+
+                    $('#message').empty();
+
+                    var file = this.files[0];
+                    console.log(file.type);
+                    var match = ["text/plain", "application/zip", "application/gzip"];
+
+                    if ( !( (file.type == match[0]) || (file.type == match[1]) || (file.type == match[2]) ) )
+                    {
+                        $('.progress').hide();
+                        $('.alert-danger .text').text('Unvalid image format. Allowed formats: .txt, .gzip, .zip');
+                        $('.alert-danger').show();
+                        $('#submit').attr('disabled', '');
+                        return false;
+                    }
+
+                    if ( file.size > maxsize )
+                    {
+                        $('.progress').hide();
+                        $('.alert-danger .text').text('The size of image you are attempting to upload is ' + (file.size/1024).toFixed(2) + ' GB, maximum size allowed is ' + (maxsize/1024).toFixed(2));
+                        $('.alert-danger').show();
+                         $('#submit').attr('disabled', '');
+                        return false;
+                    }
+
+                    $('#submit').removeAttr("disabled");
+
+
                 });
             });
        });

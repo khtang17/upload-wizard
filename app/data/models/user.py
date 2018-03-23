@@ -81,10 +81,8 @@ class UserModel(db.Model, UserMixin):
 
 def my_append_listener(target, value, initiator):
     from app.email import notify_new_role_to_user
-    notify_new_role_to_user(target)
     if str(value).startswith("Vendor"):
-        # notify_new_role_to_user()
-        pass
+        notify_new_role_to_user(target)
 
 
 event.listen(UserModel.roles, 'append', my_append_listener)

@@ -1,12 +1,24 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-<h1>Welcome!</h1>
-You can able to upload the file after admin gives you a permission. Thank you.
+    <h1>Welcome! {{ current_user.username }}</h1>
+    <br/>
+    {% if current_user.has_role('Vendor') %}
+         <table>
+            {% if user.company %}
+                <tr valign="top"><td><h3>Company name: {{ user.company.name }}</h3></td><td>
+            {% endif %}
+            <tr valign="top">
+                <td>
+                    {% if user.company.logo %}
+                        <img src="{{ user.company.url }}" style="max-height: 150px">
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    {% else %}
+        <p>You can able to upload the file after admin gives you a permission. Thank you.</p>
+    {% endif %}
 
-{% endblock %}
-
-
-{% block scripts %}
 
 {% endblock %}
