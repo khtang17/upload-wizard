@@ -20,7 +20,7 @@
             {% for history in histories %}
             <tr valign="top">
                 <td>{{ pagestart+loop.index }}</td>
-                <td>{{ history.date_uploaded }}</td>
+                <td>{{ moment(history.date_uploaded).format('LLL') }}</td>
                 <td>{{ history.file_name }}</td>
                 <td>{{ history.type }}</td>
                 <td>{{ history.purchasability }}</td>

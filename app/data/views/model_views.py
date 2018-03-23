@@ -1,6 +1,8 @@
 from flask_user import current_user
 from flask import url_for, redirect, request, abort
 from flask_admin.contrib import sqla
+from flask import Markup
+from datetime import timezone
 
 
 class AdminModelView(sqla.ModelView):
@@ -24,7 +26,7 @@ class AdminModelView(sqla.ModelView):
                 abort(403)
             else:
                 # login
-                return redirect(url_for('security.login', next=request.url))
+                return redirect(url_for('user.login', next=request.url))
 
 
 class UserView(AdminModelView):
@@ -43,16 +45,45 @@ class RoleView(AdminModelView):
     page_size = 20
 
 
+def _list_thumbnail(view, context, model, name):
+    if not model.logo:
+        return ''
+
+    return Markup(
+        '<img src="{model.url}" style="height: 40px;">'.format(model=model)
+    )
+
+
+def utc_to_local(utc_dt):
+    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+
+
+def _date_format(view, context, model, name):
+    if not model.date_uploaded:
+        return ''
+
+    return utc_to_local(model.date_uploaded).strftime("%b %d %Y %H:%M")
+
+
 class CompanyView(AdminModelView):
-    column_exclude_list = ['name', 'description', 'telephone_number', 'toll_free_number', 'address']
+    column_list = ['logo', 'telephone_number', 'toll_free_number',
+                   'sales_email', 'idnumber', 'cmpdname',	'cas', 'price']
     form_excluded_columns = ('users', 'logo')
     page_size = 20
 
+    column_formatters = {
+        'logo': _list_thumbnail
+    }
+
 
 class HistoryView(AdminModelView):
-    column_list = ['date_uploaded', 'user', 'file_name', 'type', 'purchasability',
-                   'natural_products', 'file_size', 'status']
-    column_searchable_list = ('date_uploaded', 'file_name', 'file_size')
+    column_list = ['date', 'user', 'file_name', 'type', 'purchasability',
+                   'natural_products', 'file_size', 'status', 'file_size']
+    column_searchable_list = ('file_name', 'type', 'purchasability')
     column_editable_list = ('status',)
     can_create = False
     page_size = 20
+
+    column_formatters = {
+        'date': _date_format
+    }
