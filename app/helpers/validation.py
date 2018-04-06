@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from flask_login import current_user
 from app.data.models.history import UploadHistoryModel
 import pathlib
+import sys
 
 
 def validate(file, form):
@@ -52,6 +53,7 @@ def validate(file, form):
         history.save_to_db()
         save_file(file, history.file_name)
     except:
+        print(sys.exc_info())
         return {"message": "An error occured inserting the file."}, 500
 
     return {'message': "File Uploaded! File Size:{}".format(file_size)}, 200
