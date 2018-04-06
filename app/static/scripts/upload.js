@@ -57,9 +57,7 @@ $(document).ready(function () {
                 url: '/company',
                 data: form_data,
                 contentType: false,
-                // cache: false,
                 processData: false,
-                // async: false,
                 success: function(data) {
                     if(data[1] == 200) {
                         $('.alert-success .text').text(data[0].message);
@@ -104,7 +102,6 @@ $(document).ready(function () {
               return false;
             }
 
-            // $('#upload-button').removeAttr("disabled");
             $('#submit').removeAttr("disabled");
 
             var reader = new FileReader();
