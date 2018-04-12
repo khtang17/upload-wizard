@@ -26,7 +26,7 @@
     <br/>
     <div class="row">
         <div class="col-md-8">
-            <h5><strong>Acceptable file formats: .txt, .gzip and .zip</strong></h5>
+            <h5><strong>Acceptable file formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, .tsv</strong></h5>
             <h5>Special requirements for the <strong>.TXT</strong> file:</h5>
             <ul>
                 <li>
@@ -63,13 +63,15 @@
 
                 var maxsize = 1024 * 1024 * 1024; // 1GB
 
-               $('form').on('submit', function(event) {
+                $('form').on('submit', function(event) {
                     event.preventDefault();
 
                     $('#progressBar').attr('aria-valuenow', 0).css('width', '0%').text('0%');
                     $('.progress').show();
                     $('.alert-danger').hide();
                     $('.alert-success').hide();
+                    $('#file').hide();
+                    $('#submit').attr('disabled', '');
 
                     //var form_data = new FormData($('form')[0]);
                     var form_data = new FormData($('form')[0]);
@@ -101,14 +103,23 @@
                                 $('#file').val("");
                                 $('.alert-success .text').text(data[0].message);
                                 $('.alert-success').show();
+                            }else if(data[1] == 400 || data[1] == 500){
+                                $('.progress').hide();
+                                $('.alert-danger .text').text(data[0].message);
+                                $('.alert-danger').show();
                             }else{
                                 $('.progress').hide();
-                                $('.alert-danger .text').text('Please upload only allowed files! (.txt, .gzip, .zip)');
+                                $('.alert-danger .text').text('Please upload only allowed files! ' +
+                                    '(.bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, .tsv)');
                                 $('.alert-danger').show();
                             }
+                            $('#file').show();
+                            $('#submit').removeAttr("disabled");
                         },error: function(jqXHR, status, err){
                             $('.alert-danger .text').text(err.toLowerCase()+'!');
                             $('.alert-danger').show();
+                            $('#file').show();
+                            $('#submit').removeAttr("disabled");
                         }
                     });
                 });
@@ -118,13 +129,14 @@
                     $('#message').empty();
 
                     var file = this.files[0];
-                    console.log(file.type);
-                    var match = ["text/plain", "application/zip", "application/gzip"];
+                    var val = $(this).val().toLowerCase(),
+                        regex = new RegExp("(.*?)\.(bz2|7z|tar|gz|zip|sdf|txt|smi|csv)$");
 
-                    if ( !( (file.type == match[0]) || (file.type == match[1]) || (file.type == match[2]) ) )
-                    {
+                    if (!(regex.test(val))) {
+                        $(this).val('');
                         $('.progress').hide();
-                        $('.alert-danger .text').text('Unvalid image format. Allowed formats: .txt, .gzip, .zip');
+                        $('.alert-danger .text').text('Unvalid file format. ' +
+                            'Allowed formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, .tsv');
                         $('.alert-danger').show();
                         $('#submit').attr('disabled', '');
                         return false;
@@ -133,9 +145,10 @@
                     if ( file.size > maxsize )
                     {
                         $('.progress').hide();
-                        $('.alert-danger .text').text('The size of image you are attempting to upload is ' + (file.size/1024).toFixed(2) + ' GB, maximum size allowed is ' + (maxsize/1024).toFixed(2));
+                        $('.alert-danger .text').text('The size of image you are attempting to upload is ' +
+                            (file.size/1024).toFixed(2) + ' GB, maximum size allowed is ' + (maxsize/1024).toFixed(2));
                         $('.alert-danger').show();
-                         $('#submit').attr('disabled', '');
+                        $('#submit').attr('disabled', '');
                         return false;
                     }
 

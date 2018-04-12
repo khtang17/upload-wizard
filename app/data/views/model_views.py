@@ -30,10 +30,10 @@ class AdminModelView(sqla.ModelView):
 
 
 class UserView(AdminModelView):
-    column_list = ['active', 'username', 'roles', 'email', 'confirmed_at', 'company']
-    form_columns = ('active', 'roles', 'username', 'email', 'company')
+    column_list = ['active', 'username', 'short_name', 'roles', 'email', 'confirmed_at', 'company']
+    form_columns = ('active', 'roles', 'username', 'short_name', 'email', 'company')
     column_searchable_list = ('username', 'email')
-    column_editable_list = ('active', 'username', 'email', 'company')
+    column_editable_list = ('active', 'email', 'company')
     page_size = 20
 
 
@@ -66,7 +66,7 @@ def _date_format(view, context, model, name):
 
 
 class CompanyView(AdminModelView):
-    column_list = ['logo', 'telephone_number', 'toll_free_number',
+    column_list = ['logo', 'name', 'telephone_number', 'toll_free_number',
                    'sales_email', 'idnumber', 'cmpdname',	'cas', 'price']
     form_excluded_columns = ('users', 'logo')
     page_size = 20
