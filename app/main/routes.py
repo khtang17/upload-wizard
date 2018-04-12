@@ -1,5 +1,4 @@
-from flask import render_template, flash, redirect, url_for, Blueprint
-from app import app
+from flask import render_template, flash, redirect, url_for, current_app
 from flask_user import current_user, roles_required, user_confirmed_email, login_required
 
 from app.data.models.format import FileFormatModel
@@ -7,31 +6,34 @@ from app.data.forms.upload_form import UploadForm
 from app.data.forms.company_form import CompanyForm
 from app.data.models.user import UserModel
 from app.data.models.company import CompanyModel
+from app.data.models.history import UploadHistoryModel
 from flask import request
-# from werkzeug.urls import url_parse
-
-from app.exception import InvalidUsage
-from app.helpers.validation import validate, check_img_type, save_file
 from flask import jsonify
+
+from app.helpers.validation import validate, check_img_type, save_file
 from app.email import notify_new_user_to_admin
+from app.main import bp
+import os
 
 
-@user_confirmed_email.connect_via(app)
+@user_confirmed_email.connect_via(bp)
 def _after_confirmed_hook(sender, user, **extra):
     notify_new_user_to_admin(user)
 
 
-@app.route('/company', methods=['GET', 'POST'])
+@bp.route('/company', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
 def company():
     form = CompanyForm()
+    print(form.validate_on_submit())
     if form.validate_on_submit():
+        print('hi')
         company_name_duplication = CompanyModel.find_by_name(form.name.data)
         if not form.id.data:
             if company_name_duplication:
                 flash('This company has already registered by other user', category="danger")
-                return redirect(url_for('company'))
+                return redirect(url_for('main.company'))
 
             company = CompanyModel(name=form.name.data,
                                    description=form.description.data,
@@ -50,7 +52,8 @@ def company():
 
             if form.file.data:
                 if check_img_type(form.file.data):
-                    company.logo = save_file(form.file.data, form.name.data)
+                    company.logo = save_file(form.file.data, form.name.data, True)
+                    print(company.logo)
                 else:
                     return False
 
@@ -61,12 +64,12 @@ def company():
         else:
             if company_name_duplication and company_name_duplication.id != int(form.id.data):
                 flash('This company has already registered by other user', category="danger")
-                return redirect(url_for('company'))
+                return redirect(url_for('main.company'))
 
             company = CompanyModel.find_by_id(int(form.id.data))
             if form.file.data:
                 if check_img_type(form.file.data):
-                    company.logo = save_file(form.file.data, form.name.data)
+                    company.logo = save_file(form.file.data, form.name.data, True)
                     print(company.logo)
                 else:
                     return False
@@ -85,9 +88,7 @@ def company():
             company.cas = form.cas.data
             company.price = form.price.data
             company.save_to_db()
-        # flash('Updated!', category="success")
         return jsonify({"message": "Updated!"}, 200)
-        # return redirect(url_for('company'))
     elif request.method == 'GET':
         user = UserModel.find_by_email(current_user.email)
         if user.company:
@@ -110,50 +111,83 @@ def company():
     return render_template('company.html', title='Profile', form=form)
 
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
+@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/index', methods=['GET', 'POST'])
 def index():
     if current_user.is_authenticated:
         if current_user.has_role('Admin'):
             return redirect(url_for('admin.index'))
         else:
-            return redirect(url_for('welcome'))
+            return redirect(url_for('main.welcome'))
     else:
         return redirect(url_for('user.login'))
 
 
-@app.route('/welcome')
+@bp.route('/welcome')
 @login_required
 def welcome():
     user = UserModel.find_by_email(current_user.email)
     return render_template('welcome.html', user=user, title='Welcome')
 
 
-@app.route('/help')
+@bp.route('/help')
 @login_required
 def help_page():
     return render_template('help.html', title='Help')
 
 
-@app.route('/history', methods=['GET', 'POST'])
+@bp.route('/history', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
 def history():
     page = request.args.get('page', 1, type=int)
     histories = current_user.upload_histories.paginate(
-        page, app.config['LISTS_PER_PAGE'], False)
-    next_url = url_for('history', page=histories.next_num) \
+        page, current_app.config['LISTS_PER_PAGE'], False)
+    next_url = url_for('main.history', page=histories.next_num) \
         if histories.has_next else None
-    prev_url = url_for('history', page=histories.prev_num) \
+    prev_url = url_for('main.history', page=histories.prev_num) \
         if histories.has_prev else None
-    pagestart = (page-1)*app.config['LISTS_PER_PAGE']
+    pagestart = (page-1)*current_app.config['LISTS_PER_PAGE']
     return render_template('history.html', title='Home Page', histories=histories.items,
                            next_url=next_url,
                            prev_url=prev_url,
                            pagestart=pagestart)
 
 
-@app.route('/upload', methods=['GET', 'POST'])
+@bp.route('/result', methods=['GET', 'POST'])
+@login_required
+def result():
+    id = request.args.get('id', type=int)
+    history = UploadHistoryModel.find_by_id(id)
+    stdout = ""
+    stderr = ""
+    process = ""
+    base_folder = current_app.config['UPLOAD_FOLDER']
+    folder = "{}/{}_vendor/{}/".format(base_folder, current_user.id, id)
+    if not os.path.exists(os.path.realpath(os.path.dirname(folder))):
+        folder = "{}/{}_{}/{}/".format(base_folder, current_user.id, current_user.short_name, id)
+    file_dir = os.path.realpath(os.path.dirname(folder))
+    print(file_dir)
+    print(os.path.join(file_dir, "stdout"))
+    if os.path.isfile(os.path.join(file_dir, "stdout")):
+        with open(os.path.join(file_dir, "stdout"), 'r') as file1:
+            stdout = file1.read()
+            file1.close()
+        with open(os.path.join(file_dir, "stderr"), 'r') as file2:
+            stderr = file2.read()
+            file2.close()
+    else:
+        if history.file_name.rsplit('.', 1)[1] == 'sdf':
+            process = "Job process is not finished yet!"
+        else:
+            process = "Job has already been finished!"
+
+    return render_template('result.html', title='Job Result', history=history, process=process,
+                           stdout=stdout,
+                           stderr=stderr)
+
+
+@bp.route('/upload', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
 def upload():

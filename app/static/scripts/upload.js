@@ -54,7 +54,7 @@ $(document).ready(function () {
                     return xhr;
                 },
                 type: 'POST',
-                url: '/company',
+                url: "{{ url_for('main.company') }}",
                 data: form_data,
                 contentType: false,
                 processData: false,

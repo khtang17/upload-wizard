@@ -1,6 +1,7 @@
 from app import db
 from app.data.models.user import UserModel
 from datetime import datetime
+from flask import current_app
 
 
 class CompanyModel(db.Model):
@@ -8,7 +9,7 @@ class CompanyModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), index=True, unique=True)
-    description = db.Column(db.String(400), index=True)
+    description = db.Column(db.String(1024), index=True)
     logo = db.Column(db.String(400))
     address = db.Column(db.String(100), index=True)
     telephone_number = db.Column(db.String(40), index=True)
@@ -20,8 +21,8 @@ class CompanyModel(db.Model):
     personal_contact_email = db.Column(db.String(100), index=True)
     date_created = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     users = db.relationship(UserModel, backref='company', lazy='dynamic')
-    idnumber = db.Column(db.String(20), default='IDNUMBER')
-    cmpdname = db.Column(db.String(20), default='NAME')
+    idnumber = db.Column(db.String(20))
+    cmpdname = db.Column(db.String(20))
     cas = db.Column(db.String(20))
     price = db.Column(db.String(20))
 
@@ -29,7 +30,7 @@ class CompanyModel(db.Model):
                  toll_free_number, fax_number, website, sales_email,
                  personal_contact_name, personal_contact_email,
                  idnumber, cmpdname, cas, price):
-        self.name = name.upper()
+        self.name = name
         self.description = description
         self.address = address
         self.telephone_number = telephone_number
@@ -42,19 +43,17 @@ class CompanyModel(db.Model):
         self.idnumber = idnumber
         self.cmpdname = cmpdname
         self.cas = cas
-        self.pricae = price
+        self.price = price
 
     @property
     def url(self):
-        from app import app
-        return app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
+        return current_app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
 
     @property
     def filepath(self):
-        from app import app
         if self.logo is None:
             return
-        return app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
+        return current_app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
 
     def save_to_db(self):
         db.session.add(self)

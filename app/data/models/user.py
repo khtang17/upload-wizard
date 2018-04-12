@@ -31,11 +31,15 @@ class UserModel(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
+    short_name = db.Column(db.String(64), index=True, unique=True, nullable=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password = db.Column(db.String(255), nullable=False, server_default='')
     active = db.Column(db.Boolean(), default=False)
     confirmed_at = db.Column(db.DateTime, index=True)
-    upload_histories = db.relationship(UploadHistoryModel, backref='user', lazy='dynamic')
+    upload_histories = db.relationship(UploadHistoryModel,
+                                       order_by='desc(UploadHistoryModel.date_uploaded)',
+                                       backref='user',
+                                       lazy='dynamic')
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
     roles = db.relationship('RoleModel', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))

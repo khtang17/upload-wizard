@@ -6,7 +6,8 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 class UploadForm(FlaskForm):
     file = FileField('File', validators=[
         FileRequired(),
-        FileAllowed(['txt', 'gzip', 'zip'], 'Please upload only allowed files! (.txt, .)')
+        FileAllowed(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi', 'csv', 'tsv'],
+                    'Please upload only allowed files! (.txt, .)')
     ])
     type = SelectField(
         'Type',

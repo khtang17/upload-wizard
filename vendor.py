@@ -1,9 +1,10 @@
-from app import app, db
+from app import create_app, db
 from app.data.models.user import UserModel
 from app.data.models.history import UploadHistoryModel
 from app.data.models.format import FileFormatModel
 from app.data.models.company import CompanyModel
 
+app = create_app()
 
 @app.shell_context_processor
 def make_shell_context():

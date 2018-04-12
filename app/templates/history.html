@@ -10,6 +10,7 @@
                 <th>#</th>
                 <th>Date</th>
                 <th>File Name</th>
+                <th>Result</th>
                 <th>Type</th>
                 <th>Purchasability</th>
                 <th>Natural Products</th>
@@ -22,6 +23,7 @@
                 <td>{{ pagestart+loop.index }}</td>
                 <td>{{ moment(history.date_uploaded).format('LLL') }}</td>
                 <td>{{ history.file_name }}</td>
+                <td><a href="{{ url_for('main.result', id=history.id)  }}">result</a></td>
                 <td>{{ history.type }}</td>
                 <td>{{ history.purchasability }}</td>
                 <td>{{ history.natural_products }}</td>

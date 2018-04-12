@@ -1,8 +1,8 @@
 from flask_mail import Message
-from app import app, mail
+from app import mail
 from threading import Thread
 from app.data.models.user import UserModel
-from flask import render_template
+from flask import render_template, current_app
 
 
 def send_async_email(app, msg):
@@ -14,7 +14,7 @@ def send_email(subject, sender, recipients, text_body, html_body):
     msg = Message(subject, sender=sender, recipients=recipients)
     msg.body = text_body
     msg.html = html_body
-    Thread(target=send_async_email, args=(app, msg)).start()
+    Thread(target=send_async_email, args=(current_app._get_current_object(), msg)).start()
 
 
 def notify_new_user_to_admin(user):
@@ -23,7 +23,7 @@ def notify_new_user_to_admin(user):
     for admin in admins:
         admin_emails.append(admin.email)
     send_email('New user registration!',
-               sender=app.config['MAIL_DEFAULT_SENDER'],
+               sender=current_app.config['MAIL_DEFAULT_SENDER'],
                recipients=admin_emails,
                text_body=render_template('email/email_confirmation_notify.txt',
                                          user=user),
@@ -32,9 +32,8 @@ def notify_new_user_to_admin(user):
 
 
 def notify_new_role_to_user(user):
-    print("hi {}".format(user.email))
     send_email('You have granted access to system!',
-               sender=app.config['MAIL_DEFAULT_SENDER'],
+               sender=current_app.config['MAIL_DEFAULT_SENDER'],
                recipients=[user.email],
                text_body=render_template('email/user_role_notify.txt', user=user),
                html_body=render_template('email/user_role_notify.html', user=user))
