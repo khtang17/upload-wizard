@@ -24,13 +24,17 @@
         </div>
     </div>
     <div class="row">
-        <p class="lead">Select a PNG or JPEG or JPG logo, having maximum size <span id="max-size"></span> MB.</p>
         <div class="col-md-6">
             <div id="image-preview-div" style="display: none">
                 <label for="exampleInputFile">Logo:</label>
                 <br>
-                <img id="preview-img" src="http://files.docking.org/vendorlogos/{{ form.logo.data }}">
+                {% if form.logo.data %}
+                    <img id="preview-img" src="http://files.docking.org/vendorlogos/{{ form.logo.data }}">
+                {% else %}
+                    <img id="preview-img" src="/static/images/empty-small.png">
+                {% endif %}
             </div>
+            <p>Select a PNG or JPEG or JPG logo, having maximum size <span id="max-size"></span> MB.</p>
             {{ wtf.quick_form(form) }}
             <br/>
             <br/>

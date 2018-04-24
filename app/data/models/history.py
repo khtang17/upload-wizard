@@ -1,5 +1,6 @@
 from datetime import datetime
 from app import db
+from app.data.models.job_log import JobLogModel
 
 
 class UploadHistoryModel(db.Model):
@@ -14,6 +15,10 @@ class UploadHistoryModel(db.Model):
     purchasability = db.Column(db.String(50))
     natural_products = db.Column(db.Boolean(), nullable=False)
     status = db.Column(db.Integer, index=True, nullable=False, default=1)
+    job_logs = db.relationship(JobLogModel,
+                               order_by='desc(JobLogModel.date)',
+                               backref='history',
+                               lazy='dynamic')
 
     def __init__(self, user_id, file_name, file_size):
         self.user_id = user_id

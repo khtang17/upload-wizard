@@ -2,6 +2,30 @@
 
 {% block app_content %}
 <h1>Help</h1>
-Help content
+<br/>
+    <ol>
+        <li>New users should register.</li>
+        <li>A confirmation email is sent to confirm ownership of the email</li>
+        <li>User logs in, confirming email.</li>
+        <li>Administrator must activate (approve) the account</li>
+        <li>User can now edit company information (one time)</li>
+        <li>User can begin with first upload.</li>
+    </ol>
+    <p>The following formats are supported</p>
+
+<ul>
+    <li> One item per line formats. Each of these formats should have a header line defining the columns
+        (see below) and use a standard field separator as described below.
+        <ul>
+            <li>.smi - white space separated fields
+            <li>.txt - white space separated fields
+            <li>.csv - comma separated values
+            <li>.tsv - tab separated values
+        </ul>
+    </li>
+    <li>Special molecule formats : SDF </li>
+</ul>
+<p>Additionally, any of these files may be compressed using:  zip, gzip
+    or tar.gz  (tgz).The fields are defined by the user in the "Company Profile" definition</p>
 
 {% endblock %}

@@ -77,6 +77,7 @@ class CompanyView(AdminModelView):
 
 
 class HistoryView(AdminModelView):
+    column_default_sort = ('date_uploaded', True)
     column_list = ['date', 'user', 'file_name', 'type', 'purchasability',
                    'natural_products', 'file_size', 'status', 'file_size']
     column_searchable_list = ('file_name', 'type', 'purchasability')
