@@ -26,15 +26,11 @@ def _after_confirmed_hook(sender, user, **extra):
 @roles_required('Vendor')
 def company():
     form = CompanyForm()
-    print(form.validate_on_submit())
     if form.validate_on_submit():
-        print('hi')
         company_name_duplication = CompanyModel.find_by_name(form.name.data)
         if not form.id.data:
             if company_name_duplication:
-                flash('This company has already registered by other user', category="danger")
-                return redirect(url_for('main.company'))
-
+                return jsonify({"message": "This company has already registered by other user"}, 400)
             company = CompanyModel(name=form.name.data,
                                    description=form.description.data,
                                    address=form.address.data,
@@ -63,14 +59,12 @@ def company():
             user.save_to_db()
         else:
             if company_name_duplication and company_name_duplication.id != int(form.id.data):
-                flash('This company has already registered by other user', category="danger")
-                return redirect(url_for('main.company'))
+                return jsonify({"message": "This company has already registered by other user"}, 400)
 
             company = CompanyModel.find_by_id(int(form.id.data))
             if form.file.data:
                 if check_img_type(form.file.data):
                     company.logo = save_file(form.file.data, form.name.data, True)
-                    print(company.logo)
                 else:
                     return False
             company.name = form.name.data
@@ -88,6 +82,7 @@ def company():
             company.cas = form.cas.data
             company.price = form.price.data
             company.save_to_db()
+        flash('Updated!', category='success')
         return jsonify({"message": "Updated!"}, 200)
     elif request.method == 'GET':
         user = UserModel.find_by_email(current_user.email)
@@ -159,6 +154,8 @@ def history():
 def result():
     id = request.args.get('id', type=int)
     history = UploadHistoryModel.find_by_id(id)
+    if history.user.id != current_user.id:
+        return render_template('errors/404.html'), 404
     stdout = ""
     stderr = ""
     process = ""
@@ -177,10 +174,7 @@ def result():
             stderr = file2.read()
             file2.close()
     else:
-        if history.file_name.rsplit('.', 1)[1] == 'sdf':
-            process = "Job process is not finished yet!"
-        else:
-            process = "Job has already been finished!"
+        process = "Job process is not finished yet!"
 
     return render_template('result.html', title='Job Result', history=history, process=process,
                            stdout=stdout,

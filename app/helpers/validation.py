@@ -5,11 +5,9 @@ from app.data.models.format import FileFormatModel
 from werkzeug.utils import secure_filename
 from flask_login import current_user
 from app.data.models.history import UploadHistoryModel
-from app.data.models.user import UserModel
 import pathlib
 import sys
 import subprocess
-from subprocess import call
 
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi', 'csv', 'tsv'])
@@ -22,32 +20,32 @@ def allowed_file(filename):
 
 def validate(file, form):
     if file and allowed_file(file.filename):
-        print(1)
-        if file.mimetype.startswith('text/plain'):
-            formats = FileFormatModel.find_all()
-            line_number = 0
-            lines = file.readlines()
-            if len(lines) == 1:
-                lines = lines[0].split(b'\r')
-            for line in lines:
-                line_number += 1
-                if line_number > 100:
-                    break
-                try:
-                    cols = line.decode('windows-1252').strip().split('\t')
-                    if len(cols) >= len(formats):
-                        for idx, input_format in enumerate(formats):
-                            obj = str
-                            if input_format.col_type.lower().startswith("int"):
-                                obj = int
-                            elif input_format.col_type.lower().startswith("float"):
-                                obj = float
-                            if not isinstance(cols[idx], obj):
-                                return {'message': "Type error on the line #{}".format(line_number)}, 400
-                    else:
-                        return {'message': "Columns must be at least {}".format(len(formats))}, 400
-                except:
-                    return {'message': "Type error on the line #{}".format(line_number)}, 400
+        test=""
+        # if file.mimetype.startswith('text/plain'):
+        #     formats = FileFormatModel.find_all()
+        #     line_number = 0
+        #     lines = file.readlines()
+        #     if len(lines) == 1:
+        #         lines = lines[0].split(b'\r')
+        #     for line in lines:
+        #         line_number += 1
+        #         if line_number > 100:
+        #             break
+        #         try:
+        #             cols = line.decode('windows-1252').strip().split('\t')
+        #             if len(cols) >= len(formats):
+        #                 for idx, input_format in enumerate(formats):
+        #                     obj = str
+        #                     if input_format.col_type.lower().startswith("int"):
+        #                         obj = int
+        #                     elif input_format.col_type.lower().startswith("float"):
+        #                         obj = float
+        #                     if not isinstance(cols[idx], obj):
+        #                         return {'message': "Type error on the line #{}".format(line_number)}, 400
+        #             else:
+        #                 return {'message': "Columns must be at least {}".format(len(formats))}, 400
+        #         except:
+        #             return {'message': "Type error on the line #{}".format(line_number)}, 400
     else:
         return {"message": "Invalid file format!"}, 400
 
@@ -97,36 +95,40 @@ def save_file(file, name, is_logo, id=""):
         file_dir = os.path.realpath(os.path.dirname(folder))
         pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
         file.stream.seek(0)
+        print(name)
+        print(secure_filename(name))
         file.save(os.path.join(file_dir, secure_filename(name)))
-        if name.rsplit('.', 1)[1] == 'sdf':
-            try:
-                print("user:"+str(current_user.company.idnumber))
-                if current_user.company.idnumber:
-                    script_folder = current_app.config['UPLOAD_FOLDER'] + "script/"
-                    # print(script_folder
-                    #       + 'script.sh {} {} {} {}'.format(script_folder,
-                    #                                        file_dir,
-                    #                                        current_user.company.idnumber, name))
-                    os.chdir(folder)
-                    out = subprocess.Popen(["qsub " + script_folder
-                                            + 'script.sh {} {} {} {}'.format(script_folder,
-                                                                             file_dir,
-                                                                             current_user.company.idnumber,
-                                                                             name)
-                                            + " > jobID"],
-                                           shell=True)
-                    # print(out.communicate())
-                    return {"message": "Your job has been submitted!"}, 200
-            except AttributeError:
-                return {"message": " === Please enter your IDNUMBER in the company profile section. "
-                                   "We need your company IDNUMBER to validate .sdf file. ==="}, 400
-            except:
-                print(sys.exc_info())
-                return {"message": sys.exc_info()[0]}, 500
     except:
         print(sys.exc_info())
-        return {"message": sys.exc_info()[0]}, 500
+        return {"message": "1: " + str(sys.exc_info()[0])}, 500
 
     if is_logo:
         return name
+    else:
+        str_mandatory_columns = FileFormatModel.find_all_mandatory_column_str()
+        str_optional_columns = FileFormatModel.find_all_optional_column_str()
+        return run_bash_script(file_dir, str_mandatory_columns, str_optional_columns)
+
     return None
+
+
+def run_bash_script(file_dir, str_mandatory_columns, str_optional_columns):
+    try:
+        if current_user.company.idnumber:
+            script_dir = current_app.config['UPLOAD_FOLDER'] + "script/"
+            os.chdir(file_dir)
+            out = subprocess.Popen(["qsub " + script_dir
+                                    + 'script.sh {} {} {} {} {}'.format(script_dir, file_dir,
+                                                                        current_user.company.idnumber.replace(" ", ","),
+                                                                        str_mandatory_columns,
+                                                                        str_optional_columns)
+                                    + " > jobID"],
+                                   shell=True)
+            # print(out.communicate())
+            return {"message": "Your job has been submitted!"}, 200
+    except AttributeError:
+        return {"message": " Please enter your IDNUMBER in the company profile section. "
+                           "We need your company IDNUMBER to validate .sdf file. "}, 400
+    except:
+        print(sys.exc_info())
+        return {"message": "1: " + str(sys.exc_info()[0])}, 500

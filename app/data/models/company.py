@@ -2,6 +2,7 @@ from app import db
 from app.data.models.user import UserModel
 from datetime import datetime
 from flask import current_app
+from sqlalchemy import func
 
 
 class CompanyModel(db.Model):
@@ -69,7 +70,7 @@ class CompanyModel(db.Model):
 
     @classmethod
     def find_by_name(cls, name):
-        return cls.query.filter_by(name=name.upper()).first()
+        return cls.query.filter(func.lower(cls.name) == func.lower(name)).first()
 
     def __repr__(self):
         return '<Company {}>'.format(self.name)

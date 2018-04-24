@@ -54,14 +54,13 @@ $(document).ready(function () {
                     return xhr;
                 },
                 type: 'POST',
-                url: "{{ url_for('main.company') }}",
+                url: '/company',
                 data: form_data,
                 contentType: false,
                 processData: false,
                 success: function(data) {
                     if(data[1] == 200) {
-                        $('.alert-success .text').text(data[0].message);
-                        $('.alert-success').show();
+                        window.location.reload();
                     }else{
                         $('.progress').hide();
                         $('.alert-danger .text').text(data[0].message);
