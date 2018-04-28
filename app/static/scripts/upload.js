@@ -28,52 +28,52 @@ $(document).ready(function () {
        if(ext.length > 0)
            preview();
 
-       $('form').on('submit', function(event) {
-            event.preventDefault();
-
-            $('#progressBar').attr('aria-valuenow', 0).css('width', '0%').text('0%');
-            $('.progress').show();
-            $('.alert-danger').hide();
-            $('.alert-success').hide();
-
-            var form_data = new FormData($('form')[0]);
-            $.ajax({
-                xhr: function(){
-                    var xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener('progress', function(e){
-                       if(e.lengthComputable){
-                           console.log('Bytes Loaded: ' + e.loaded);
-                           console.log('Total size: ' + e.total);
-                           console.log('Percentage uploaded: ' + (e.loaded / e.total));
-
-                           var percent = Math.round((e.loaded / e.total) * 100);
-
-                           $('#progressBar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
-                       }
-                    });
-                    return xhr;
-                },
-                type: 'POST',
-                url: '/company',
-                data: form_data,
-                contentType: false,
-                processData: false,
-                success: function(data) {
-                    if(data[1] == 200) {
-                        window.location.reload();
-                    }else{
-                        $('.progress').hide();
-                        $('.alert-danger .text').text(data[0].message);
-                        $('.alert-danger').show();
-                    }
-                    console.log(data);
-                },error: function(jqXHR, status, err){
-                     console.log(status);
-                    $('.alert-danger .text').text(err.toLowerCase()+'!');
-                    $('.alert-danger').show();
-                }
-            });
-        });
+       // $('form').on('submit', function(event) {
+       //      event.preventDefault();
+       //
+       //      $('#progressBar').attr('aria-valuenow', 0).css('width', '0%').text('0%');
+       //      $('.progress').show();
+       //      $('.alert-danger').hide();
+       //      $('.alert-success').hide();
+       //
+       //      var form_data = new FormData($('form')[0]);
+       //      $.ajax({
+       //          xhr: function(){
+       //              var xhr = new window.XMLHttpRequest();
+       //              xhr.upload.addEventListener('progress', function(e){
+       //                 if(e.lengthComputable){
+       //                     console.log('Bytes Loaded: ' + e.loaded);
+       //                     console.log('Total size: ' + e.total);
+       //                     console.log('Percentage uploaded: ' + (e.loaded / e.total));
+       //
+       //                     var percent = Math.round((e.loaded / e.total) * 100);
+       //
+       //                     $('#progressBar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
+       //                 }
+       //              });
+       //              return xhr;
+       //          },
+       //          type: 'POST',
+       //          url: '/company',
+       //          data: form_data,
+       //          contentType: false,
+       //          processData: false,
+       //          success: function(data) {
+       //              if(data[1] == 200) {
+       //                  window.location.reload();
+       //              }else{
+       //                  $('.progress').hide();
+       //                  $('.alert-danger .text').text(data[0].message);
+       //                  $('.alert-danger').show();
+       //              }
+       //              console.log(data);
+       //          },error: function(jqXHR, status, err){
+       //               console.log(status);
+       //              $('.alert-danger .text').text(err.toLowerCase()+'!');
+       //              $('.alert-danger').show();
+       //          }
+       //      });
+       //  });
 
 
        $('#file').change(function() {
