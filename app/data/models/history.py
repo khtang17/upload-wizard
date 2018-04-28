@@ -1,9 +1,52 @@
 from datetime import datetime
 from app import db
 from app.data.models.job_log import JobLogModel
+from flask import url_for
 
 
-class UploadHistoryModel(db.Model):
+class PaginatedAPIMixin(object):
+    @staticmethod
+    def to_collection_dict(query, page, per_page, *endpoint, **kwargs):
+        resources = query.paginate(page, per_page, False)
+        data = {
+            'data': [item.to_dict() for item in resources.items],
+            'meta': {
+                'page': page,
+                'perpage': per_page,
+                'pages': resources.pages,
+                'total': resources.total,
+                'sort': "desc",
+                'field': "DateUploaded"
+            },
+            'links': {
+                'self': url_for(endpoint, page=page, per_page=per_page,
+                                **kwargs),
+                'next': url_for(endpoint, page=page + 1, per_page=per_page,
+                                **kwargs) if resources.has_next else None,
+                'prev': url_for(endpoint, page=page - 1, per_page=per_page,
+                                **kwargs) if resources.has_prev else None
+            }
+        }
+        return data
+
+    @staticmethod
+    def to_all_collection_dict(query, page, per_page, field):
+        resources = query.paginate(page, per_page, False)
+        data = {
+            'data': [item.to_dict() for item in query.all()],
+            'meta': {
+                'page': page,
+                'perpage': per_page,
+                'pages': resources.pages,
+                'total': resources.total,
+                'sort': "desc",
+                'field': field
+            }
+        }
+        return data
+
+
+class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     __tablename__ = 'history'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -20,10 +63,43 @@ class UploadHistoryModel(db.Model):
                                backref='history',
                                lazy='dynamic')
 
+    # token = db.Column(db.String(32), index=True, unique=True)
+    # token_expiration = db.Column(db.DateTime)
+
+    def to_dict(self, include_email=False):
+        data = {
+            'ID': self.id,
+            'UserId': self.user_id,
+            'DateUploaded': self.date_uploaded.isoformat() + 'Z',
+            'FileName': self.file_name,
+            'FileSize': self.file_size,
+            'Type': self.type,
+            'Purchasability': self.purchasability,
+            'NaturalProducts': self.natural_products,
+            'Status': self.status,
+        }
+        return data
+
+    def from_dict(self, data):
+        for field in ['id', 'user_id', 'date_uploaded']:
+            if field in data:
+                setattr(self, field, data[field])
+
     def __init__(self, user_id, file_name, file_size):
         self.user_id = user_id
         self.file_name = "{}_{}".format(self.get_miliseconds(), file_name)
         self.file_size = file_size
+
+    def json(self):
+        return {'id': self.id,
+                'user_id': self.user_id,
+                # 'date_uploaded': self.date_uploaded.isoformat() + 'Z',
+                'file_name': self.file_name,
+                'file_size': self.file_size,
+                'type': self.type,
+                'purchasability': self.purchasability,
+                'natural_products': self.natural_products,
+                'status': self.status}
 
     def get_miliseconds(self):
         (dt, micro) = datetime.utcnow().strftime('%Y%m%d%H%M%S.%f').split('.')
@@ -48,3 +124,22 @@ class UploadHistoryModel(db.Model):
 
     def __repr__(self):
         return '<UploadHistory {}>'.format(self.file_name)
+
+    # def get_token(self, expires_in=3600):
+    #     now = datetime.utcnow()
+    #     if self.token and self.token_expiration > now + timedelta(seconds=60):
+    #         return self.token
+    #     self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+    #     self.token_expiration = now + timedelta(seconds=expires_in)
+    #     db.session.add(self)
+    #     return self.token
+    #
+    # def revoke_token(self):
+    #     self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
+    #
+    # @staticmethod
+    # def check_token(token):
+    #     history = UploadHistoryModel.query.filter_by(token=token).first()
+    #     if history is None or history.token_expiration < datetime.utcnow():
+    #         return None
+    #     return history

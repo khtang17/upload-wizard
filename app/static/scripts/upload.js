@@ -7,14 +7,14 @@ function noPreview() {
 
 function preview() {
   $('#image-preview-div').css("display", "block");
-  $('#preview-img').css('max-height', '250px');
+  $('#preview-img').css('height', '150px');
 }
 
 function selectImage(e) {
   $('#file').css("color", "green");
   $('#image-preview-div').css("display", "block");
   $('#preview-img').attr('src', e.target.result);
-  $('#preview-img').css('max-height', '250px');
+  $('#preview-img').css('height', '150px');
 }
 
 $(document).ready(function () {

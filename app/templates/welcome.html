@@ -1,26 +1,35 @@
 {% extends "base.html" %}
 
-{% block app_content %}
-    <h1>Welcome! {{ current_user.username }}</h1>
-    <br/>
-    {% if current_user.has_role('Vendor') %}
-         <table>
-            {% if user.company %}
-                <tr valign="top"><td><h3>Company name: {{ user.company.name }}</h3></td><td>
-            {% endif %}
-            <tr valign="top">
-                <td>
-                    {% if user.company.logo %}
-                        <img src="{{ user.company.url }}" style="max-height: 150px">
-                    {% endif %}
-                </td>
-            </tr>
-        </table>
-    {% else %}
-        <p>For security, please wait for the administrator to review your account application.
-            This often takes only a few hours. You will receive an email when you have been approved to upload files.
-            Thank you for your patience.</p>
-    {% endif %}
+{% block content %}
+        <div class="m-portlet m-portlet--mobile ">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        {% if current_user.has_role('Vendor') %}
+                            {% if user.company %}
+                                <h3 class="m-portlet__head-text">Company name: {{ user.company.name }}</h3>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
 
-
+            </div>
+            <div class="m-portlet__body">
+                 {% if current_user.has_role('Vendor') %}
+                 <table>
+                    <tr valign="top">
+                        <td>
+                            {% if user.company.logo %}
+                                <img src="{{ user.company.url }}" style="max-height: 150px">
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+                {% else %}
+                <p>For security, please wait for the administrator to review your account application.
+                        This often takes only a few hours. You will receive an email when you have been approved to upload files.
+                        Thank you for your patience.</p>
+                {% endif %}
+            </div>
+        </div>
 {% endblock %}

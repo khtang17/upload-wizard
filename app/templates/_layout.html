@@ -1,0 +1,32 @@
+<!-- begin:: Page -->
+<div class="m-grid m-grid--hor m-grid--root m-page">
+	<!--[html-partial:include:{"file":"partials\/_header-base.html"}]/-->
+    {% include "partials/_header-base.html" %}
+    <!-- begin::Body -->
+	<div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop m-body">
+		<!--[html-partial:include:{"file":"partials\/_aside-left.html"}]/-->
+{#        {% include "partials/_aside-left.html" %}#}
+		<div class="m-grid__item m-grid__item--fluid m-wrapper">
+			<!--[html-partial:include:{"file":"partials\/_subheader-search.html"}]/-->
+{#            {% include "partials/_subheader-search.html" %}#}
+			<div class="m-content">
+
+                    {% block content %}
+                             application content needs to be provided in the app_content block
+                            {% block app_content %}{% endblock %}
+                    {% endblock %}
+
+            </div>
+		</div>
+	</div>
+	<!-- end:: Body -->
+<!--[html-partial:include:{"file":"partials\/_footer-default.html"}]/-->
+    {% include "partials/_footer-default.html" %}
+</div>
+<!-- end:: Page -->
+<!--[html-partial:include:{"file":"partials\/_layout-quick-sidebar.html"}]/-->
+{% include "partials/_layout-quick-sidebar.html" %}
+<!--[html-partial:include:{"file":"partials\/_layout-scroll-top.html"}]/-->
+{% include "partials/_layout-scroll-top.html" %}
+<!--[html-partial:include:{"file":"partials\/_layout-tooltips.html"}]/-->
+{% include "partials/_layout-tooltips.html" %}

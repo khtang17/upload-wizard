@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, current_app
+from flask import render_template, flash, redirect, url_for, current_app, app
 from flask_user import current_user, roles_required, user_confirmed_email, login_required
 
 from app.data.models.format import FileFormatModel
@@ -14,6 +14,7 @@ from app.helpers.validation import validate, check_img_type, save_file
 from app.email import notify_new_user_to_admin
 from app.main import bp
 import os
+# import flask_menu as menu
 
 
 @user_confirmed_email.connect_via(bp)
@@ -21,11 +22,22 @@ def _after_confirmed_hook(sender, user, **extra):
     notify_new_user_to_admin(user)
 
 
+@bp.route('/welcome')
+@login_required
+# @menu.register_menu(app, '.', 'Home')
+def welcome():
+    user = UserModel.find_by_email(current_user.email)
+    return render_template('welcome.html', user=user, title='Welcome')
+
+
 @bp.route('/company', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
+# @menu.register_menu(app, '.third', 'Company', order=3)
 def company():
+    print("hi111")
     form = CompanyForm()
+    print(form.validate_on_submit())
     if form.validate_on_submit():
         company_name_duplication = CompanyModel.find_by_name(form.name.data)
         if not form.id.data:
@@ -118,15 +130,9 @@ def index():
         return redirect(url_for('user.login'))
 
 
-@bp.route('/welcome')
-@login_required
-def welcome():
-    user = UserModel.find_by_email(current_user.email)
-    return render_template('welcome.html', user=user, title='Welcome')
-
-
 @bp.route('/help')
 @login_required
+# @menu.register_menu(app, '.fourth', 'Help', order=4)
 def help_page():
     return render_template('help.html', title='Help')
 
@@ -134,6 +140,7 @@ def help_page():
 @bp.route('/history', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
+# @menu.register_menu(app, '.first', 'History', order=1)
 def history():
     page = request.args.get('page', 1, type=int)
     histories = current_user.upload_histories.paginate(
@@ -184,6 +191,7 @@ def result():
 @bp.route('/upload', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
+# @menu.register_menu(app, '.second', 'Upload', order=2)
 def upload():
     # file_format = FileFormatModel(title='smiles', col_type="str", order=1)
     # file_format.save_to_db()
@@ -200,6 +208,16 @@ def upload():
         return jsonify(return_msg)
     return render_template('upload.html', title='Upload File', form=form, formats=formats)
 
+
+@bp.route('/histories', methods=['GET', 'POST'])
+@login_required
+@roles_required('Vendor')
+def get_histories():
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 20, type=int), 100)
+    data = UploadHistoryModel.to_all_collection_dict(
+        UploadHistoryModel.query.filter_by(user_id=current_user.id), page, per_page, 'ID')
+    return jsonify(data)
 
 # @app.errorhandler(InvalidUsage)
 # def handle_invalid_usage(error):
