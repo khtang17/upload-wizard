@@ -32,27 +32,28 @@
                 </div>
             </div>
             <br/>
-            <div class="row">
-                <div class="col-md-8">
-                    <h5>Acceptable file formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, .tsv</h5>
-                    <h5>Special requirements for the <strong>.TXT</strong> file:</h5>
-                    <ul>
-                        <li>
-                            .TXT file maximum upload size limit: <span class="label label-success">1GB</span>
-                        </li>
-                        <li> File mandatory columns
-                            <table border="1" style="margin:5px;">
-                                <!--<tr>-->
-                                    <!--<td style="padding:5px;" colspan="{{ formats | length }}">File mandatory columns order and types</td>-->
-                                <!--</tr>-->
-                                <tr>
-                                    {% for format in formats %}
-                                    <td style="padding:5px;" > {{ format.title}}(type:{{ format.col_type}}) </td>
-                                    {% endfor %}
-                                </tr>
-                            </table>
-                        </li>
-                    </ul>
+            <div class="m-section__content">
+                <div class="m-demo" data-code-preview="true" data-code-html="true" data-code-js="false">
+                    <div class="m-demo__preview">
+                        <p class="lead">
+                             <h5>Acceptable file formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, .tsv</h5>
+                            <h5>Special requirements for the <strong>.TXT</strong> file:</h5>
+                            <ul>
+                                <li>
+                                    .TXT file maximum upload size limit: <span class="label label-success">1GB</span>
+                                </li>
+                                <li> File mandatory columns
+                                    <table border="1" style="margin:5px;">
+                                        <tr>
+                                            {% for format in formats %}
+                                            <td style="padding:5px;" > {{ format.title}}(type:{{ format.col_type}}) </td>
+                                            {% endfor %}
+                                        </tr>
+                                    </table>
+                                </li>
+                            </ul>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

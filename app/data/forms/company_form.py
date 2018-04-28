@@ -6,7 +6,7 @@ from flask_wtf.file import FileField, FileAllowed
 
 class CompanyForm(FlaskForm):
     id = HiddenField('Company ID')
-    file = FileField('Company Logo:',
+    file = FileField('Company Logo:', render_kw={"class": "form-control btn btn-outline-info"},
                      validators=[
                          FileAllowed(['png', 'jpeg', 'jpg'], 'Please upload only allowed files! (.txt, .jpeg, .jpg)')
                      ])
