@@ -4,7 +4,7 @@ var DatatableJsonRemoteDemo= {
         e;
         t=$(".m_datatable").mDatatable( {
             data: {
-                type: "remote", source: "http://127.0.0.1:5000/histories", pageSize: 20
+                type: "remote", source: "/histories", pageSize: 20
             }
             , layout: {
                 theme: "default", class: "", scroll: !1, footer: !1
