@@ -18,7 +18,11 @@
 			<div class="m-dropdown__header m--align-center">
 				<div class="m-card-user m-card-user--skin-light">
 					<div class="m-card-user__pic">
-						<img src="{{ url_for('static', filename='assets/app/media/img/users/user4.jpg') }}" class="m--img-rounded m--marginless" alt=""/>
+                        {% if current_user.company.logo %}
+                            <img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" class="m--img-rounded m--marginless">
+                        {% else %}
+                            <img src="/static/images/empty-small.png" class="m--img-rounded m--marginless">
+                        {% endif %}
 					</div>
 					<div class="m-card-user__details">
 						<span class="m-card-user__name m--font-weight-500">

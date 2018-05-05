@@ -7,13 +7,15 @@ from app.data.forms.company_form import CompanyForm
 from app.data.models.user import UserModel
 from app.data.models.company import CompanyModel
 from app.data.models.history import UploadHistoryModel
+from app.data.models.job_log import JobLogModel
 from flask import request
-from flask import jsonify
 
 from app.helpers.validation import validate, check_img_type, save_file
 from app.email import notify_new_user_to_admin
 from app.main import bp
 import os
+
+from flask import jsonify
 # import flask_menu as menu
 
 
@@ -35,7 +37,6 @@ def welcome():
 @roles_required('Vendor')
 # @menu.register_menu(app, '.third', 'Company', order=3)
 def company():
-    print("hi111")
     form = CompanyForm()
     print(form.validate_on_submit())
     if form.validate_on_submit():
@@ -179,6 +180,8 @@ def result():
             file1.close()
         with open(os.path.join(file_dir, "stderr"), 'r') as file2:
             stderr = file2.read()
+            stderr = stderr.replace("%", "")
+            stderr = stderr.replace('\n', "<br/>")
             file2.close()
     else:
         process = "Job process is not finished yet!"
@@ -188,17 +191,27 @@ def result():
                            stderr=stderr)
 
 
+@bp.route('/job_logs', methods=['GET'])
+@login_required
+def job_logs():
+    history_id = request.args.get('history_id', type=int)
+    id = request.args.get('id', type=int)
+    job_logs = JobLogModel.find_by_history(history_id, id)
+    return jsonify([{
+        'id': l.id,
+        'status': l.status,
+        'status_type': l.status_type,
+        'date': l.date
+    } for l in job_logs])
+
+
 @bp.route('/upload', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
 # @menu.register_menu(app, '.second', 'Upload', order=2)
 def upload():
-    # file_format = FileFormatModel(title='smiles', col_type="str", order=1)
-    # file_format.save_to_db()
-    # file_format = FileFormatModel(title='product_id', col_type="str", order=2)
-    # file_format.save_to_db()
-    # file_format = FileFormatModel(title='cas_number', col_type="str", order=3)
-    # file_format.save_to_db()
+    g.current_user = current_user
+    print(current_user.get_token())
     form = UploadForm()
     formats = FileFormatModel.find_all()
     if form.validate_on_submit():

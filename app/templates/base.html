@@ -1,54 +1,4 @@
-{#{% extends 'bootstrap/base.html' %}#}
-{##}
-{#{% block title %}#}
-{#    {{ user_manager.USER_APP_NAME }}#}
-{#{% endblock %}#}
-{##}
-{#{% block styles %}#}
-{#{{ super() }}#}
-{#<link href="{{ url_for('static', filename='styles/sticky-footer-navbar.css')}}" rel="stylesheet">#}
-{#<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">#}
-{#{% endblock styles %}#}
-{##}
-{#{% block body %}#}
-{#    {% block navbar %}#}
-{#        {% include "navbar.html" %}#}
-{#    {% endblock %}#}
-{##}
-{#        <div class="container">#}
-{#            {% with messages = get_flashed_messages(with_categories=true) %}#}
-{#              {% if messages %}#}
-{#                {% for category, message in messages %}#}
-{#                    {% if category=='error' %}#}
-{#                        {% set category='danger' %}#}
-{#                    {% endif %}#}
-{#                    <div class="alert alert-{{ category }} alert-dismissible" role="alert">#}
-{#                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">#}
-{#                        <span aria-hidden="true" >&times;</span></button>#}
-{#                    {{ message|safe }}{{ type }}</div>#}
-{#                {% endfor %}#}
-{#              {% endif %}#}
-{#            {% endwith %}#}
-{#        {% block outer_content %}#}
-{#            {% block content %}#}
-{#                     application content needs to be provided in the app_content block#}
-{#                    {% block app_content %}{% endblock %}#}
-{#            {% endblock %}#}
-{#        {% endblock %}#}
-{#        </div>#}
-{##}
-{#    <br/>#}
-{#    <br/>#}
-{##}
-{#    {% include "footer.html" %}#}
-{##}
-{#    {% block scripts %}#}
-{#        {{ super() }}#}
-{#        {{ moment.include_moment() }}#}
-{#    {% endblock %}#}
-{#{% endblock %}#}
-
-<!DOCTYPE html><!-- Template Name: Metronic - Responsive Admin Dashboard Template build with Twitter Bootstrap 4Author: KeenThemesWebsite: http://www.keenthemes.com/Contact: support@keenthemes.comFollow: www.twitter.com/keenthemesDribbble: www.dribbble.com/keenthemesLike: www.facebook.com/keenthemesPurchase: http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemesRenew Support: http://themeforest.net/item/metronic-responsive-admin-dashboard-template/4021469?ref=keenthemesLicense: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.-->
+<!DOCTYPE html>
 <html lang="en" >
 	<!-- begin::Head -->
 	<head>
@@ -100,6 +50,19 @@
                         <!--[html-partial:include:{"file":"partials\/_subheader-search.html"}]/-->
             {#            {% include "partials/_subheader-search.html" %}#}
                         <div class="m-content">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                              {% if messages %}
+                                {% for category, message in messages %}
+                                    {% if category=='error' %}
+                                        {% set category='danger' %}
+                                    {% endif %}
+                                    <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">
+                                        <span aria-hidden="true" >&times;</span></button>
+                                    {{ message|safe }}{{ type }}</div>
+                                {% endfor %}
+                              {% endif %}
+                            {% endwith %}
                             {% block content %}{% endblock %}
                         </div>
                     </div>
@@ -114,7 +77,6 @@
             <!--[html-partial:include:{"file":"partials\/_layout-scroll-top.html"}]/-->
             {% include "partials/_layout-scroll-top.html" %}
             <!--[html-partial:include:{"file":"partials\/_layout-tooltips.html"}]/-->
-            {% include "partials/_layout-tooltips.html" %}
     	<!--begin::Base Scripts -->
 		<script src="{{ url_for('static', filename='assets/vendors/base/vendors.bundle.js')}}" type="text/javascript"></script>
 		<script src="{{ url_for('static', filename='assets/demo/demo6/base/scripts.bundle.js')}}" type="text/javascript"></script>

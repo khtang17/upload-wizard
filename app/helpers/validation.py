@@ -86,12 +86,13 @@ def save_file(file, name, is_logo, id=""):
             folder = current_app.config['LOGO_UPLOAD_FOLDER']
             name = name.replace(" ", "_") + os.path.splitext(file.filename)[1]
         else:
-            folder = current_app.config['UPLOAD_FOLDER'] + str(current_user.id) + "_"
+            user_folder = str(current_user.id) + "_"
             if current_user.short_name:
-                folder += current_user.short_name
+                user_folder += current_user.short_name
             else:
-                folder += "vendor"
-            folder += "/" + str(id) + "/"
+                user_folder += "vendor"
+            user_folder += "/" + str(id) + "/"
+            folder = current_app.config['UPLOAD_FOLDER'] + user_folder
         file_dir = os.path.realpath(os.path.dirname(folder))
         pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
         file.stream.seek(0)
@@ -107,25 +108,31 @@ def save_file(file, name, is_logo, id=""):
     else:
         str_mandatory_columns = FileFormatModel.find_all_mandatory_column_str()
         str_optional_columns = FileFormatModel.find_all_optional_column_str()
-        return run_bash_script(file_dir, str_mandatory_columns, str_optional_columns)
+        return run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, id)
 
     return None
 
 
-def run_bash_script(file_dir, str_mandatory_columns, str_optional_columns):
+def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, history_id):
     try:
-        if current_user.company.idnumber:
+        print(current_user.get_token())
+        print(current_user.company.idnumber)
+        if len(current_user.company.idnumber) > 0:
             script_dir = current_app.config['UPLOAD_FOLDER'] + "script/"
-            os.chdir(file_dir)
+            os.chdir(current_app.config['UPLOAD_FOLDER']+user_folder)
             out = subprocess.Popen(["qsub " + script_dir
-                                    + 'script.sh {} {} {} {} {}'.format(script_dir, file_dir,
+                                    + 'script.sh {} {} {} {} {} {}'.format(user_folder,
                                                                         current_user.company.idnumber.replace(" ", ","),
                                                                         str_mandatory_columns,
-                                                                        str_optional_columns)
+                                                                        str_optional_columns,
+                                                                        current_user.get_token(),
+                                                                        history_id)
                                     + " > jobID"],
                                    shell=True)
             # print(out.communicate())
             return {"message": "Your job has been submitted!"}, 200
+        return {"message": " Please enter your IDNUMBER in the company profile section. "
+                           "We need your company IDNUMBER to validate .sdf file. "}, 400
     except AttributeError:
         return {"message": " Please enter your IDNUMBER in the company profile section. "
                            "We need your company IDNUMBER to validate .sdf file. "}, 400

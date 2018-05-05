@@ -2,7 +2,7 @@
 
 
 {% block content %}
-{% from "flask_user/macros.html" import render_field, render_checkbox_field, render_submit_field %}
+
 
 <div class="m-login__signin">
     <div class="m-login__head">
@@ -12,22 +12,32 @@
     </div>
 
     {# ** Login form ** #}
-    <form action="{{ url_for('user.login') }}" method="POST"
-          class="form m-login__form m-form" role="form">
+    <form method="POST" class="form m-login__form m-form" role="form">
         {{ login_form.hidden_tag() }}
-
-
-        {# Username or Email #}
-        {% set field = login_form.username if user_manager.enable_username else login_form.email %}
-        {{ render_field(field, tabindex=110) }}
-
-        {# Password #}
-        {{ render_field(login_form.password, tabindex=120) }}
-
-        {# Remember me #}
-{#        {% if user_manager.enable_remember_me %}#}
-{#        {{ render_checkbox_field(login_form.remember_me, tabindex=130) }}#}
-{#        {% endif %}#}
+        {% set field1 = form.username %}
+        {% if field1.errors %}
+            {% for e in field1.errors %}
+                <div class="m-alert m-alert--outline alert alert-danger alert-dismissible animated fadeIn" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
+                        <span>{{ e }}</span>
+                    </div>
+            {% endfor %}
+        {% endif %}
+        {% set field2 = form.password %}
+        {% if field2.errors %}
+            {% for e in field2.errors %}
+                <div class="m-alert m-alert--outline alert alert-danger alert-dismissible animated fadeIn" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
+                    <span>{{ e }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="form-group m-form__group  ">
+            <input class="form-control m-input" id="username" name="username" placeholder="Username or Email" tabindex="110" type="text" value="">
+        </div>
+        <div class="form-group m-form__group  ">
+            <input class="form-control m-input" id="password" name="password" placeholder="Password" tabindex="120" type="password" value="">
+        </div>
 
         <div class="row m-login__form-sub">
             {% if user_manager.enable_remember_me %}
@@ -47,10 +57,11 @@
             </div>
             {% endif %}
         </div>
-
-        {# Submit button #}
-        {{ render_submit_field(login_form.submit, tabindex=180) }}
-
+        <div class="m-login__form-action">
+            <button id="m_login_signin_submit" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air m-login__btn m-login__btn--primary">
+                Sign In
+            </button>
+        </div>
     </form>
 </div>
 <div class="m-login__signup">
@@ -62,27 +73,57 @@
             Enter your details to create your account:
         </div>
     </div>
-
-    {# ** Register form ** #}
     <form action="{{ url_for('user.register') }}" method="POST" novalidate formnovalidate
           class="form m-login__form m-form" role="form">
         {{ register_form.hidden_tag() }}
-
-        {# Username or Email #}
-        {% set field = register_form.username if user_manager.enable_username else register_form.email %}
-        {{ render_field(field, tabindex=210) }}
-
-        {% if user_manager.enable_email and user_manager.enable_username %}
-            {{ render_field(register_form.email, tabindex=220) }}
+        {% set field3 = register_form.email %}
+        {% if field3.errors %}
+            {% for e in field3.errors %}
+                <div class="m-alert m-alert--outline alert alert-danger alert-dismissible animated fadeIn" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
+                    <span>{{ e }}</span>
+                </div>
+            {% endfor %}
         {% endif %}
-
-        {{ render_field(register_form.password, tabindex=230) }}
-
-        {% if user_manager.enable_retype_password %}
-            {{ render_field(register_form.retype_password, tabindex=240) }}
+        {% set field4 = register_form.password %}
+        {% if field4.errors %}
+            {% for e in field4.errors %}
+                <div class="m-alert m-alert--outline alert alert-danger alert-dismissible animated fadeIn" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
+                    <span>{{ e }}</span>
+                </div>
+            {% endfor %}
         {% endif %}
+        {% set field5 = register_form.retype_password %}
+        {% if field5.errors %}
+            {% for e in field5.errors %}
+                <div class="m-alert m-alert--outline alert alert-danger alert-dismissible animated fadeIn" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
+                    <span>{{ e }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="form-group m-form__group  ">
+            <input class="form-control m-input" id="username" name="username" placeholder="Username" tabindex="210" type="text" value="">
+        </div>
+        <div class="form-group m-form__group  ">
+            <input class="form-control m-input" id="email" name="email" placeholder="Email" tabindex="220" type="text" value="">
+        </div>
+        <div class="form-group m-form__group  ">
+            <input class="form-control m-input" id="password" name="password" placeholder="Password" tabindex="230" type="password" value="">
+        </div>
+        <div class="form-group m-form__group  ">
+            <input class="form-control m-input" id="retype_password" name="retype_password" placeholder="Retype Password" tabindex="240" type="password" value="">
+        </div>
 
-        {{ render_submit_field(register_form.submit, tabindex=280) }}
+        <div class="m-login__form-action">
+            <button id="m_login_signup_submit" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air  m-login__btn">
+                Register
+            </button>
+            <button id="m_login_signup_cancel" class="btn btn-outline-focus m-btn m-btn--pill m-btn--custom  m-login__btn">
+                Cancel
+            </button>
+        </div>
     </form>
 </div>
 <div class="m-login__forget-password">
@@ -96,8 +137,17 @@
     </div>
     <form class="form m-login__form m-form" action="{{ url_for('user.forgot_password') }}" method="POST" role="form">
         {{ form.hidden_tag() }}
-        {{ render_field(form.email, tabindex=10) }}
-        {{ render_submit_field(form.submit, "Reset", tabindex=90) }}
+        <div class="form-group m-form__group  ">
+            <input class="form-control m-input" id="email" name="email" placeholder="Email" tabindex="10" type="text" value="">
+        </div>
+        <div class="m-login__form-action">
+            <button id="m_login_forget_password_submit" class="btn btn-focus m-btn m-btn--pill m-btn--custom m-btn--air  m-login__btn m-login__btn--primaryr">
+                Request
+            </button>
+            <button id="m_login_forget_password_cancel" class="btn btn-outline-focus m-btn m-btn--pill m-btn--custom m-login__btn">
+                Cancel
+            </button>
+        </div>
     </form>
 </div>
 {% endblock %}

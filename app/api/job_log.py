@@ -1,45 +1,24 @@
 from app.api import bp
-from flask import jsonify
+from app.data.models.job_log import JobLogModel
 from app.data.models.history import UploadHistoryModel
-from flask import request
-from flask_login import current_user
-from flask_user import login_required
-
-# @bp.route('/history/<int:id>', methods=['GET'])
-# def get_histories(id):
-#     return jsonify(UploadHistoryModel.query.get_or_404(id).to_dict())
+from flask import request, jsonify
+from app.api.auth import token_auth
+from app.api.errors import bad_request
+from flask import g
 
 
-# @bp.route('/histories', methods=['GET', 'POST'])
-# @login_required
-# def get_histories():
-#     page = request.args.get('page', 1, type=int)
-#     per_page = min(request.args.get('per_page', 10, type=int), 100)
-#     data = UploadHistoryModel.to_collection_dict(
-#         UploadHistoryModel.query.filter_by(user_id=current_user.id), page, per_page, 'api.get_histories')
-#         # UploadHistoryModel.query.filter_by(user_id=current_user.id), page, per_page, 'api.get_histories')
-#     return jsonify(data)
-
-# @bp.route('/users', methods=['GET'])
-# def get_users():
-#     pass
-#
-#
-# @bp.route('/users/<int:id>/followers', methods=['GET'])
-# def get_followers(id):
-#     pass
-#
-#
-# @bp.route('/users/<int:id>/followed', methods=['GET'])
-# def get_followed(id):
-#     pass
-#
-#
-# @bp.route('/users', methods=['POST'])
-# def create_user():
-#     pass
-#
-#
-# @bp.route('/users/<int:id>', methods=['PUT'])
-# def update_user(id):
-#     pass
+@bp.route('/job_logs', methods=['POST'])
+@token_auth.login_required
+def create_log():
+    data = request.get_json() or {}
+    print(data)
+    if 'history_id' not in data or 'status' not in data or 'status_type' not in data:
+        return bad_request('must include id, status and status_type fields')
+    if UploadHistoryModel.query.filter_by(id=data['history_id'], user_id=g.current_user.id).first() is None:
+        return bad_request('please check history_id')
+    job_log = JobLogModel()
+    job_log.from_dict(data)
+    job_log.save_to_db()
+    response = jsonify(job_log.to_dict())
+    response.status_code = 201
+    return response
