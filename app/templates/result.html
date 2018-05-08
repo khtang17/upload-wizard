@@ -11,13 +11,13 @@
 
         </div>
         <div class="m-portlet__body">
-                        <p><b>File Name: </b>{{ history.file_name }}</p>
-                        <p><b>File Size: </b>{{ history.file_size }}</p>
-                        <p><b>Upload Date: </b>{{ moment(history.date_uploaded).format('LLL')}}</p>
-                        <p><b>Type: </b>{{ history.type }}</p>
-                        <p><b>Purchasability: </b>{{ history.purchasability }}</p>
-                        <p><b>Natural products: </b>{{ history.natural_products }}</p>
-                        <br/>
+            <p><b>File Name: </b>{{ history.file_name }}</p>
+            <p><b>File Size: </b>{{ history.file_size }}</p>
+            <p><b>Upload Date: </b>{{ moment(history.date_uploaded).format('LLL') }}</p>
+            <p><b>Type: </b>{{ history.type }}</p>
+            <p><b>Purchasability: </b>{{ history.purchasability }}</p>
+            <p><b>Natural products: </b>{{ history.natural_products }}</p>
+            <br/>
             {#            {% if process %}#}
             {#                <div class="alert alert-info" role="alert"> {{ process }} </div>#}
             {#            {%- else %}#}
@@ -30,23 +30,23 @@
                         <div class="last_log_id" style="display:none">0</div>
                         <div class="last_log_status" style="display:none"></div>
                         {% for log in history.job_logs %}
-                        <div class="m-timeline-2__item">
-                            <span class="m-timeline-2__item-time">{{ moment(log.date).format("mm:ss") }}</span>
-                            <div class="m-timeline-2__item-cricle">
-                                {% if log.status_type == 1 %}
-                                    <i class="fa fa-genderless m--font-success"></i>
-                                {% elif log.status_type == 2 %}
-                                    <i class="fa fa-genderless m--font-warning"></i>
-                                {% elif log.status_type == 3 %}
-                                    <i class="fa fa-genderless m--font-danger"></i>
-                                {% elif log.status_type == 4 %}
-                                    <i class="fa fa-genderless m--font-brand"></i>
-                                {% endif %}
+                            <div class="m-timeline-2__item">
+                                <span class="m-timeline-2__item-time">{{ moment(log.date).format("mm:ss") }}</span>
+                                <div class="m-timeline-2__item-cricle">
+                                    {% if log.status_type == 1 %}
+                                        <i class="fa fa-genderless m--font-success"></i>
+                                    {% elif log.status_type == 2 %}
+                                        <i class="fa fa-genderless m--font-warning"></i>
+                                    {% elif log.status_type == 3 %}
+                                        <i class="fa fa-genderless m--font-danger"></i>
+                                    {% elif log.status_type == 4 %}
+                                        <i class="fa fa-genderless m--font-brand"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="m-timeline-2__item-text  m--padding-top-5">
+                                    {{ log.status }}
+                                </div>
                             </div>
-                            <div class="m-timeline-2__item-text  m--padding-top-5">
-                                {{ log.status }}
-                            </div>
-                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -54,26 +54,26 @@
             <div class="m-spinner m-spinner--info m-spinner--lg" style="margin-left: 56px;"></div>
             <br/>
             <br/>
-         <div class="panel panel-danger">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Standard error</h3>
-                </div>
-                <div class="panel-body stderr"> {{ stdout|safe }} </div>
-            </div>
-            <div class="panel panel-danger">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Standard error</h3>
-                </div>
-                <div class="panel-body stderr"> {{ stderr|safe }} </div>
-            </div>
+{#            <div class="panel panel-danger">#}
+{#                <div class="panel-heading">#}
+{#                    <h3 class="panel-title">Standard error</h3>#}
+{#                </div>#}
+{#                <div class="panel-body stderr"> {{ stdout|safe }} </div>#}
+{#            </div>#}
+{#            <div class="panel panel-danger">#}
+{#                <div class="panel-heading">#}
+{#                    <h3 class="panel-title">Standard error</h3>#}
+{#                </div>#}
+{#                <div class="panel-body stderr"> {{ stderr|safe }} </div>#}
+{#            </div>#}
         </div>
     </div>
 {% endblock %}
 
 {% block scripts %}
-{{ super() }}
+    {{ super() }}
     <script>
-         $(function() {
+        $(function () {
             {% if history.job_logs.count() > 0 %}
                 $('.last_log_id').text({{ history.job_logs[-1].id }});
                 $('.last_log_status').text({{ history.job_logs[-1].status_type }});
@@ -82,35 +82,35 @@
                 {% endif %}
             {% endif %}
 
-            var interval = setInterval(function() {
-                $.ajax('{{ url_for('main.job_logs') }}?history_id=' + {{ history.id }}+'&id='+$('.last_log_id').text()).done(
-                    function(job_logs) {
+            var interval = setInterval(function () {
+                $.ajax('{{ url_for('main.job_logs') }}?history_id=' + {{ history.id }}+'&id=' + $('.last_log_id').text()).done(
+                    function (job_logs) {
                         for (var i = 0; i < job_logs.length; i++) {
                             var msg = '';
-                            if(job_logs[i].status_type == 1)
+                            if (job_logs[i].status_type == 1)
                                 msg = 'success';
-                            else if(job_logs[i].status_type == 2)
+                            else if (job_logs[i].status_type == 2)
                                 msg = 'warning';
-                            else if(job_logs[i].status_type == 3)
+                            else if (job_logs[i].status_type == 3)
                                 msg = 'danger';
                             else
                                 msg = 'brand';
 
                             $('.m-timeline-2__items').append(
-                                '<div class="m-timeline-2__item">'+
-                                '<span class="m-timeline-2__item-time">'+moment(job_logs[i].date).format("mm:ss")+'</span>'+
-                                '<div class="m-timeline-2__item-cricle">'+
-                                     '<i class="fa fa-genderless m--font-'+msg+'"></i>'+
-                                '</div>'+
-                                '<div class="m-timeline-2__item-text  m--padding-top-5">' + job_logs[i].status +'</div>'+
-                            '</div>'
+                                '<div class="m-timeline-2__item">' +
+                                '<span class="m-timeline-2__item-time">' + moment(job_logs[i].date).format("mm:ss") + '</span>' +
+                                '<div class="m-timeline-2__item-cricle">' +
+                                '<i class="fa fa-genderless m--font-' + msg + '"></i>' +
+                                '</div>' +
+                                '<div class="m-timeline-2__item-text  m--padding-top-5">' + job_logs[i].status + '</div>' +
+                                '</div>'
                             ).fadeIn('slow');
 
                         }
-                        if($('.last_log_status').text() == 4){
-                             clearInterval(interval);
+                        if ($('.last_log_status').text() == 4) {
+                            clearInterval(interval);
                         }
-                        if(job_logs.length > 0) {
+                        if (job_logs.length > 0) {
                             id = job_logs[job_logs.length - 1].id;
                             $('.last_log_id').text(id);
                             if (job_logs[job_logs.length - 1].status_type == 4) {

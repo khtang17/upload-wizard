@@ -8,14 +8,21 @@ from app.data.models.history import UploadHistoryModel
 import pathlib
 import sys
 import subprocess
+from flask import request, jsonify
 
 
-ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi', 'csv', 'tsv'])
+ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
+ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm'])
 
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+def allowed_file2(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS2
 
 
 def validate(file, form):
@@ -139,3 +146,9 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
     except:
         print(sys.exc_info())
         return {"message": "1: " + str(sys.exc_info()[0])}, 500
+
+
+def excel_validation(request):
+    dictData = request.get_array(field_name='file', sheet_name='FieldGuide')
+    for data in dictData:
+        print(data)

@@ -36,7 +36,8 @@
                 <div class="m-demo" data-code-preview="true" data-code-html="true" data-code-js="false">
                     <div class="m-demo__preview">
                         <p class="lead">
-                             <h5>Acceptable file formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, .tsv</h5>
+                             <h5>Acceptable file formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv,
+                            .tsv, .xls, .xlsx, .xlsm</h5>
                             <h5>Special requirements for the <strong>.TXT</strong> file:</h5>
                             <ul>
                                 <li>
@@ -105,6 +106,8 @@
                         processData: false,
                         // async: false,
                         success: function(data) {
+                            alert(data[0]);
+                            alert(data[1]);
                             if(data[1] == 200) {
                                 $('#file').val("");
                                 $('.alert-success .text').text(data[0].message);
@@ -116,7 +119,8 @@
                             }else{
                                 $('.progress').hide();
                                 $('.alert-danger .text').text('Please upload only allowed files! ' +
-                                    '(.bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, .tsv)');
+                                    '(.bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, ' +
+                                    '.tsv, .xls, .xlsx, .xlsm)');
                                 $('.alert-danger').show();
                             }
                             $('#file').show();
@@ -136,13 +140,14 @@
 
                     var file = this.files[0];
                     var val = $(this).val().toLowerCase(),
-                        regex = new RegExp("(.*?)\.(bz2|7z|tar|gz|zip|sdf|txt|smi|csv)$");
+                        regex = new RegExp("(.*?)\.(bz2|7z|tar|gz|zip|sdf|txt|smi|csv|xls|xlsx|xlsm|tsv)$");
 
                     if (!(regex.test(val))) {
                         $(this).val('');
                         $('.progress').hide();
                         $('.alert-danger .text').text('Unvalid file format. ' +
-                            'Allowed formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, .tsv');
+                            'Allowed formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, ' +
+                            '.tsv, .xls, .xlsx, .xlsm');
                         $('.alert-danger').show();
                         $('#submit').attr('disabled', '');
                         return false;
