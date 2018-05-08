@@ -10,13 +10,13 @@ from app.data.models.history import UploadHistoryModel
 from app.data.models.job_log import JobLogModel
 from flask import request
 
-from app.helpers.validation import validate, check_img_type, save_file
+from app.helpers.validation import validate, check_img_type, save_file, allowed_file2, excel_validation
 from app.email import notify_new_user_to_admin
 from app.main import bp
 import os
 
-from flask import jsonify
-# import flask_menu as menu
+from flask import Flask, request, jsonify
+import flask_excel as excel
 
 
 @user_confirmed_email.connect_via(bp)
@@ -189,6 +189,7 @@ def result():
     return render_template('result.html', title='Job Result', history=history, process=process,
                            stdout=stdout,
                            stderr=stderr)
+    # return render_template('result.html', title='Job Result', history=history)
 
 
 @bp.route('/job_logs', methods=['GET'])
@@ -210,14 +211,13 @@ def job_logs():
 @roles_required('Vendor')
 # @menu.register_menu(app, '.second', 'Upload', order=2)
 def upload():
-    g.current_user = current_user
-    print(current_user.get_token())
     form = UploadForm()
     formats = FileFormatModel.find_all()
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate_on_submit():
+        if allowed_file2(form.file.data.filename):
+            #return jsonify({"result": request.get_book_dict(field_name='file')})
+            excel_validation(request)
         return_msg = validate(form.file.data, form)
-        print(return_msg[0]['message'])
-        print(return_msg[1])
         return jsonify(return_msg)
     return render_template('upload.html', title='Upload File', form=form, formats=formats)
 
@@ -231,6 +231,20 @@ def get_histories():
     data = UploadHistoryModel.to_all_collection_dict(
         UploadHistoryModel.query.filter_by(user_id=current_user.id), page, per_page, 'ID')
     return jsonify(data)
+
+
+@bp.route("/upload2", methods=['GET', 'POST'])
+def upload_file2():
+    if request.method == 'POST':
+        return jsonify({"result": request.get_book_dict(field_name='file')})
+    return '''
+    <!doctype html>
+    <title>Upload an excel file</title>
+    <h1>Excel file upload (csv, tsv, csvz, tsvz only)</h1>
+    <form action="" method=post enctype=multipart/form-data><p>
+    <input type=file name=file><input type=submit value=Upload>
+    </form>
+    '''
 
 # @app.errorhandler(InvalidUsage)
 # def handle_invalid_usage(error):
