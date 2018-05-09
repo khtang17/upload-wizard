@@ -150,5 +150,17 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
 
 def excel_validation(request):
     dictData = request.get_array(field_name='file', sheet_name='FieldGuide')
-    for data in dictData:
-        print(data)
+    mandatoryFields = []
+    for data in dictData[1:]:
+        if data[2].lower().startswith('mandatory'):
+            mandatoryFields.append(data[0].split(' ', 1)[0])
+    print(mandatoryFields)
+
+    dictValue = request.get_array(field_name='file', sheet_name='Example')
+    headers = dictValue[0]
+    if mandatoryFields in headers:
+        for value in dictValue[1:]:
+            pass
+    print(dictValue)
+
+    return {"message": "Your excel file has been submitted!"}, 200
