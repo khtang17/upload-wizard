@@ -106,8 +106,6 @@
                         processData: false,
                         // async: false,
                         success: function(data) {
-                            alert(data[0]);
-                            alert(data[1]);
                             if(data[1] == 200) {
                                 $('#file').val("");
                                 $('.alert-success .text').text(data[0].message);

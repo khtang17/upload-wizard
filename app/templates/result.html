@@ -8,7 +8,6 @@
                     <h3 class="m-portlet__head-text">Job Result</h3>
                 </div>
             </div>
-
         </div>
         <div class="m-portlet__body">
             <p><b>File Name: </b>{{ history.file_name }}</p>
@@ -17,13 +16,15 @@
             <p><b>Type: </b>{{ history.type }}</p>
             <p><b>Purchasability: </b>{{ history.purchasability }}</p>
             <p><b>Natural products: </b>{{ history.natural_products }}</p>
+            {% if history.catalogs.all()|length > 0 %}
+                <p><b>Export files: </b>
+                    <a href="{{ url_for('main.export', history_id=history.id, type='csv') }}" >.csv</a>,
+                    <a href="{{ url_for('main.export', history_id=history.id, type='xls') }}" >.xls</a>,
+                    <a href="{{ url_for('main.export', history_id=history.id, type='xlsx') }}" >.xlsx</a>,
+{#                    <a href="{{ url_for('main.export', history_id=history.id, type='txt') }}" >.txt</a>#}
+                </p>
+            {% endif %}
             <br/>
-            {#            {% if process %}#}
-            {#                <div class="alert alert-info" role="alert"> {{ process }} </div>#}
-            {#            {%- else %}#}
-            {#                <div class="panel panel-success"> <div class="panel-heading"> <h3 class="panel-title">Standard output</h3> </div> <div class="panel-body"> {{ stdout }} </div> </div>#}
-            {#                <div class="panel panel-danger"> <div class="panel-heading"> <h3 class="panel-title">Standard error</h3> </div> <div class="panel-body"> {{ stderr }} </div> </div>#}
-            {#            {%- endif %}#}
             <div id="mCSB_5_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
                 <div class="m-timeline-2">
                     <div class="m-timeline-2__items  m--padding-top-25 m--padding-bottom-30">
@@ -31,7 +32,7 @@
                         <div class="last_log_status" style="display:none"></div>
                         {% for log in history.job_logs %}
                             <div class="m-timeline-2__item">
-                                <span class="m-timeline-2__item-time">{{ moment(log.date).format("mm:ss") }}</span>
+                                <span class="m-timeline-2__item-time">{{ moment(log.date).format("hh:mm") }}</span>
                                 <div class="m-timeline-2__item-cricle">
                                     {% if log.status_type == 1 %}
                                         <i class="fa fa-genderless m--font-success"></i>
@@ -98,7 +99,7 @@
 
                             $('.m-timeline-2__items').append(
                                 '<div class="m-timeline-2__item">' +
-                                '<span class="m-timeline-2__item-time">' + moment(job_logs[i].date).format("mm:ss") + '</span>' +
+                                '<span class="m-timeline-2__item-time">' + moment(job_logs[i].date).format("hh:mm") + '</span>' +
                                 '<div class="m-timeline-2__item-cricle">' +
                                 '<i class="fa fa-genderless m--font-' + msg + '"></i>' +
                                 '</div>' +

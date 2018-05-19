@@ -5,14 +5,18 @@ from app.data.models.format import FileFormatModel
 from werkzeug.utils import secure_filename
 from flask_login import current_user
 from app.data.models.history import UploadHistoryModel
+from app.data.models.catalog import CatalogModel
+from app.data.models.job_log import JobLogModel
+from app.data.models.settings import SettingsModel
 import pathlib
 import sys
 import subprocess
+from app import db
 from flask import request, jsonify
 
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
-ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm'])
+ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
 
 
 def allowed_file(filename):
@@ -128,14 +132,13 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
             script_dir = current_app.config['UPLOAD_FOLDER'] + "script/"
             os.chdir(current_app.config['UPLOAD_FOLDER']+user_folder)
             out = subprocess.Popen(["qsub " + script_dir
-                                    + 'script.sh {} {} {} {} {} {}'.format(user_folder,
-                                                                        current_user.company.idnumber.replace(" ", ","),
-                                                                        str_mandatory_columns,
-                                                                        str_optional_columns,
-                                                                        current_user.get_token(),
-                                                                        history_id)
-                                    + " > jobID"],
-                                   shell=True)
+                                    + 'script.sh {} {} {} {} {} {}'
+                                   .format(user_folder,
+                                           current_user.company.idnumber.replace(" ", ","),
+                                           str_mandatory_columns,
+                                           str_optional_columns,
+                                           current_user.get_token(),
+                                           history_id) + " > jobID"], shell=True)
             # print(out.communicate())
             return {"message": "Your job has been submitted!"}, 200
         return {"message": " Please enter your IDNUMBER in the company profile section. "
@@ -148,19 +151,101 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
         return {"message": "1: " + str(sys.exc_info()[0])}, 500
 
 
-def excel_validation(request):
-    dictData = request.get_array(field_name='file', sheet_name='FieldGuide')
-    mandatoryFields = []
-    for data in dictData[1:]:
+def excel_validation(request, form):
+    dict_data = request.get_array(field_name='file', sheet_name='FieldGuide')
+    mandatory_fields = []
+    mandatory_field_ids = []
+    optional_fields = []
+    validation_row_limit = 100
+    for data in dict_data[1:]:
         if data[2].lower().startswith('mandatory'):
-            mandatoryFields.append(data[0].split(' ', 1)[0])
-    print(mandatoryFields)
+            mandatory_fields.append(data[0].split(' ', 1)[0])
+        elif data[2].lower().startswith('optional'):
+            optional_fields.append(data[0].split(' ', 1)[0])
+    print(dict_data[:][0])
+    print("Mandatory fields:")
+    print(mandatory_fields)
 
-    dictValue = request.get_array(field_name='file', sheet_name='Example')
-    headers = dictValue[0]
-    if mandatoryFields in headers:
-        for value in dictValue[1:]:
-            pass
-    print(dictValue)
+    dict_value = request.get_array(field_name='file', sheet_name='Example')
+    headers = dict_value[0]
+    print("headers")
+    print(headers)
+    if set(mandatory_fields).issubset(set(headers)):
+        for mField in mandatory_fields:
+            mandatory_field_ids.append(headers.index(mField))
+        for index, item in enumerate(dict_value[1:]):
+            if validation_row_limit == index + 1:
+                break
+            for mFieldID in mandatory_field_ids:
+                if len(str(item[mFieldID]).strip()) == 0:
+                    print("Mandatory field ["+headers[mFieldID]+"] has no value on the row "+str(index+1))
+                    return {"message": "Mandatory field [" + headers[mFieldID]
+                                       + "] has no value on the row "+str(index+1)}, 400
+    #print(dictValue)
+
+    history = UploadHistoryModel(current_user.id, form.file.data.filename, 'unknown')
+    history.type = form.type.data
+    history.purchasability = form.purchasability.data
+    history.natural_products = form.natural_products.data
+    history.save_to_db()
+
+    settings = SettingsModel.find_all()
+
+    for item_list in dict_value[1:]:
+        for index, value in enumerate(item_list):
+            # if value:
+            if headers[index] in mandatory_fields:
+                for setting in settings:
+                    if headers[index].lower().startswith(setting.field_name):
+                        if setting.field_type.lower().startswith('double'):
+                            print("hi1")
+                            if isfloat(value):
+                                print("Floaaaaaaat")
+                                if float(value) < setting.min:
+                                    job_log = JobLogModel()
+                                    job_log.status = "[" + headers[index] \
+                                                     + "] field value must be greater than " + str(setting.min)
+                                    job_log.status_type = 3
+                                    job_log.history_id = history.id
+                                    job_log.save_to_db()
+                                    job_log = JobLogModel()
+                                    job_log.status = "Finished"
+                                    job_log.status_type = 4
+                                    job_log.history_id = history.id
+                                    job_log.save_to_db()
+                                    return {"message": "Your excel file has been submitted!"}, 200
+                                if float(value) > setting.max:
+                                    job_log = JobLogModel()
+                                    job_log.status = "[" + headers[index] \
+                                                     + "] field value was greater than max value:" + str(setting.max)
+                                    job_log.status_type = 3
+                                    job_log.history_id = history.id
+                                    job_log.save_to_db()
+                catalog = CatalogModel(headers[index], 'mandatory', value, history.id)
+                catalog.save_to_db()
+            if headers[index] in optional_fields:
+                catalog = CatalogModel(headers[index], 'optional', value, history.id)
+                catalog.save_to_db()
+
+    job_log = JobLogModel()
+    job_log.status = "Finished"
+    job_log.status_type = 4
+    job_log.history_id = history.id
+    job_log.save_to_db()
+    catalogs = CatalogModel.find_by_history_id(history.id)
+    res = {c.field_name: c.value for c in catalogs}
+    print("catalog as dict")
+    print(res)
 
     return {"message": "Your excel file has been submitted!"}, 200
+
+
+def isfloat(value):
+  try:
+    float(value)
+    return True
+  except ValueError:
+    return False
+
+
+

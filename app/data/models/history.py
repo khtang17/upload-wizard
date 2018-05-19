@@ -1,6 +1,7 @@
 from datetime import datetime
 from app import db
 from app.data.models.job_log import JobLogModel
+from app.data.models.catalog import CatalogModel
 from flask import url_for
 
 
@@ -63,6 +64,11 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                                backref='history',
                                lazy='dynamic')
 
+    catalogs = db.relationship(CatalogModel,
+                               order_by='asc(CatalogModel.id)',
+                               backref='history',
+                               lazy='dynamic')
+
     def to_dict(self, include_email=False):
         data = {
             'ID': self.id,
@@ -84,7 +90,7 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
 
     def __init__(self, user_id, file_name, file_size):
         self.user_id = user_id
-        self.file_name = "{}_{}".format(self.get_miliseconds(), file_name)
+        self.file_name = "{}_{}".format(self.get_miliseconds(), file_name.replace(" ", "_"))
         self.file_size = file_size
 
     def json(self):
