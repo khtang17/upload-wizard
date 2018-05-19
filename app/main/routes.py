@@ -8,6 +8,7 @@ from app.data.models.user import UserModel
 from app.data.models.company import CompanyModel
 from app.data.models.history import UploadHistoryModel
 from app.data.models.job_log import JobLogModel
+from app.data.models.catalog import CatalogModel
 from flask import request
 
 from app.helpers.validation import validate, check_img_type, save_file, allowed_file2, excel_validation
@@ -162,34 +163,28 @@ def history():
 def result():
     id = request.args.get('id', type=int)
     history = UploadHistoryModel.find_by_id(id)
-    if history.user.id != current_user.id:
-        return render_template('errors/404.html'), 404
-    stdout = ""
-    stderr = ""
-    process = ""
-    base_folder = current_app.config['UPLOAD_FOLDER']
-    folder = "{}/{}_vendor/{}/".format(base_folder, current_user.id, id)
-    if not os.path.exists(os.path.realpath(os.path.dirname(folder))):
-        folder = "{}/{}_{}/{}/".format(base_folder, current_user.id, current_user.short_name, id)
-    file_dir = os.path.realpath(os.path.dirname(folder))
-    print(file_dir)
-    print(os.path.join(file_dir, "stdout"))
-    if os.path.isfile(os.path.join(file_dir, "stdout")):
-        with open(os.path.join(file_dir, "stdout"), 'r') as file1:
-            stdout = file1.read()
-            file1.close()
-        with open(os.path.join(file_dir, "stderr"), 'r') as file2:
-            stderr = file2.read()
-            stderr = stderr.replace("%", "")
-            stderr = stderr.replace('\n', "<br/>")
-            file2.close()
-    else:
-        process = "Job process is not finished yet!"
 
-    return render_template('result.html', title='Job Result', history=history, process=process,
-                           stdout=stdout,
-                           stderr=stderr)
-    # return render_template('result.html', title='Job Result', history=history)
+    # stdout = ""
+    # stderr = ""
+    # base_folder = current_app.config['UPLOAD_FOLDER']
+    # folder = "{}/{}_vendor/{}/".format(base_folder, current_user.id, id)
+    # if not os.path.exists(os.path.realpath(os.path.dirname(folder))):
+    #     folder = "{}/{}_{}/{}/".format(base_folder, current_user.id, current_user.short_name, id)
+    # file_dir = os.path.realpath(os.path.dirname(folder))
+    # print(file_dir)
+    # print(os.path.join(file_dir, "stdout"))
+    # if os.path.isfile(os.path.join(file_dir, "stdout")):
+    #     with open(os.path.join(file_dir, "stdout"), 'r') as file1:
+    #         stdout = file1.read()
+    #         file1.close()
+    #     with open(os.path.join(file_dir, "stderr"), 'r') as file2:
+    #         stderr = file2.read()
+    #         stderr = stderr.replace("%", "")
+    #         stderr = stderr.replace('\n', "<br/>")
+    #         file2.close()
+
+    return render_template('result.html', title='Job Result', history=history)
+    # return render_template('result.html', title='Job Result', history=history, stdout=stdout, stderr=stderr)
 
 
 @bp.route('/job_logs', methods=['GET'])
@@ -216,7 +211,7 @@ def upload():
     if request.method == 'POST' and form.validate_on_submit():
         if allowed_file2(form.file.data.filename):
             #return jsonify({"result": request.get_book_dict(field_name='file')})
-            excel_validation(request)
+            return jsonify(excel_validation(request, form))
         return_msg = validate(form.file.data, form)
         return jsonify(return_msg)
     return render_template('upload.html', title='Upload File', form=form, formats=formats)
@@ -233,18 +228,55 @@ def get_histories():
     return jsonify(data)
 
 
-@bp.route("/upload2", methods=['GET', 'POST'])
-def upload_file2():
-    if request.method == 'POST':
-        return jsonify({"result": request.get_book_dict(field_name='file')})
-    return '''
-    <!doctype html>
-    <title>Upload an excel file</title>
-    <h1>Excel file upload (csv, tsv, csvz, tsvz only)</h1>
-    <form action="" method=post enctype=multipart/form-data><p>
-    <input type=file name=file><input type=submit value=Upload>
-    </form>
-    '''
+# @bp.route("/upload2", methods=['GET', 'POST'])
+# def upload_file2():
+#     if request.method == 'POST':
+#         return jsonify({"result": request.get_book_dict(field_name='file')})
+#     return '''
+#     <!doctype html>
+#     <title>Upload an excel file</title>
+#     <h1>Excel file upload (csv, tsv, csvz, tsvz only)</h1>
+#     <form action="" method=post enctype=multipart/form-data><p>
+#     <input type=file name=file><input type=submit value=Upload>
+#     </form>
+#     '''
+
+
+@bp.route("/export/<history_id>/<type>", methods=['GET'])
+def export(history_id, type):
+    # history_id = request.args.get('id', type=int)
+    # type = request.args.get('type', type=str)
+    if not str(type).lower() in ['xls', 'xlsx', 'csv', 'tsv']:
+        return render_template('errors/404.html'), 404
+
+    catalogs = CatalogModel.find_by_history_id(history_id)
+    attr_count = [c.field_name for c in catalogs].index(catalogs[0].field_name, 1)
+    title = [c.field_name for c in catalogs[:attr_count]]
+    data = [c.value for c in catalogs]
+    values = [data[i:i + attr_count] for i in range(0, len(data), attr_count)]
+    values.insert(0, title)
+    return excel.make_response_from_array(values, str(type).lower(),
+                                          file_name="export_data_{}".format(history_id))
+    # title.append(catalogs[0].field_name)
+    # for catalog in catalogs[1:]:
+    #     if catalogs[0].field_name == catalog.field_name:
+    #         break
+    #     title.append(catalog.field_name)
+    # print(title)
+    # print(len(title))
+    # res = []
+    # res.append(title)
+    # val = []
+    # for index, item in enumerate(catalogs):
+    #     val.append(item.value)
+    #     # print(str(index) + ":"+str(index % (len(title)-1)))
+    #     if index % (len(title)-1) == 0 and index >= (len(title)-1):
+    #         res.append(val)
+    #         val = []
+    #         # print("hiii")
+    # return excel.make_response_from_array(res, "csv",
+    #                                       file_name="export_data")
+
 
 # @app.errorhandler(InvalidUsage)
 # def handle_invalid_usage(error):
