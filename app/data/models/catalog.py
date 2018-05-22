@@ -8,7 +8,6 @@ class CatalogModel(db.Model):
     field_name = db.Column(db.String(100), index=True)
     type = db.Column(db.String(100), index=True)
     value = db.Column(db.String(500), index=True)
-    value2 = db.Column(db.String(500), index=True)
     history_id = db.Column(db.Integer, db.ForeignKey('history.id'))
 
     def __init__(self, field_name, type, value, history_id):
@@ -20,6 +19,11 @@ class CatalogModel(db.Model):
     @classmethod
     def find_by_history_id(cls, id):
         return cls.query.filter_by(history_id=id).order_by(cls.id).all()
+
+    @classmethod
+    def save_objects(cls, objects):
+        db.session.bulk_save_objects(objects)
+        db.session.commit()
 
     def save_to_db(self):
         db.session.add(self)

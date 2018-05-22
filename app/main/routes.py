@@ -250,13 +250,20 @@ def export(history_id, type):
         return render_template('errors/404.html'), 404
 
     catalogs = CatalogModel.find_by_history_id(history_id)
-    attr_count = [c.field_name for c in catalogs].index(catalogs[0].field_name, 1)
+    # try:
+    #     attr_count = [c.field_name for c in catalogs].index(catalogs[0].field_name, 1)
+    # except ValueError:
+    #     attr_count = len(catalogs)
+
+    attr_count = len(set(c.field_name for c in catalogs))+1
     title = [c.field_name for c in catalogs[:attr_count]]
     data = [c.value for c in catalogs]
     values = [data[i:i + attr_count] for i in range(0, len(data), attr_count)]
     values.insert(0, title)
     return excel.make_response_from_array(values, str(type).lower(),
                                           file_name="export_data_{}".format(history_id))
+    # return excel.make_response_from_array(
+    #     values, 'handsontable.html')
     # title.append(catalogs[0].field_name)
     # for catalog in catalogs[1:]:
     #     if catalogs[0].field_name == catalog.field_name:
