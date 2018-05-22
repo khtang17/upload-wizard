@@ -159,15 +159,26 @@ def excel_validation(request, form):
     validation_row_limit = 100
     for data in dict_data[1:]:
         if data[2].lower().startswith('mandatory'):
+            if data[0].split(' ', 1)[0] in mandatory_fields:
+                print("Duplicated")
+                return {"message": "Mandatory field [" + data[0].split(' ', 1)[0] + "] duplicated "}, 400
             mandatory_fields.append(data[0].split(' ', 1)[0])
         elif data[2].lower().startswith('optional'):
+            if data[0].split(' ', 1)[0] in optional_fields:
+                return {"message": "Optional field [" + data[0].split(' ', 1)[0] + "] duplicated "}, 400
             optional_fields.append(data[0].split(' ', 1)[0])
+    mandatory_fields = list(set(mandatory_fields))
+    optional_fields = list(set(optional_fields))
     print(dict_data[:][0])
     print("Mandatory fields:")
     print(mandatory_fields)
 
     dict_value = request.get_array(field_name='file', sheet_name='Example')
     headers = dict_value[0]
+    diplicated_fields = set([x for x in headers if headers.count(x) > 1])
+    if len(diplicated_fields) > 0:
+        return {"message": "Field duplication error: {}".format(list(diplicated_fields))}, 400
+
     print("headers")
     print(headers)
     if set(mandatory_fields).issubset(set(headers)):
@@ -181,51 +192,57 @@ def excel_validation(request, form):
                     print("Mandatory field ["+headers[mFieldID]+"] has no value on the row "+str(index+1))
                     return {"message": "Mandatory field [" + headers[mFieldID]
                                        + "] has no value on the row "+str(index+1)}, 400
-    #print(dictValue)
+    print("hiiiiiiiiiiiiiiiii")
 
-    history = UploadHistoryModel(current_user.id, form.file.data.filename, 'unknown')
+    form.file.data.seek(0, os.SEEK_END)
+    file_length = form.file.data.tell()
+    file_size = size(file_length, system=alternative)
+    history = UploadHistoryModel(current_user.id, secure_filename(form.file.data.filename), file_size)
     history.type = form.type.data
     history.purchasability = form.purchasability.data
     history.natural_products = form.natural_products.data
     history.save_to_db()
 
+    headers2 = [h.lower() for h in headers]
     settings = SettingsModel.find_all()
 
+    for setting in settings:
+        index = headers2.index(setting.field_name.lower())
+        if index:
+            for item_list in dict_value[1:]:
+                if setting.field_type.lower().startswith('double'):
+                    if isfloat(item_list[index]):
+                        if float(item_list[index]) < setting.min:
+                            job_log = JobLogModel()
+                            job_log.status = "[" + headers[index] \
+                                             + "] field value must be greater than " + str(setting.min)
+                            job_log.status_type = 3
+                            job_log.history_id = history.id
+                            job_log.save_to_db()
+                            job_log = JobLogModel()
+                            job_log.status = "Finished"
+                            job_log.status_type = 4
+                            job_log.history_id = history.id
+                            job_log.save_to_db()
+                            return {"message": "Your excel file has been submitted!"}, 200
+                        if float(item_list[index]) > setting.max:
+                            job_log = JobLogModel()
+                            job_log.status = "[" + headers[index] \
+                                             + "] field value was greater than max value:" + str(setting.max)
+                            job_log.status_type = 3
+                            job_log.history_id = history.id
+                            job_log.save_to_db()
+
+    print("hiiiiiiiiiiiiiiiii2222")
+    catalog_objs = []
     for item_list in dict_value[1:]:
         for index, value in enumerate(item_list):
-            # if value:
             if headers[index] in mandatory_fields:
-                for setting in settings:
-                    if headers[index].lower().startswith(setting.field_name):
-                        if setting.field_type.lower().startswith('double'):
-                            print("hi1")
-                            if isfloat(value):
-                                print("Floaaaaaaat")
-                                if float(value) < setting.min:
-                                    job_log = JobLogModel()
-                                    job_log.status = "[" + headers[index] \
-                                                     + "] field value must be greater than " + str(setting.min)
-                                    job_log.status_type = 3
-                                    job_log.history_id = history.id
-                                    job_log.save_to_db()
-                                    job_log = JobLogModel()
-                                    job_log.status = "Finished"
-                                    job_log.status_type = 4
-                                    job_log.history_id = history.id
-                                    job_log.save_to_db()
-                                    return {"message": "Your excel file has been submitted!"}, 200
-                                if float(value) > setting.max:
-                                    job_log = JobLogModel()
-                                    job_log.status = "[" + headers[index] \
-                                                     + "] field value was greater than max value:" + str(setting.max)
-                                    job_log.status_type = 3
-                                    job_log.history_id = history.id
-                                    job_log.save_to_db()
-                catalog = CatalogModel(headers[index], 'mandatory', value, history.id)
-                catalog.save_to_db()
+                catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
             if headers[index] in optional_fields:
-                catalog = CatalogModel(headers[index], 'optional', value, history.id)
-                catalog.save_to_db()
+                catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
+
+    CatalogModel.save_objects(catalog_objs)
 
     job_log = JobLogModel()
     job_log.status = "Finished"
@@ -246,6 +263,4 @@ def isfloat(value):
     return True
   except ValueError:
     return False
-
-
 
