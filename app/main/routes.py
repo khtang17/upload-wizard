@@ -15,6 +15,7 @@ from app.helpers.validation import validate, check_img_type, save_file, allowed_
 from app.email import notify_new_user_to_admin
 from app.main import bp
 import os
+from flask_menu import Menu, register_menu
 
 from flask import Flask, request, jsonify
 import flask_excel as excel
@@ -27,7 +28,7 @@ def _after_confirmed_hook(sender, user, **extra):
 
 @bp.route('/welcome')
 @login_required
-# @menu.register_menu(app, '.', 'Home')
+@register_menu(bp, '.main', 'Home', order=0)
 def welcome():
     user = UserModel.find_by_email(current_user.email)
     return render_template('welcome.html', user=user, title='Welcome')
@@ -36,7 +37,7 @@ def welcome():
 @bp.route('/company', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
-# @menu.register_menu(app, '.third', 'Company', order=3)
+@register_menu(bp, '.welcome', 'Company Profile', order=3)
 def company():
     form = CompanyForm()
     print(form.validate_on_submit())
@@ -58,7 +59,8 @@ def company():
                                    idnumber=form.idnumber.data,
                                    cmpdname=form.cmpdname.data,
                                    cas=form.cas.data,
-                                   price=form.price.data)
+                                   price=form.price.data,
+                                   job_notify_email=form.job_notify_email.data)
 
             if form.file.data:
                 if check_img_type(form.file.data):
@@ -95,6 +97,7 @@ def company():
             company.cmpdname = form.cmpdname.data
             company.cas = form.cas.data
             company.price = form.price.data
+            company.job_notify_email = form.job_notify_email.data
             company.save_to_db()
         flash('Updated!', category='success')
         return jsonify({"message": "Updated!"}, 200)
@@ -117,6 +120,7 @@ def company():
             form.cmpdname.data = user.company.cmpdname
             form.cas.data = user.company.cas
             form.price.data = user.company.price
+            form.job_notify_email.data = user.company.job_notify_email
     return render_template('company.html', title='Profile', form=form)
 
 
@@ -134,7 +138,7 @@ def index():
 
 @bp.route('/help')
 @login_required
-# @menu.register_menu(app, '.fourth', 'Help', order=4)
+@register_menu(bp, '.fourth', 'Help', order=4)
 def help_page():
     return render_template('help.html', title='Help')
 
@@ -142,7 +146,7 @@ def help_page():
 @bp.route('/history', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
-# @menu.register_menu(app, '.first', 'History', order=1)
+@register_menu(bp, '.first', 'History', order=1)
 def history():
     page = request.args.get('page', 1, type=int)
     histories = current_user.upload_histories.paginate(
@@ -163,7 +167,8 @@ def history():
 def result():
     id = request.args.get('id', type=int)
     history = UploadHistoryModel.find_by_id(id)
-
+    if history.user.id != current_user.id:
+        return render_template('errors/404.html'), 404
     # stdout = ""
     # stderr = ""
     # base_folder = current_app.config['UPLOAD_FOLDER']
@@ -204,7 +209,7 @@ def job_logs():
 @bp.route('/upload', methods=['GET', 'POST'])
 @login_required
 @roles_required('Vendor')
-# @menu.register_menu(app, '.second', 'Upload', order=2)
+@register_menu(bp, '.second', 'File Upload', order=2)
 def upload():
     form = UploadForm()
     formats = FileFormatModel.find_all()
@@ -224,7 +229,8 @@ def get_histories():
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 20, type=int), 100)
     data = UploadHistoryModel.to_all_collection_dict(
-        UploadHistoryModel.query.filter_by(user_id=current_user.id), page, per_page, 'ID')
+        UploadHistoryModel.query.filter_by(user_id=current_user.id).order_by(
+            UploadHistoryModel.id.desc()), page, per_page, 'ID')
     return jsonify(data)
 
 
@@ -255,7 +261,7 @@ def export(history_id, type):
     # except ValueError:
     #     attr_count = len(catalogs)
 
-    attr_count = len(set(c.field_name for c in catalogs))+1
+    attr_count = len(set(c.field_name for c in catalogs))
     title = [c.field_name for c in catalogs[:attr_count]]
     data = [c.value for c in catalogs]
     values = [data[i:i + attr_count] for i in range(0, len(data), attr_count)]

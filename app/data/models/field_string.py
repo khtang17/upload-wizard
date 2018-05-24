@@ -1,15 +1,12 @@
 from app import db
 
 
-class SettingsModel(db.Model):
-    __tablename__ = 'settings'
+class FieldStringModel(db.Model):
+    __tablename__ = 'field_string'
 
     id = db.Column(db.Integer, primary_key=True)
-    field_name = db.Column(db.String(100), index=True)
-    field_type = db.Column(db.String(100))
-    min = db.Column(db.Float)
-    max = db.Column(db.Float)
-    number_of_decimal = db.Column(db.Integer)
+    field_name = db.Column(db.String(100), index=True, unique=True)
+    allowed_values = db.Column(db.Text)
 
     @classmethod
     def find_all(cls):

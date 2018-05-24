@@ -26,6 +26,7 @@ class CompanyModel(db.Model):
     cmpdname = db.Column(db.String(20))
     cas = db.Column(db.String(20))
     price = db.Column(db.String(20))
+    job_notify_email = db.Column(db.Boolean(), nullable=True, default=False)
 
     def __init__(self, name, description, address, telephone_number,
                  toll_free_number, fax_number, website, sales_email,

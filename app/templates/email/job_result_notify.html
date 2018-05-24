@@ -1,0 +1,33 @@
+<p>Dear {{ history.user.username }},</p>
+<p>
+Your job has been finished.
+</p>
+<p>
+<p>Status Log:</p>
+<p> ------------------------------ </p>
+{% for log in history.job_logs %}
+    <div class="m-timeline-2__item">
+        <span class="m-timeline-2__item-time">{{ moment(log.date).format("hh:mm") }}</span>
+        <div class="m-timeline-2__item-cricle">
+            {% if log.status_type == 1 %}
+                <i class="fa fa-genderless m--font-success"></i>
+            {% elif log.status_type == 2 %}
+                <i class="fa fa-genderless m--font-warning"></i>
+            {% elif log.status_type == 3 %}
+                <i class="fa fa-genderless m--font-danger"></i>
+            {% elif log.status_type == 4 %}
+                <i class="fa fa-genderless m--font-brand"></i>
+            {% endif %}
+        </div>
+        <div class="m-timeline-2__item-text  m--padding-top-5">
+            - {{ log.status }}
+        </div>
+    </div>
+{% endfor %}
+<p> ------------------------------ </p>
+</p>
+<p>
+
+</p>
+<p>Sincerely,</p>
+<p>Irwin and Shoichet Lab</p>

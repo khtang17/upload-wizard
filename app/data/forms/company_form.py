@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, HiddenField
+from wtforms import StringField, SubmitField, TextAreaField, HiddenField, BooleanField
 from wtforms.validators import ValidationError, DataRequired, Email
 from flask_wtf.file import FileField, FileAllowed
 
@@ -47,5 +47,6 @@ class CompanyForm(FlaskForm):
                                          "placeholder": "Enter cas number"})
     price = StringField('Price:', render_kw={"class": "form-control m-input",
                                              "placeholder": "Enter price"})
+    job_notify_email = BooleanField('Job Notify by an Email:')
     submit = SubmitField('Save', render_kw={"class": "btn btn-success"})
 

@@ -8,7 +8,7 @@ class JobLogModel(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     history_id = db.Column(db.Integer, db.ForeignKey('history.id'))
     status = db.Column(db.Text)
-    status_type = db.Column(db.Integer())
+    status_type = db.Column(db.Integer(), index=True)
     date = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
     # def __init__(self, history_id, status, status_type):
@@ -23,6 +23,7 @@ class JobLogModel(db.Model):
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
+        self.check_email_notify()
 
     def from_dict(self, data):
         for field in ['history_id', 'status', 'status_type']:
@@ -36,3 +37,17 @@ class JobLogModel(db.Model):
             'status_type': self.status_type
         }
         return data
+
+    def check_email_notify(self):
+        from app.email import notify_job_result_to_user
+        from app.data.models.history import UploadHistoryModel
+        if self.status_type == 4:
+            history = UploadHistoryModel.find_by_id(self.history_id)
+            if history.user.company.job_notify_email:
+                notify_job_result_to_user(history)
+
+    def __str__(self):
+        return self.status_type
+
+    def __repr__(self):
+        return '<JobLog history_id:{}, status_type{}>'.format(self.history_id, self.status_type)

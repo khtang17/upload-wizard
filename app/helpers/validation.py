@@ -7,10 +7,13 @@ from flask_login import current_user
 from app.data.models.history import UploadHistoryModel
 from app.data.models.catalog import CatalogModel
 from app.data.models.job_log import JobLogModel
-from app.data.models.settings import SettingsModel
+from app.data.models.field_string import FieldStringModel
+from app.data.models.field_integer import FieldIntegerModel
+from app.data.models.field_decimal import FieldDecimalModel
 import pathlib
 import sys
 import subprocess
+import numbers
 from app import db
 from flask import request, jsonify
 
@@ -169,9 +172,6 @@ def excel_validation(request, form):
             optional_fields.append(data[0].split(' ', 1)[0])
     mandatory_fields = list(set(mandatory_fields))
     optional_fields = list(set(optional_fields))
-    print(dict_data[:][0])
-    print("Mandatory fields:")
-    print(mandatory_fields)
 
     dict_value = request.get_array(field_name='file', sheet_name='Example')
     headers = dict_value[0]
@@ -179,8 +179,6 @@ def excel_validation(request, form):
     if len(diplicated_fields) > 0:
         return {"message": "Field duplication error: {}".format(list(diplicated_fields))}, 400
 
-    print("headers")
-    print(headers)
     if set(mandatory_fields).issubset(set(headers)):
         for mField in mandatory_fields:
             mandatory_field_ids.append(headers.index(mField))
@@ -192,7 +190,8 @@ def excel_validation(request, form):
                     print("Mandatory field ["+headers[mFieldID]+"] has no value on the row "+str(index+1))
                     return {"message": "Mandatory field [" + headers[mFieldID]
                                        + "] has no value on the row "+str(index+1)}, 400
-    print("hiiiiiiiiiiiiiiiii")
+    else:
+        return {"message": "Mandatory field missing"}, 400
 
     form.file.data.seek(0, os.SEEK_END)
     file_length = form.file.data.tell()
@@ -204,36 +203,63 @@ def excel_validation(request, form):
     history.save_to_db()
 
     headers2 = [h.lower() for h in headers]
-    settings = SettingsModel.find_all()
 
-    for setting in settings:
-        index = headers2.index(setting.field_name.lower())
-        if index:
-            for item_list in dict_value[1:]:
-                if setting.field_type.lower().startswith('double'):
-                    if isfloat(item_list[index]):
-                        if float(item_list[index]) < setting.min:
-                            job_log = JobLogModel()
-                            job_log.status = "[" + headers[index] \
-                                             + "] field value must be greater than " + str(setting.min)
-                            job_log.status_type = 3
-                            job_log.history_id = history.id
-                            job_log.save_to_db()
-                            job_log = JobLogModel()
-                            job_log.status = "Finished"
-                            job_log.status_type = 4
-                            job_log.history_id = history.id
-                            job_log.save_to_db()
-                            return {"message": "Your excel file has been submitted!"}, 200
-                        if float(item_list[index]) > setting.max:
-                            job_log = JobLogModel()
-                            job_log.status = "[" + headers[index] \
-                                             + "] field value was greater than max value:" + str(setting.max)
-                            job_log.status_type = 3
-                            job_log.history_id = history.id
-                            job_log.save_to_db()
+    decimal_fields = FieldDecimalModel.find_all()
+    for dec_field in decimal_fields:
+        field_index = headers2.index(dec_field.field_name.lower())
+        if field_index:
+            for row, item_list in enumerate(dict_value[1:]):
+                if isinstance(item_list[field_index], numbers.Real):
+                    if float(item_list[field_index]) < dec_field.min_val:
+                        job_log = JobLogModel()
+                        job_log.status = "[{}] field value " \
+                                         "must be greater than {}".format(headers[field_index], dec_field.min_val)
+                        job_log.status_type = 3
+                        job_log.history_id = history.id
+                        job_log.save_to_db()
+                        job_log = JobLogModel()
+                        job_log.status = "Finished"
+                        job_log.status_type = 4
+                        job_log.history_id = history.id
+                        job_log.save_to_db()
+                        return {"message": "[{}] field value must be greater "
+                                           "than {}".format(headers[field_index], dec_field.min_val)}, 400
+                    if float(item_list[field_index]) > dec_field.max_val:
+                        job_log = JobLogModel()
+                        job_log.status = "[{}] field value was greater than max value: {}. " \
+                                         "At line {}".format(headers[field_index], dec_field.max_val, row + 1)
+                        job_log.status_type = 3
+                        job_log.history_id = history.id
+                        job_log.save_to_db()
+                    dict_value[row+1][field_index] = "{0:.2f}".format(item_list[field_index])
+                else:
+                    job_log = JobLogModel()
+                    job_log.status = "[{}] field has invalid data " \
+                                     "at line {}".format(headers[field_index], row + 1)
+                    job_log.status_type = 3
+                    job_log.history_id = history.id
+                    job_log.save_to_db()
+                    job_log = JobLogModel()
+                    job_log.status = "Finished"
+                    job_log.status_type = 4
+                    job_log.history_id = history.id
+                    job_log.save_to_db()
+                    return {"message": "[{}] field has invalid data "
+                                       "at line {}".format(headers[field_index], row + 1)}, 400
 
-    print("hiiiiiiiiiiiiiiiii2222")
+    string_fields = FieldStringModel.find_all()
+    for str_field in string_fields:
+        field_index = headers2.index(str_field.field_name.lower())
+        if field_index:
+            for row, item_list in enumerate(dict_value[1:]):
+                try:
+                    if str(item_list[field_index]).lower() not in [str(x.strip().lower()) for x in str_field.allowed_values.split(',')]:
+                        return {"message": "[{}] field value is not allowed "
+                                           "at line {}".format(headers[field_index], row + 1)}, 400
+                except:
+                    return {"message": "[{}] field allowed values has an error. "
+                                       "Please contact admin to fix this issue.".format(headers[field_index])}, 400
+
     catalog_objs = []
     for item_list in dict_value[1:]:
         for index, value in enumerate(item_list):
@@ -256,11 +282,4 @@ def excel_validation(request, form):
 
     return {"message": "Your excel file has been submitted!"}, 200
 
-
-def isfloat(value):
-  try:
-    float(value)
-    return True
-  except ValueError:
-    return False
 

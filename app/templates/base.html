@@ -73,7 +73,7 @@
             </div>
             <!-- end:: Page -->
             <!--[html-partial:include:{"file":"partials\/_layout-quick-sidebar.html"}]/-->
-            {% include "partials/_layout-quick-sidebar.html" %}
+{#            {% include "partials/_layout-quick-sidebar.html" %}#}
             <!--[html-partial:include:{"file":"partials\/_layout-scroll-top.html"}]/-->
             {% include "partials/_layout-scroll-top.html" %}
             <!--[html-partial:include:{"file":"partials\/_layout-tooltips.html"}]/-->
@@ -93,6 +93,24 @@
                 $('body').removeClass('m-page--loading');
             });
 		</script>
+        <style>
+            .circular--landscape {
+              display: inline-block;
+              position: relative;
+              width: 42px;
+              height: 42px;
+              overflow: hidden;
+              border-radius: 50%;
+              vertical-align: middle;
+              margin-top: 8px;
+            }
+
+            .circular--landscape img {
+              width: auto;
+              height: 100%;
+              margin-left: -50px;
+            }
+        </style>
         {% block scripts %}
             {{ moment.include_moment() }}
         {% endblock %}

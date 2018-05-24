@@ -29,7 +29,7 @@ setup(
     author_email='UCSF',
 
     # Choose your license
-    license='UC Reagents',
+    license='UC Regents',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -44,7 +44,7 @@ setup(
         'Topic :: Software Development :: Build Tools',
 
         # Pick your license as you wish (should match "license" above)
-        'License :: UC Reagents',
+        'License :: UC Regents',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
