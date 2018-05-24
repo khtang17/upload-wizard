@@ -28,6 +28,7 @@ $(document).ready(function () {
        if(ext.length > 0)
            preview();
 
+       /**
        // $('form').on('submit', function(event) {
        //      event.preventDefault();
        //
@@ -74,7 +75,7 @@ $(document).ready(function () {
        //          }
        //      });
        //  });
-
+        **/
 
        $('#file').change(function() {
 
@@ -87,7 +88,7 @@ $(document).ready(function () {
             {
               noPreview();
 
-              $('#message').html('<div class="alert alert-warning" role="alert">Unvalid image format. Allowed formats: JPG, JPEG, PNG.</div>');
+              $('#message').html('<div class="alert alert-warning" role="alert">Invalid image format. Allowed formats: JPG, JPEG, PNG.</div>');
 
               return false;
             }

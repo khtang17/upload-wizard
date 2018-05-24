@@ -69,10 +69,13 @@ var DatatableJsonRemoteDemo= {
                             title: "Job Submitted", class: "m-badge--brand"
                         }
                         , 2: {
-                            title: "Job Finished", class: " m-badge--metal"
+                            title: "Warning", class: " m-badge--warning"
                         }
                         , 3: {
-                            title: "Running", class: " m-badge--primary"
+                            title: "Error", class: " m-badge--danger"
+                        }
+                        , 4: {
+                            title: "Job Finished", class: " m-badge--success"
                         }
                     }
                     ;

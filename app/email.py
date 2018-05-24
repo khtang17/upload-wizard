@@ -37,3 +37,11 @@ def notify_new_role_to_user(user):
                recipients=[user.email],
                text_body=render_template('email/user_role_notify.txt', user=user),
                html_body=render_template('email/user_role_notify.html', user=user))
+
+
+def notify_job_result_to_user(history):
+    send_email('Your job has been finished!',
+               sender=current_app.config['MAIL_DEFAULT_SENDER'],
+               recipients=[history.user.email],
+               text_body=render_template('email/job_result_notify.txt', history=history),
+               html_body=render_template('email/job_result_notify.html', history=history))

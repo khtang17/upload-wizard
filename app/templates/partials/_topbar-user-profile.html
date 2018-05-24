@@ -1,36 +1,26 @@
 <li class="m-nav__item m-topbar__user-profile  m-dropdown m-dropdown--medium m-dropdown--arrow  m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light" m-dropdown-toggle="click">
 	<a href="#" class="m-nav__link m-dropdown__toggle">
-		<span class="m-topbar__userpic m--hide">
-			<img src="./assets/app/media/img/users/user4.jpg" class="m--img-rounded m--marginless m--img-centered" alt=""/>
-		</span>
-		<span class="m-nav__link-icon m-topbar__usericon">
-			<span class="m-nav__link-icon-wrapper">
-				<i class="flaticon-user-ok"></i>
-			</span>
-		</span>
-		<span class="m-topbar__username m--hide">
-			Nick
-		</span>
+        <div class="circular--landscape"><img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" alt=""/></div>
 	</a>
 	<div class="m-dropdown__wrapper">
 		<span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
 		<div class="m-dropdown__inner">
 			<div class="m-dropdown__header m--align-center">
 				<div class="m-card-user m-card-user--skin-light">
-					<div class="m-card-user__pic">
+					<div class="circular--landscape">
                         {% if current_user.company.logo %}
-                            <img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" class="m--img-rounded m--marginless">
+                            <img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" >
                         {% else %}
-                            <img src="/static/images/empty-small.png" class="m--img-rounded m--marginless">
+                            <img src="/static/images/empty-small.png" >
                         {% endif %}
 					</div>
 					<div class="m-card-user__details">
 						<span class="m-card-user__name m--font-weight-500">
 							{{ current_user.username }}
 						</span>
-						<a href="" class="m-card-user__email m--font-weight-300 m-link">
+						<div class="m-card-user__email m--font-weight-300">
 							{{ current_user.email }}
-						</a>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -48,7 +38,7 @@
 								<span class="m-nav__link-title">
 									<span class="m-nav__link-wrap">
 										<span class="m-nav__link-text">
-											My Profile
+											Company Profile
 										</span>
 {#										<span class="m-nav__link-badge">#}
 {#											<span class="m-badge m-badge--success">#}
@@ -76,7 +66,7 @@
 {#								</span>#}
 {#							</a>#}
 {#						</li>#}
-						<li class="m-nav__separator m-nav__separator--fit"></li>
+{#						<li class="m-nav__separator m-nav__separator--fit"></li>#}
 						<li class="m-nav__item">
 							<a href="{{ url_for('user.logout') }}" class="btn m-btn--pill    btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder">
 								Logout

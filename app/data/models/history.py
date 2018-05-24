@@ -2,7 +2,7 @@ from datetime import datetime
 from app import db
 from app.data.models.job_log import JobLogModel
 from app.data.models.catalog import CatalogModel
-from flask import url_for
+from flask import url_for, jsonify
 
 
 class PaginatedAPIMixin(object):
@@ -32,14 +32,14 @@ class PaginatedAPIMixin(object):
 
     @staticmethod
     def to_all_collection_dict(query, page, per_page, field):
-        resources = query.paginate(page, per_page, False)
+        # resources = query.paginate(page, per_page, False)
         data = {
             'data': [item.to_dict() for item in query.all()],
             'meta': {
                 'page': page,
                 'perpage': per_page,
-                'pages': resources.pages,
-                'total': resources.total,
+                # 'pages': resources.pages,
+                # 'total': resources.total,
                 'sort': "desc",
                 'field': field
             }
@@ -69,7 +69,7 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                                backref='history',
                                lazy='dynamic')
 
-    def to_dict(self, include_email=False):
+    def to_dict(self):
         data = {
             'ID': self.id,
             'UserId': self.user_id,
@@ -79,7 +79,8 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
             'Type': self.type,
             'Purchasability': self.purchasability,
             'NaturalProducts': self.natural_products,
-            'Status': self.status,
+            'Status': 4
+            # 'Status': self.get_status_type()
         }
         return data
 
@@ -93,6 +94,12 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
         self.file_name = "{}_{}".format(self.get_miliseconds(), file_name.replace(" ", "_"))
         self.file_size = file_size
 
+    def get_status_type(self):
+        job = self.job_logs.order_by(JobLogModel.status_type.desc()).first()
+        if job:
+            return job.status_type
+        return 4
+
     def json(self):
         return {'id': self.id,
                 'user_id': self.user_id,
@@ -102,7 +109,8 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                 'type': self.type,
                 'purchasability': self.purchasability,
                 'natural_products': self.natural_products,
-                'status': self.status}
+                'status': self.status
+                }
 
     def get_miliseconds(self):
         (dt, micro) = datetime.utcnow().strftime('%Y%m%d%H%M%S.%f').split('.')

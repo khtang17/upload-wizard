@@ -53,6 +53,7 @@ py==1.4.34
 pycparser==2.18
 pycryptodome==3.5.1
 pyexcel==0.5.8
+pyexcel-handsontable==0.0.1
 pyexcel-io==0.5.7
 pyexcel-ods==0.5.2
 pyexcel-webio==0.1.4
