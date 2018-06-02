@@ -7,8 +7,8 @@ from flask_login import current_user
 from app.data.models.history import UploadHistoryModel
 from app.data.models.catalog import CatalogModel
 from app.data.models.job_log import JobLogModel
-from app.data.models.field_string import FieldStringModel
-from app.data.models.field_integer import FieldIntegerModel
+from app.data.models.field import FieldModel
+from app.data.models.field_allowed_value import FieldAllowedValueModel
 from app.data.models.field_decimal import FieldDecimalModel
 import pathlib
 import sys
@@ -141,7 +141,7 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
                                            str_mandatory_columns,
                                            str_optional_columns,
                                            current_user.get_token(),
-                                           history_id) + " > jobID"], shell=True)
+                                           history_id) + " > jobID"], shell=True, close_fds=True)
             # print(out.communicate())
             return {"message": "Your job has been submitted!"}, 200
         return {"message": " Please enter your IDNUMBER in the company profile section. "
@@ -155,43 +155,34 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
 
 
 def excel_validation(request, form):
-    dict_data = request.get_array(field_name='file', sheet_name='FieldGuide')
-    mandatory_fields = []
+    warning_msg = []
+    error_msg = []
+    mandatory_fields = [mand.field_name.lower() for mand in FieldModel.find_by_mandatory(True)]
     mandatory_field_ids = []
-    optional_fields = []
-    validation_row_limit = 100
-    for data in dict_data[1:]:
-        if data[2].lower().startswith('mandatory'):
-            if data[0].split(' ', 1)[0] in mandatory_fields:
-                print("Duplicated")
-                return {"message": "Mandatory field [" + data[0].split(' ', 1)[0] + "] duplicated "}, 400
-            mandatory_fields.append(data[0].split(' ', 1)[0])
-        elif data[2].lower().startswith('optional'):
-            if data[0].split(' ', 1)[0] in optional_fields:
-                return {"message": "Optional field [" + data[0].split(' ', 1)[0] + "] duplicated "}, 400
-            optional_fields.append(data[0].split(' ', 1)[0])
-    mandatory_fields = list(set(mandatory_fields))
-    optional_fields = list(set(optional_fields))
+    optional_fields = [mand.field_name.lower() for mand in FieldModel.find_by_mandatory(False)]
+    validation_row_limit = int(current_app.config['FILE_VALIDATION_LIMIT'])
 
-    dict_value = request.get_array(field_name='file', sheet_name='Example')
-    headers = dict_value[0]
+    dict_value = request.get_array(field_name='file')
+    if len(dict_value) <= 1:
+        return {"message": "No data error!"}, 400
+    headers = [h.lower() for h in dict_value[0]]
+    print("headers")
+    print(headers)
     diplicated_fields = set([x for x in headers if headers.count(x) > 1])
     if len(diplicated_fields) > 0:
-        return {"message": "Field duplication error: {}".format(list(diplicated_fields))}, 400
+        error_msg.append([0, "Field duplication error: {} \n".format(list(diplicated_fields))])
 
     if set(mandatory_fields).issubset(set(headers)):
-        for mField in mandatory_fields:
-            mandatory_field_ids.append(headers.index(mField))
+        for m_field in mandatory_fields:
+            mandatory_field_ids.append(headers.index(m_field))
         for index, item in enumerate(dict_value[1:]):
-            if validation_row_limit == index + 1:
-                break
-            for mFieldID in mandatory_field_ids:
-                if len(str(item[mFieldID]).strip()) == 0:
-                    print("Mandatory field ["+headers[mFieldID]+"] has no value on the row "+str(index+1))
-                    return {"message": "Mandatory field [" + headers[mFieldID]
-                                       + "] has no value on the row "+str(index+1)}, 400
+            # if validation_row_limit == index + 1:
+            #     break
+            for m_field_id in mandatory_field_ids:
+                if not item[m_field_id]:
+                    error_msg.append(["Line {}: ".format(index + 1), "Mandatory field [{}] has no value".format(headers[m_field_id])])
     else:
-        return {"message": "Mandatory field missing"}, 400
+        error_msg.append(["", "Mandatory field missing {}".format(set(mandatory_fields)-set(headers))])
 
     form.file.data.seek(0, os.SEEK_END)
     file_length = form.file.data.tell()
@@ -202,64 +193,107 @@ def excel_validation(request, form):
     history.natural_products = form.natural_products.data
     history.save_to_db()
 
-    headers2 = [h.lower() for h in headers]
-
     decimal_fields = FieldDecimalModel.find_all()
     for dec_field in decimal_fields:
-        field_index = headers2.index(dec_field.field_name.lower())
+        # it skips when mandatory field is missing
+        try:
+            field_index = headers.index(dec_field.field.field_name.lower())
+        except:
+            break
+
         if field_index:
             for row, item_list in enumerate(dict_value[1:]):
                 if isinstance(item_list[field_index], numbers.Real):
                     if float(item_list[field_index]) < dec_field.min_val:
-                        job_log = JobLogModel()
-                        job_log.status = "[{}] field value " \
-                                         "must be greater than {}".format(headers[field_index], dec_field.min_val)
-                        job_log.status_type = 3
-                        job_log.history_id = history.id
-                        job_log.save_to_db()
-                        job_log = JobLogModel()
-                        job_log.status = "Finished"
-                        job_log.status_type = 4
-                        job_log.history_id = history.id
-                        job_log.save_to_db()
-                        return {"message": "[{}] field value must be greater "
-                                           "than {}".format(headers[field_index], dec_field.min_val)}, 400
+                        error_msg.append(["Line {}: ".format(row + 1),
+                                          "[{}] field value must be "
+                                          "greater than {}".format(headers[field_index], dec_field.min_val)])
+                        # error_msg += "Line{}: [{}] field value must be greater " \
+                        #              "than {} \n".format(row + 1, headers[ field_index], dec_field.min_val)
                     if float(item_list[field_index]) > dec_field.max_val:
-                        job_log = JobLogModel()
-                        job_log.status = "[{}] field value was greater than max value: {}. " \
-                                         "At line {}".format(headers[field_index], dec_field.max_val, row + 1)
-                        job_log.status_type = 3
-                        job_log.history_id = history.id
-                        job_log.save_to_db()
+                        warning_msg.append(["Line {}: ".format(row + 1),
+                                            "[{}] field value is greater "
+                                            "than max value: {}".format(headers[field_index], dec_field.max_val)])
+                        # warning_msg += "Line{}: [{}] field value was greater " \
+                        #              "than max value: {}.\n".format(row + 1, headers[field_index], dec_field.max_val)
                     dict_value[row+1][field_index] = "{0:.2f}".format(item_list[field_index])
                 else:
-                    job_log = JobLogModel()
-                    job_log.status = "[{}] field has invalid data " \
-                                     "at line {}".format(headers[field_index], row + 1)
-                    job_log.status_type = 3
-                    job_log.history_id = history.id
-                    job_log.save_to_db()
-                    job_log = JobLogModel()
-                    job_log.status = "Finished"
-                    job_log.status_type = 4
-                    job_log.history_id = history.id
-                    job_log.save_to_db()
-                    return {"message": "[{}] field has invalid data "
-                                       "at line {}".format(headers[field_index], row + 1)}, 400
+                    error_msg.append(["Line {}: ".format(row + 1),
+                                      "[{}] field has invalid data".format(headers[field_index])])
+                    # error_msg += "Line{}: [{}] field has invalid data \n".format(row + 1, headers[field_index])
 
-    string_fields = FieldStringModel.find_all()
+    string_fields = FieldAllowedValueModel.find_all()
     for str_field in string_fields:
-        field_index = headers2.index(str_field.field_name.lower())
+        # it skips when mandatory field is missing
+        try:
+            field_index = headers.index(str_field.field.field_name.lower())
+        except:
+            break
+
         if field_index:
             for row, item_list in enumerate(dict_value[1:]):
                 try:
-                    if str(item_list[field_index]).lower() not in [str(x.strip().lower()) for x in str_field.allowed_values.split(',')]:
-                        return {"message": "[{}] field value is not allowed "
-                                           "at line {}".format(headers[field_index], row + 1)}, 400
+                    if str(item_list[field_index]).lower() not in \
+                            [str(x.strip().lower()) for x in str_field.allowed_values.split(',')]:
+                        error_msg.append(["Line {}: ".format(row + 1),
+                                          "[{}] field value is not allowed".format(headers[field_index])])
+                        # error_msg += "Line{}: [{}] field value is not allowed".format(row + 1, headers[field_index])
                 except:
-                    return {"message": "[{}] field allowed values has an error. "
-                                       "Please contact admin to fix this issue.".format(headers[field_index])}, 400
+                    error_msg.append(["Line {}: ".format(row + 1),
+                                      "[{}] field allowed values has an error. "
+                                      "Please contact admin to fix this issue.".format(headers[field_index])])
+                    # error_msg += "Line{}: [{}] field allowed values has an error. " \
+                    #              "Please contact admin to fix this issue.".format(row + 1, headers[field_index])
 
+    # error_msg_set = set(["{} {}".format(x[0], x[1]) for x in error_msg if error_msg.count(x) == 1])
+    # warning_msg_set = set(["{} {}".format(x[0], x[1]) for x in warning_msg if warning_msg.count(x) == 1])
+
+    error_msg_set = set(["{} {}".format(min([y[0] for y in error_msg if y[1] == x[1]]), x[1])
+                         for x in error_msg if len([y for y in error_msg if y[1] == x[1]]) == 1])
+    warning_msg_set = set(["{} {}".format(min([y[0] for y in warning_msg if y[1] == x[1]]), x[1])
+                           for x in warning_msg if len([y for y in warning_msg if y[1] == x[1]]) == 1])
+
+    error_msg_set.update(set(["{} {}  (same errors occurred {} other lines)".format(
+        [y[0] for y in error_msg if y[1] == x[1]][0], x[1], len([y for y in error_msg if y[1] == x[1]]))
+                     for x in error_msg if len([y for y in error_msg if y[1] == x[1]]) > 1]))
+    warning_msg_set.update(set(["{} {}  (same errors occurred {} other lines)".format(
+        [y[0] for y in warning_msg if y[1] == x[1]][0], x[1], len([y for y in warning_msg if y[1] == x[1]]))
+        for x in warning_msg if len([y for y in warning_msg if y[1] == x[1]]) > 1]))
+
+    # error_msg_set.update(set([x[1] + " (same errors at the {} more lines)".format(
+    #     error_msg.count(x)) for x in error_msg if error_msg.count(x) > 1]))
+    # warning_msg_set.update(set([x[1] + " (same errors at the {} more lines)".format(
+    #     warning_msg.count(x)) for x in warning_msg if warning_msg.count(x) > 1]))
+
+
+
+    print("ERROR")
+    print(error_msg)
+    print(error_msg_set)
+    print("WARNING")
+    # print(warning_msg)
+    print(warning_msg_set)
+    if warning_msg:
+        job_log = JobLogModel()
+        job_log.status = '<br>'.join(str(s) for s in warning_msg_set)
+        job_log.status_type = 2
+        job_log.history_id = history.id
+        job_log.save_to_db()
+
+    if error_msg:
+        job_log = JobLogModel()
+        job_log.status = '<br>'.join(str(s) for s in error_msg_set)
+        job_log.status_type = 3
+        job_log.history_id = history.id
+        job_log.save_to_db()
+        job_log = JobLogModel()
+        job_log.status = "Finished"
+        job_log.status_type = 4
+        job_log.history_id = history.id
+        job_log.save_to_db()
+        return {"message": '<br>'.join(str(s) for s in error_msg_set)}, 400
+
+    print("line 280")
     catalog_objs = []
     for item_list in dict_value[1:]:
         for index, value in enumerate(item_list):
@@ -275,10 +309,10 @@ def excel_validation(request, form):
     job_log.status_type = 4
     job_log.history_id = history.id
     job_log.save_to_db()
-    catalogs = CatalogModel.find_by_history_id(history.id)
-    res = {c.field_name: c.value for c in catalogs}
-    print("catalog as dict")
-    print(res)
+    # catalogs = CatalogModel.find_by_history_id(history.id)
+    # res = {c.field_name: c.value for c in catalogs}
+    # print("catalog as dict")
+    # print(res)
 
     return {"message": "Your excel file has been submitted!"}, 200
 

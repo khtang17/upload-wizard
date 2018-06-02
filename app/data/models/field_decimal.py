@@ -5,10 +5,11 @@ class FieldDecimalModel(db.Model):
     __tablename__ = 'field_decimal'
 
     id = db.Column(db.Integer, primary_key=True)
-    field_name = db.Column(db.String(100), index=True, unique=True)
-    min_val = db.Column(db.Float)
-    max_val = db.Column(db.Float)
-    decimal_places = db.Column(db.Integer)
+    min_val = db.Column(db.Float, nullable=False)
+    max_val = db.Column(db.Float, nullable=False)
+    decimal_places = db.Column(db.Integer, nullable=False)
+    field_id = db.Column(db.Integer, db.ForeignKey('field.id'), nullable=False, unique=True)
+    field = db.relationship("FieldModel", back_populates="field_decimal")
 
     # def __init__(self, field_name, min_val, max_val, decimal_places):
     #     self.field_name = field_name

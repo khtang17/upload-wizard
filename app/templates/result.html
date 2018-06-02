@@ -45,7 +45,7 @@
                                     {% endif %}
                                 </div>
                                 <div class="m-timeline-2__item-text  m--padding-top-5">
-                                    {{ log.status }}
+                                    {{ log.status|safe }}
                                 </div>
                             </div>
                         {% endfor %}

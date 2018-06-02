@@ -1,12 +1,13 @@
 from app import db
 
 
-class FieldStringModel(db.Model):
-    __tablename__ = 'field_string'
+class FieldAllowedValueModel(db.Model):
+    __tablename__ = 'field_allowed_value'
 
     id = db.Column(db.Integer, primary_key=True)
-    field_name = db.Column(db.String(100), index=True, unique=True)
-    allowed_values = db.Column(db.Text)
+    allowed_values = db.Column(db.Text, nullable=False)
+    field_id = db.Column(db.Integer, db.ForeignKey('field.id'), nullable=False, unique=True)
+    field = db.relationship("FieldModel", back_populates="field_allowed_value")
 
     @classmethod
     def find_all(cls):

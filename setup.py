@@ -16,13 +16,15 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.20180409.1',
+    version='0.20180601.1',
 
-    description='A sample Python project',
+    description='Upload Wizard v1.0',
     long_description='',
 
+    zip_safe=False,
+
     # The project's main homepage.
-    url='https://github.com/pypa/sampleproject',
+    url='https://github.com/chinzod/vendor-upload',
 
     # Author details
     author='UCSF',
@@ -62,7 +64,87 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    # install_requires=['peppercorn'],
+    install_requires=[
+        'alembic==0.9.8',
+        'aniso8601==3.0.0',
+        'asn1crypto==0.24.0',
+        'Babel==2.5.3',
+        'bcrypt==3.1.4',
+        'blinker==1.4',
+        'certifi==2018.4.16',
+        'cffi==1.11.5',
+        'chardet==3.0.4',
+        'click==6.7',
+        'colorama==0.3.9',
+        'cryptography==2.2.2',
+        'defusedxml==0.5.0',
+        'docopt==0.6.2',
+        'dominate==2.3.1',
+        'et-xmlfile==1.0.1',
+        'Flask==0.12.2',
+        'Flask-Admin==1.5.1',
+        'Flask-Babel==0.11.1',
+        'Flask-BabelEx==0.9.3',
+        'Flask-Bootstrap==3.3.7.1',
+        'Flask-Excel==0.0.7',
+        'Flask-HTTPAuth==3.2.3',
+        'Flask-JWT==0.3.2',
+        'Flask-Login==0.4.1',
+        'Flask-Mail==0.9.1',
+        'Flask-Menu==0.7.0',
+        'Flask-Migrate==2.1.1',
+        'Flask-Moment==0.6.0',
+        'Flask-OpenID==1.2.5',
+        'Flask-Principal==0.4.0',
+        'Flask-RESTful==0.3.6',
+        'Flask-Security==3.0.0',
+        'Flask-SQLAlchemy==2.1',
+        'Flask-User==0.6.21',
+        'Flask-WTF==0.14.2',
+        'gunicorn==19.7.1',
+        'httpie==0.9.9',
+        'hurry.filesize==0.9',
+        'idna==2.6',
+        'itsdangerous==0.24',
+        'jdcal==1.4',
+        'Jinja2==2.10',
+        'lml==0.0.1',
+        'Mako==1.0.7',
+        'MarkupSafe==1.0',
+        'odfpy==1.3.6',
+        'openpyxl==2.5.3',
+        'passlib==1.7.1',
+        'psycopg2==2.7.4',
+        'psycopg2-binary==2.7.4',
+        'py==1.4.34',
+        'pycparser==2.18',
+        'pycryptodome==3.5.1',
+        'pyexcel==0.5.8',
+        'pyexcel-handsontable==0.0.1',
+        'pyexcel-io==0.5.7',
+        'pyexcel-ods==0.5.2',
+        'pyexcel-webio==0.1.4',
+        'pyexcel-xls==0.5.6',
+        'pyexcel-xlsx==0.5.6',
+        'Pygments==2.2.0',
+        'PyJWT==1.4.2',
+        'python-dateutil==2.6.1',
+        'python-dotenv==0.8.2',
+        'python-editor==1.0.3',
+        'python3-openid==3.1.0',
+        'pytz==2018.3',
+        'requests==2.18.4',
+        'six==1.11.0',
+        'speaklater==1.3',
+        'SQLAlchemy==1.2.4',
+        'texttable==1.2.1',
+        'urllib3==1.22',
+        'visitor==0.1.3',
+        'Werkzeug==0.14.1',
+        'WTForms==2.1',
+        'xlrd==1.1.0',
+        'xlwt==1.3.0',
+    ],
 
     scripts=(
         '.env',
@@ -75,16 +157,17 @@ setup(
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
-    extras_require={
-        'dev': ['check-manifest'],
-        'test': ['coverage'],
-    },
+    # extras_require={
+    #     'dev': ['check-manifest'],
+    #     'test': ['coverage'],
+    # },
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
         'static': 'app/static/*',
+        'templates': 'app/template/*',
     },
 
     # Although 'package_data' is the preferred approach, in some case you may

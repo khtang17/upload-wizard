@@ -88,3 +88,7 @@ class HistoryView(AdminModelView):
     column_formatters = {
         'date': _date_format
     }
+
+
+class FieldView(AdminModelView):
+    form_excluded_columns = ('field_decimal', 'field_allowed_value')
