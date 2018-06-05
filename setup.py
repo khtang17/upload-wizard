@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.20180601.1',
+    version='0.20180604.1',
 
     description='Upload Wizard v1.0',
     long_description='',
@@ -148,8 +148,10 @@ setup(
 
     scripts=(
         '.env',
-        'app.py',
+        '.ebextensions/application.config',
+        'application.py',
         'config.py',
+        'vendor.py',
         'setup.py',
         'requirements.txt',
     ),
@@ -165,9 +167,10 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
+    include_package_data=True,
     package_data={
-        'static': 'app/static/*',
-        'templates': 'app/template/*',
+        'static': 'application/static/*',
+        'templates': 'application/template/*',
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
@@ -181,7 +184,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'sample=sample:main',
+            'sample=application.py:main',
         ],
     },
 )
