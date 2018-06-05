@@ -151,7 +151,6 @@ setup(
         '.ebextensions/application.config',
         'application.py',
         'config.py',
-        'vendor.py',
         'setup.py',
         'requirements.txt',
     ),
@@ -169,8 +168,8 @@ setup(
     # have to be included in MANIFEST.in as well.
     include_package_data=True,
     package_data={
-        'static': 'application/static/*',
-        'templates': 'application/template/*',
+        'static': 'app/static/*',
+        'templates': 'app/template/*',
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
@@ -184,7 +183,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'sample=application.py:main',
+            'sample=app.py:main',
         ],
     },
 )
