@@ -1,12 +1,12 @@
-from application import create_app, db
-# from application.data.models.user import UserModel
-# from application.data.models.history import UploadHistoryModel
-# from application.data.models.format import FileFormatModel
-# from application.data.models.company import CompanyModel
+#from app import create_app, db
+# from app.data.models.user import UserModel
+# from app.data.models.history import UploadHistoryModel
+# from app.data.models.format import FileFormatModel
+# from app.data.models.company import CompanyModel
 #
-application = create_app()
+#app = create_app()
 #
-# @application.shell_context_processor
+# @app.shell_context_processor
 # def make_shell_context():
 #     return {'db': db, 'User': UserModel, 'UploadHistory': UploadHistoryModel, 'FileFormat': FileFormatModel,
 #             'Company': CompanyModel}
