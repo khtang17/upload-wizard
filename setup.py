@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.20180604.1',
+    version='0.20180605.1',
 
     description='Upload Wizard v1.0',
     long_description='',
@@ -96,7 +96,6 @@ setup(
         'Flask-Moment==0.6.0',
         'Flask-OpenID==1.2.5',
         'Flask-Principal==0.4.0',
-        'Flask-RESTful==0.3.6',
         'Flask-Security==3.0.0',
         'Flask-SQLAlchemy==2.1',
         'Flask-User==0.6.21',
