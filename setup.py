@@ -100,7 +100,6 @@ setup(
         'Flask-SQLAlchemy==2.1',
         'Flask-User==0.6.21',
         'Flask-WTF==0.14.2',
-        'gunicorn==19.7.1',
         'httpie==0.9.9',
         'hurry.filesize==0.9',
         'idna==2.6',

@@ -211,6 +211,7 @@ def job_logs():
 @roles_required('Vendor')
 @register_menu(application, '.second', 'File Upload', order=2)
 def upload():
+    # if current_app.config['ZINC_MODE']:
     form = UploadForm()
     formats = FileFormatModel.find_all()
     if request.method == 'POST' and form.validate_on_submit():
@@ -219,6 +220,9 @@ def upload():
             return jsonify(excel_validation(request, form))
         return_msg = validate(form.file.data, form)
         return jsonify(return_msg)
+    # else:
+    #     # return_msg = validate(form)
+    #     return jsonify(return_msg)
     return render_template('upload.html', title='Upload File', form=form, formats=formats)
 
 
