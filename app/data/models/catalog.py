@@ -1,4 +1,5 @@
 from app import db
+import time
 
 
 class CatalogModel(db.Model):
@@ -6,8 +7,8 @@ class CatalogModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     field_name = db.Column(db.String(100), index=True)
-    type = db.Column(db.String(100), index=True)
-    value = db.Column(db.String(500), index=True)
+    type = db.Column(db.String(100))
+    value = db.Column(db.String(500))
     history_id = db.Column(db.Integer, db.ForeignKey('history.id'))
 
     def __init__(self, field_name, type, value, history_id):
@@ -22,8 +23,32 @@ class CatalogModel(db.Model):
 
     @classmethod
     def save_objects(cls, objects):
+        t0 = time.time()
         db.session.bulk_save_objects(objects)
         db.session.commit()
+        print(
+            "SQLAlchemy ORM bulk_save_objects(): Total time for " +
+            " records " + str(time.time() - t0) + " secs")
+
+    @classmethod
+    def save_mappings(cls, objects):
+        t0 = time.time()
+        db.session.bulk_insert_mappings(
+            CatalogModel, objects
+        )
+        db.session.commit()
+        print(
+            "SQLAlchemy ORM bulk_save_objects(): Total time for " +
+            " records " + str(time.time() - t0) + " secs")
+
+    @classmethod
+    def save_bulk(cls, objects):
+        t0 = time.time()
+        db.engine.execute(CatalogModel.__table__.insert(), objects)
+        db.session.commit()
+        print(
+            "SQLAlchemy ORM bulk_save_objects(): Total time for " +
+            " records " + str(time.time() - t0) + " secs")
 
     def save_to_db(self):
         db.session.add(self)

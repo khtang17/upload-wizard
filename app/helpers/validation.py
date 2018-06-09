@@ -293,17 +293,24 @@ def excel_validation(request, form):
         job_log.save_to_db()
         return {"message": '<br>'.join(str(s) for s in error_msg_set)}, 400
 
-    print("line 280")
+    print("line 296")
     catalog_objs = []
+    catalog_dict = []
     for item_list in dict_value[1:]:
         for index, value in enumerate(item_list):
             if headers[index] in mandatory_fields:
-                catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
+                # catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
+                catalog_dict.append(
+                    dict(field_name=headers[index], type='mandatory', value=value, history_id=history.id))
             if headers[index] in optional_fields:
-                catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
-
-    CatalogModel.save_objects(catalog_objs)
-
+                # catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
+                catalog_dict.append(
+                    dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
+    print("line 304")
+    # print(catalog_dict)
+    # CatalogModel.save_objects(catalog_objs)
+    #CatalogModel.save_mappings(catalog_dict)
+    CatalogModel.save_bulk(catalog_dict)
     job_log = JobLogModel()
     job_log.status = "Finished"
     job_log.status_type = 4
