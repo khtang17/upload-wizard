@@ -45,7 +45,7 @@ class CatalogModel(db.Model):
     def save_bulk(cls, objects):
         t0 = time.time()
         db.engine.execute(CatalogModel.__table__.insert(), objects)
-        # db.session.commit()
+        db.session.commit()
         print(
             "SQLAlchemy ORM bulk_save_objects(): Total time for " +
             " records " + str(time.time() - t0) + " secs")

@@ -1,7 +1,6 @@
 from app import create_app
 
 application = create_app()
-application.app_context().push()
 
 if __name__ == '__main__':
     application.debug = True

@@ -34,7 +34,8 @@
 	</head>
 	<!-- end::Head -->
     <!-- start::Body -->
-	<body  style="background-image: url(./static/assets/app/media/img/bg/bg-5.jpg)"  class="m-page--boxed m--skin- m-page--loading-enabled m-page--loading m-content--skin-light2 m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-light m-aside-left--fixed m-aside-left--offcanvas m-aside-left--minimize m-brand--minimize m-footer--push m-aside--offcanvas-default"  >
+	<body  style="background-image: url(./static/assets/app/media/img/bg/bg-5.jpg)"
+           class="m-page--boxed m--skin- m-page--loading-enabled m-page--loading m-content--skin-light2 m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-light m-aside-left--fixed m-aside-left--offcanvas m-aside-left--minimize m-brand--minimize m-footer--push m-aside--offcanvas-default"  >
 		<!--[html-partial:include:{"file":"partials\/_loader-base.html"}]/-->
         {% include "partials/_loader-base.html" %}
         <!--[html-partial:include:{"file":"_layout.html"}]/-->
@@ -42,6 +43,7 @@
             <div class="m-grid m-grid--hor m-grid--root m-page">
                 <!--[html-partial:include:{"file":"partials\/_header-base.html"}]/-->
                 {% include "partials/_header-base.html" %}
+
                 <!-- begin::Body -->
                 <div class="m-grid__item m-grid__item--fluid m-grid m-grid--ver-desktop m-grid--desktop m-body">
                     <!--[html-partial:include:{"file":"partials\/_aside-left.html"}]/-->
@@ -50,6 +52,18 @@
                         <!--[html-partial:include:{"file":"partials\/_subheader-search.html"}]/-->
             {#            {% include "partials/_subheader-search.html" %}#}
                         <div class="m-content">
+                            {% if current_user.is_authenticated %}
+                            {% with tasks = current_user.get_tasks_in_progress() %}
+                            {% if tasks %}
+                                {% for task in tasks %}
+                                <div class="alert alert-success" role="alert">
+                                    {{ task.description }}
+                                    <span id="{{ task.id }}-progress">{{ task.get_progress() }}</span>%
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                            {% endwith %}
+                            {% endif %}
                             {% with messages = get_flashed_messages(with_categories=true) %}
                               {% if messages %}
                                 {% for category, message in messages %}
@@ -92,6 +106,9 @@
             $(window).on('load', function() {
                 $('body').removeClass('m-page--loading');
             });
+            function set_task_progress(task_id, progress) {
+                $('#' + task_id + '-progress').text(progress);
+            }
 		</script>
         <style>
             .circular--landscape {

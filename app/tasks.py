@@ -1,8 +1,15 @@
 import time
+import sys
 from rq import get_current_job
-from app import db
+from app import create_app, db
 from app.data.models.task import TaskModel
 from app.data.models.user import UserModel
+from app.data.models.catalog import CatalogModel
+from flask import render_template
+
+
+app = create_app()
+app.app_context().push()
 
 
 def _set_task_progress(progress):
@@ -33,38 +40,53 @@ def example(seconds):
 
 def export_posts(user_id):
     try:
-        user = UserModel.query.get(user_id)
-        _set_task_progress(0)
-        data = []
-        i = 0
-        total_posts = 100
-        # for post in user.posts.order_by(Post.timestamp.asc()):
-        #     data.append({'body': post.body,
-        #                  'timestamp': post.timestamp.isoformat() + 'Z'})
-        #     time.sleep(5)
-        #     i += 1
-        #     _set_task_progress(100 * i // total_posts)
-        _set_task_progress(100)
-        # send email with data to user
+        catalog = CatalogModel('test', 'mandatory', 'test', 804)
+        catalog.save_to_db()
+        #user = UserModel.find_by_username("chinzo")
+        # # send_email('You have granted access to system!',
+        #            sender=app.config['MAIL_DEFAULT_SENDER'],
+        #            recipients=[user.email],
+        #            text_body=render_template('email/user_role_notify.txt', user=user),
+        #            html_body=render_template('email/user_role_notify.html', user=user))
+        # app.logger.error('Unhandled exception', exc_info="hi yu bn")
+        # catalog = CatalogModel('test', 'mandatory', 'test', 804)
+        # catalog.save_to_db()
+        # user = UserModel.query.get(user_id)
+        # user = UserModel.find_by_username("chinzo")
+        # send_email('You have granted access to system!',
+        #            sender='upload.vendor@gmail.com',
+        #            recipients=[user.email],
+        #            text_body=render_template('email/user_role_notify.txt', user=user),
+        #            html_body=render_template('email/user_role_notify.html', user=user))
+        # _set_task_progress(0)
+        # data = []
+        # i = 0
+        # total_posts = 100
+        # # for post in user.posts.order_by(Post.timestamp.asc()):
+        # #     data.append({'body': post.body,
+        # #                  'timestamp': post.timestamp.isoformat() + 'Z'})
+        # #     time.sleep(5)
+        # #     i += 1
+        # #     _set_task_progress(100 * i // total_posts)
+        # _set_task_progress(100)
+        # # send email with data to user
     except:
         # ...
         _set_task_progress(100)
-        # app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
 
 
 def save_catalog_bulk_data(objects):
     try:
-        print("1")
-        print(objects)
-        _set_task_progress(0)
-        i = 0
-        total_objects = len(objects)
-        for o in objects:
-            db.session.add(o)
-            i += 1
-            print(i)
-            _set_task_progress(100 * i // total_objects)
-        db.session.commit()
+        app.logger.error('Unhandled exception', exc_info="hi yu bn")
+        user = UserModel.query.get(1)
+        from app.email import send_email
+        send_email('You have granted access to system!',
+                   sender='upload.vendor@gmail.com',
+                   recipients=[user.email],
+                   text_body=render_template('email/user_role_notify.txt', user=user),
+                   html_body=render_template('email/user_role_notify.html', user=user))
     except:
         # ...
         _set_task_progress(100)
+        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
