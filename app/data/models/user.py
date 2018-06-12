@@ -5,11 +5,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_security import UserMixin, RoleMixin
 from flask_user import UserMixin
 from app.data.models.history import UploadHistoryModel
+from app.data.models.task import TaskModel
 from sqlalchemy import event
 
 import base64
 from datetime import datetime, timedelta
 import os
+from flask import current_app
 
 
 # Define models
@@ -49,6 +51,7 @@ class UserModel(db.Model, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
+    tasks = db.relationship('TaskModel', backref='user', lazy='dynamic')
 
     # def __init__(self, username, email, password, active):
     #     self.email = email
@@ -107,6 +110,27 @@ class UserModel(db.Model, UserMixin):
         if user is None or user.token_expiration < datetime.utcnow():
             return None
         return user
+
+    # def launch_task(self, name, description, *args, **kwargs):
+    #     rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
+    #                                             *args, **kwargs)
+    #     task = TaskModel(id=rq_job.get_id(), name=name, description=description, user=self)
+    #     db.session.add(task)
+    #     return task
+
+    def launch_task(self, name, objects, description, *args, **kwargs):
+        print(len(objects))
+        rq_job = current_app.task_queue.enqueue('app.tasks.' + name, objects,
+                                                *args, **kwargs)
+        task = TaskModel(id=rq_job.get_id(), name=name, description=description, user=self)
+        db.session.add(task)
+        return task
+
+    def get_tasks_in_progress(self):
+        return TaskModel.query.filter_by(user=self, complete=False).all()
+
+    def get_task_in_progress(self, name):
+        return TaskModel.query.filter_by(name=name, user=self, complete=False).first()
 
 
 def my_append_listener(target, value, initiator):

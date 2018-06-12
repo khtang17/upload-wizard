@@ -59,9 +59,12 @@ docs/_build/
 # PyBuilder
 target
 
-
-
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+config.py
+app/__init__.py
+
+
