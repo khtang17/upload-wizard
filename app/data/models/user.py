@@ -1,7 +1,5 @@
 from app import db
 
-from werkzeug.security import generate_password_hash, check_password_hash
-
 from flask_security import UserMixin, RoleMixin
 from flask_user import UserMixin
 from app.data.models.history import UploadHistoryModel
@@ -59,12 +57,6 @@ class UserModel(db.Model, UserMixin):
     #     self.password = password
     #     self.active = False
 
-    # def set_password(self, pwd):
-    #     self.password = generate_password_hash(pwd)
-    #
-    # def check_password(self, pwd):
-    #     return check_password_hash(self.password, pwd)
-
     def save_to_db(self):
         db.session.add(self)
         db.session.commit()
@@ -118,12 +110,14 @@ class UserModel(db.Model, UserMixin):
     #     db.session.add(task)
     #     return task
 
-    def launch_task(self, name, objects, description, *args, **kwargs):
-        print(len(objects))
-        rq_job = current_app.task_queue.enqueue('app.tasks.' + name, objects,
+    def launch_task(self, name, description, *args, **kwargs):
+        print('description:'+description)
+        rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
                                                 *args, **kwargs)
+        print('test2')
         task = TaskModel(id=rq_job.get_id(), name=name, description=description, user=self)
         db.session.add(task)
+        print('test3')
         return task
 
     def get_tasks_in_progress(self):
