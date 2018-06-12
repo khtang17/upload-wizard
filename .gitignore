@@ -64,7 +64,5 @@ target
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-config.py
-app/__init__.py
 
 
