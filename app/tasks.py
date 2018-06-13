@@ -6,7 +6,7 @@ from app.data.models.task import TaskModel
 from app.data.models.user import UserModel
 from app.data.models.catalog import CatalogModel
 from flask import render_template
-
+from app.email import send_email
 
 app = create_app()
 app.app_context().push()
@@ -42,12 +42,16 @@ def export_posts(user_id):
     try:
         catalog = CatalogModel('test', 'mandatory', 'test', 804)
         catalog.save_to_db()
-        #user = UserModel.find_by_username("chinzo")
-        # # send_email('You have granted access to system!',
-        #            sender=app.config['MAIL_DEFAULT_SENDER'],
-        #            recipients=[user.email],
-        #            text_body=render_template('email/user_role_notify.txt', user=user),
-        #            html_body=render_template('email/user_role_notify.html', user=user))
+        user = UserModel.find_by_username("test")
+        print("asdfasdf")
+        print(user.email)
+        for c in CatalogModel.find_by_history_id(804):
+            print(c.field_name)
+        send_email('You have granted access to system!',
+                   sender='upload.vendor@gmail.com',
+                   recipients=[user.email],
+                   text_body=render_template('email/user_role_notify.txt', user=user),
+                   html_body=render_template('email/user_role_notify.html', user=user), sync=True)
         # app.logger.error('Unhandled exception', exc_info="hi yu bn")
         # catalog = CatalogModel('test', 'mandatory', 'test', 804)
         # catalog.save_to_db()
