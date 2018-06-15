@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.20180611.9',
+    version='0.20180613.4',
 
     description='Upload Wizard v1.0',
     long_description='',
@@ -131,13 +131,21 @@ setup(
         'python-editor==1.0.3',
         'python3-openid==3.1.0',
         'pytz==2018.3',
+        'PyYAML==3.12',
+        'redis==2.10.6',
         'requests==2.18.4',
+        'rq==0.11.0',
+        'semantic-version==2.5.0',
         'six==1.11.0',
         'speaklater==1.3',
         'SQLAlchemy==1.2.4',
+        'tabulate==0.7.5',
+        'termcolor==1.1.0',
         'texttable==1.2.1',
         'urllib3==1.22',
         'visitor==0.1.3',
+        'wcwidth==0.1.7',
+        'websocket-client==0.48.0',
         'Werkzeug==0.14.1',
         'WTForms==2.1',
         'xlrd==1.1.0',
