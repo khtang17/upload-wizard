@@ -39,12 +39,15 @@ class JobLogModel(db.Model):
         return data
 
     def check_email_notify(self):
-        from app.email import notify_job_result_to_user
-        from app.data.models.history import UploadHistoryModel
-        if self.status_type == 4:
-            history = UploadHistoryModel.find_by_id(self.history_id)
-            if history.user.company.job_notify_email:
-                notify_job_result_to_user(history)
+        try:
+            from app.email import notify_job_result_to_user
+            from app.data.models.history import UploadHistoryModel
+            if self.status_type == 4:
+                history = UploadHistoryModel.find_by_id(self.history_id)
+                if history.user.company.job_notify_email:
+                    notify_job_result_to_user(history)
+        except:
+            pass
 
     def __str__(self):
         return self.status_type

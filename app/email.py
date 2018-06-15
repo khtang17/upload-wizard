@@ -10,11 +10,14 @@ def send_async_email(app, msg):
         mail.send(msg)
 
 
-def send_email(subject, sender, recipients, text_body, html_body):
+def send_email(subject, sender, recipients, text_body, html_body, sync=False):
     msg = Message(subject, sender=sender, recipients=recipients)
     msg.body = text_body
     msg.html = html_body
-    Thread(target=send_async_email, args=(current_app._get_current_object(), msg)).start()
+    if sync:
+        mail.send(msg)
+    else:
+        Thread(target=send_async_email, args=(current_app._get_current_object(), msg)).start()
 
 
 def notify_new_user_to_admin(user):
@@ -25,10 +28,8 @@ def notify_new_user_to_admin(user):
     send_email('New user registration!',
                sender=current_app.config['MAIL_DEFAULT_SENDER'],
                recipients=admin_emails,
-               text_body=render_template('email/email_confirmation_notify.txt',
-                                         user=user),
-               html_body=render_template('email/email_confirmation_notify.html',
-                                         user=user))
+               text_body=render_template('email/email_confirmation_notify.txt', user=user),
+               html_body=render_template('email/email_confirmation_notify.html', user=user))
 
 
 def notify_new_role_to_user(user):
