@@ -22,7 +22,7 @@
 			          });
 		</script>
 		<!--end::Web font -->        <!--begin::Base Styles -->                           <!--begin::Page Vendors -->
-		<link href="{{ url_for('static', filename='assets/vendors/custom/fullcalendar/fullcalendar.bundle.css')}}" rel="stylesheet" type="text/css" />
+{#		<link href="{{ url_for('static', filename='assets/vendors/custom/fullcalendar/fullcalendar.bundle.css')}}" rel="stylesheet" type="text/css" />#}
 		<!--end::Page Vendors -->
 		<link href="{{ url_for('static', filename='assets/vendors/base/vendors.bundle.css')}}" rel="stylesheet" type="text/css" />
 		<link href="{{ url_for('static', filename='assets/demo/demo6/base/style.bundle.css')}}"  rel="stylesheet" type="text/css" />
@@ -106,9 +106,6 @@
             $(window).on('load', function() {
                 $('body').removeClass('m-page--loading');
             });
-            function set_task_progress(task_id, progress) {
-                $('#' + task_id + '-progress').text(progress);
-            }
 		</script>
         <style>
             .circular--landscape {
