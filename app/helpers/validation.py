@@ -311,10 +311,10 @@ def excel_validation(request, form):
     # CatalogModel.save_objects(catalog_objs)
     # CatalogModel.save_mappings(catalog_dict)
     # CatalogModel.save_in_one_transaction(catalog_objs)
-    catalog = CatalogModel('validation', 'mandatory', 'test', 804)
-    catalog.save_to_db()
+    # catalog = CatalogModel('validation', 'mandatory', 'test', 804)
+    # catalog.save_to_db()
     # current_user.launch_task('save_catalog_bulk_data', catalog_objs, 'Validating an input...')
-    current_user.launch_task('export_posts', 'Validating an input...')
+    # current_user.launch_task('export_posts', 'Validating an input...')
     # db.session.commit()
     job_log = JobLogModel()
     job_log.status = "Finished"
