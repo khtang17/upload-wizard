@@ -16,8 +16,8 @@ import flask_excel as excel
 
 from flask_menu import Menu
 # from flask_restful import Api
-from redis import Redis
-import rq
+# from redis import Redis
+# import rq
 db = SQLAlchemy()
 migrate = Migrate()
 # api = Api()
@@ -54,8 +54,8 @@ def create_app(config_class=Config):
     moment.init_app(app)
     excel.init_excel(app)
 
-    app.redis = Redis.from_url(app.config['REDIS_URL'])
-    app.task_queue = rq.Queue('upload-tasks', connection=app.redis)
+    # app.redis = Redis.from_url(app.config['REDIS_URL'])
+    # app.task_queue = rq.Queue('upload-tasks', connection=app.redis)
 
     from app.data.models.company import CompanyModel
     from app.data.models.user import RoleModel
@@ -68,7 +68,7 @@ def create_app(config_class=Config):
     # Create admin
     admin = flask_admin.Admin(
         app,
-        'Vendor Upload v1.0: Admin Panel',
+        'Upload Wizard v1.0: Admin Panel',
         base_template='master.html',
         template_mode='bootstrap3',
     )

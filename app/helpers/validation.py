@@ -16,7 +16,10 @@ import subprocess
 import numbers
 from app import db
 from flask import request, jsonify
+# from boto import sns
+import json
 
+# sns_conn = sns.connect_to_region('us-east-1')
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
@@ -299,14 +302,15 @@ def excel_validation(request, form):
     for item_list in dict_value[1:]:
         for index, value in enumerate(item_list):
             if headers[index] in mandatory_fields:
-                catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
-                # catalog_dict.append(
-                #     dict(field_name=headers[index], type='mandatory', value=value, history_id=history.id))
+                # catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
+                catalog_dict.append(
+                    dict(field_name=headers[index], type='mandatory', value=value, history_id=history.id))
             if headers[index] in optional_fields:
-                catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
-                # catalog_dict.append(
-                #     dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
+                # catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
+                catalog_dict.append(
+                    dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
     print("line 304")
+    # publish_to_sns(catalog_dict)
     # print(catalog_dict)
     # CatalogModel.save_objects(catalog_objs)
     # CatalogModel.save_mappings(catalog_dict)
@@ -329,3 +333,8 @@ def excel_validation(request, form):
     return {"message": "Your excel file has been submitted!"}, 200
 
 
+# def publish_to_sns(signup_data):
+#     try:
+#          sns_conn.publish(current_app.config['NEW_SIGNUP_TOPIC'], json.dumps(signup_data), "New signup: %s" % 'chinzo.dandar@gmail.com')
+#     except Exception as ex:
+#         sys.stderr.write("Error publishing subscription message to SNS: %s" % ex.message)

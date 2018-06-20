@@ -25,6 +25,10 @@ import flask_excel as excel
 def _after_confirmed_hook(sender, user, **extra):
     notify_new_user_to_admin(user)
 
+@application.route('/worker', methods=['GET', 'POST'])
+def worker():
+    return redirect()
+
 
 @application.route('/welcome')
 @login_required
