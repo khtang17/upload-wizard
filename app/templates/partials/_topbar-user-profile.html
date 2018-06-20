@@ -1,6 +1,6 @@
 <li class="m-nav__item m-topbar__user-profile  m-dropdown m-dropdown--medium m-dropdown--arrow  m-dropdown--align-right m-dropdown--mobile-full-width m-dropdown--skin-light" m-dropdown-toggle="click">
 	<a href="#" class="m-nav__link m-dropdown__toggle">
-{#        <div class="circular--landscape"><img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" alt=""/></div>#}
+        <div class="circular--landscape"><img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" alt=""/></div>
 	</a>
 	<div class="m-dropdown__wrapper">
 		<span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
@@ -8,11 +8,11 @@
 			<div class="m-dropdown__header m--align-center">
 				<div class="m-card-user m-card-user--skin-light">
 					<div class="circular--landscape">
-{#                        {% if current_user.company.logo %}#}
-{#                            <img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" >#}
-{#                        {% else %}#}
-{#                            <img src="/static/images/empty-small.png" >#}
-{#                        {% endif %}#}
+                        {% if current_user.company.logo %}
+                            <img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" >
+                        {% else %}
+                            <img src="/static/images/empty-small.png" >
+                        {% endif %}
 					</div>
 					<div class="m-card-user__details">
 						<span class="m-card-user__name m--font-weight-500">
