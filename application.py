@@ -1,4 +1,5 @@
 from app import create_app
+# from boto.connection import AWSAuthConnection
 
 application = create_app()
 
