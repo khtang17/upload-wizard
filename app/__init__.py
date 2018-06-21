@@ -18,6 +18,25 @@ from flask_menu import Menu
 # from flask_restful import Api
 # from redis import Redis
 # import rq
+
+# BEGIN CELERY
+from celery import Celery
+
+
+def make_celery(application):
+    celery = Celery(application.import_name, broker=application.config['CELERY_BROKER_URL'])
+    celery.conf.update(application.config)
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with application.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery
+# DONE CELERY
+
+
 db = SQLAlchemy()
 migrate = Migrate()
 # api = Api()
@@ -56,6 +75,12 @@ def create_app(config_class=Config):
 
     # app.redis = Redis.from_url(app.config['REDIS_URL'])
     # app.task_queue = rq.Queue('upload-tasks', connection=app.redis)
+
+    # Point to the new AWS SQS
+    #   Be sure to change the URL to your CELERY_BROKER
+    app.config.update(CELERY_BROKER_URL='sqs://sqs.us-west-1.amazonaws.com/892261348956/flask-es')
+    # Wrap the bootstrapped application in celery
+    celery = make_celery(app)
 
     from app.data.models.company import CompanyModel
     from app.data.models.user import RoleModel
