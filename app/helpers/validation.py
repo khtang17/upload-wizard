@@ -328,7 +328,7 @@ def excel_validation(request, form):
     print("ttt line 304")
     try:
         print("t1")
-        store_in_dynamo(catalog_dict)
+        # store_in_dynamo(catalog_dict)
         print("t2")
         publish_to_sns(catalog_dict)
         print("t3")
@@ -360,9 +360,9 @@ def excel_validation(request, form):
 
 def store_in_dynamo(signup_data):
     print("t4")
-    signup_item = Item(ddb_table, data=signup_data)
+    # signup_item = Item(ddb_table, data=signup_data)
     print("t5")
-    signup_item.save()
+    # signup_item.save()
     print("t6")
 
 
