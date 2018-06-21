@@ -25,17 +25,18 @@ from boto import sns
 from flask import request, Response
 import json
 
+from app.tasks import get_location
 
-AWS_REGION = 'us-east-1'
-NEW_SIGNUP_TOPIC = 'sns_topic'
-STARTUP_SIGNUP_TABLE = 'your_ddb_table_name'
-
-# Connect to DynamoDB and get ref to Table
-ddb_conn = dynamodb2.connect_to_region('us-east-1')
-ddb_table = Table(table_name=STARTUP_SIGNUP_TABLE, connection=ddb_conn)
-
-# Connect to SNS
-sns_conn = sns.connect_to_region('us-east-1')
+# AWS_REGION = 'us-east-1'
+# NEW_SIGNUP_TOPIC = 'sns_topic'
+# STARTUP_SIGNUP_TABLE = 'your_ddb_table_name'
+#
+# # Connect to DynamoDB and get ref to Table
+# ddb_conn = dynamodb2.connect_to_region('us-east-1')
+# ddb_table = Table(table_name=STARTUP_SIGNUP_TABLE, connection=ddb_conn)
+#
+# # Connect to SNS
+# sns_conn = sns.connect_to_region('us-east-1')
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
@@ -326,16 +327,17 @@ def excel_validation(request, form):
                 catalog_dict.append(
                     dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
     print("ttt line 304")
-    try:
-        print("t1")
-        # store_in_dynamo(catalog_dict)
-        print("t2")
-        publish_to_sns(catalog_dict)
-        print("t3")
-    except ConditionalCheckFailedException:
-        return Response("aldaa", status=409, mimetype='application/json')
-
-    return Response(json.dumps(catalog_dict), status=201, mimetype='application/json')
+    print("celery: {}".format(get_location()))
+    # try:
+    #     print("t1")
+    #     # store_in_dynamo(catalog_dict)
+    #     print("t2")
+    #     publish_to_sns(catalog_dict)
+    #     print("t3")
+    # except ConditionalCheckFailedException:
+    #     return Response("aldaa", status=409, mimetype='application/json')
+    #
+    # return Response(json.dumps(catalog_dict), status=201, mimetype='application/json')
     # print(catalog_dict)
     # CatalogModel.save_objects(catalog_objs)
     # CatalogModel.save_mappings(catalog_dict)
@@ -358,16 +360,16 @@ def excel_validation(request, form):
     return {"message": "Your excel file has been submitted!"}, 200
 
 
-def store_in_dynamo(signup_data):
-    print("t4")
-    # signup_item = Item(ddb_table, data=signup_data)
-    print("t5")
-    # signup_item.save()
-    print("t6")
-
-
-def publish_to_sns(signup_data):
-    try:
-         sns_conn.publish('sns_topic', json.dumps(signup_data), "New signup: %s" % 'chinzo.dandar@gmail.com')
-    except Exception as ex:
-        sys.stderr.write("Error publishing subscription message to SNS: %s" % ex.message)
+# def store_in_dynamo(signup_data):
+#     print("t4")
+#     # signup_item = Item(ddb_table, data=signup_data)
+#     print("t5")
+#     # signup_item.save()
+#     print("t6")
+#
+#
+# def publish_to_sns(signup_data):
+#     try:
+#          sns_conn.publish('sns_topic', json.dumps(signup_data), "New signup: %s" % 'chinzo.dandar@gmail.com')
+#     except Exception as ex:
+#         sys.stderr.write("Error publishing subscription message to SNS: %s" % ex)
