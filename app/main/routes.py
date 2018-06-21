@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, current_app, app
+from flask import render_template, flash, redirect, url_for, current_app, app, request, Response
 from flask_user import current_user, roles_required, user_confirmed_email, login_required
 
 from app.data.models.format import FileFormatModel
@@ -24,10 +24,6 @@ import flask_excel as excel
 @user_confirmed_email.connect_via(application)
 def _after_confirmed_hook(sender, user, **extra):
     notify_new_user_to_admin(user)
-
-@application.route('/worker', methods=['GET', 'POST'])
-def worker():
-    return redirect()
 
 
 @application.route('/welcome')
