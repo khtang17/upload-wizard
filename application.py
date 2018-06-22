@@ -32,7 +32,7 @@ def take_test():
     return render_template('test.html')
 
 #Celery Task
-@celery.task(name='tasks.get_location', queue="flask-es")
+@celery.task(name='tasks.get_location')
 def get_location(user):
         # Get the location from the API
         print("hi from celery")
