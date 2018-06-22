@@ -19,32 +19,9 @@ from flask_menu import Menu
 # from redis import Redis
 # import rq
 
-# BEGIN CELERY
-from celery import Celery
 
 
-def make_celery(application):
-    celery = Celery(application.import_name, broker=application.config['CELERY_BROKER_URL'])
-    celery.conf.update(application.config)
-    TaskBase = celery.Task
-    class ContextTask(TaskBase):
-        abstract = True
-        def __call__(self, *args, **kwargs):
-            with application.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
-    celery.Task = ContextTask
-    return celery
-# DONE CELERY
 
-###Celery Task
-@celery.task(name='tasks.get_location')
-def get_location(user):
-        # Get the location from the API
-        from app.data.models.catalog import CatalogModel
-        catalog = CatalogModel('celery', 'celery', 'celery', 804)
-        catalog.save_to_db()
-        return
-###End Task
 
 
 db = SQLAlchemy()
@@ -53,7 +30,6 @@ migrate = Migrate()
 mail = Mail()
 moment = Moment()
 bootstrap = Bootstrap()
-global celery
 # app = Flask(__name__)
 # app.config.from_object(Config)
 # db = SQLAlchemy(app)
@@ -91,7 +67,7 @@ def create_app(config_class=Config):
     app.config.update(CELERY_BROKER_URL='sqs://sqs.us-west-1.amazonaws.com/892261348956/flask-es')
     # app.config.update(CELERY_BROKER_URL='sqs://AKIAJOX2FI6TLU6VKXSA:jGvsUp1FVBW+O46ZbRT5lHAP4fsL8OyBUix5SJaX@')
     # Wrap the bootstrapped application in celery
-    celery = make_celery(app)
+
 
     from app.data.models.company import CompanyModel
     from app.data.models.user import RoleModel
