@@ -1,12 +1,15 @@
 from celery import Celery
-from app.data.models.catalog import CatalogModel
-
+# from flask_sqlalchemy import SQLAlchemy
+# from flask import Flask
 # Be sure to add your SQS URL below!
 #broker='sqs://AKIAJOX2FI6TLU6VKXSA:jGvsUp1FVBW+O46ZbRT5lHAP4fsL8OyBUix5SJaX@'
 # application = Celery('tasks', broker='sqs://sqs.us-east-1.amazonaws.com/892261348956/flask-es')
 application = Celery('tasks', broker='sqs://AKIAJOX2FI6TLU6VKXSA:jGvsUp1FVBW+O46ZbRT5lHAP4fsL8OyBUix5SJaX@')
 
 
+# app = Flask(__name__)
+# app.config
+# db = SQLAlchemy(app)
 # class ESConnection(AWSAuthConnection):
 #     def __init__(self, region, **kwargs):
 #         super(ESConnection, self).__init__(**kwargs)
@@ -22,13 +25,15 @@ application = Celery('tasks', broker='sqs://AKIAJOX2FI6TLU6VKXSA:jGvsUp1FVBW+O46
 #       host='uploadwizardeb-dev.us-west-1.elasticbeanstalk.com',
 #       is_secure=False)
 
+# app = create_app()
+# app.app_context().push()
+
 
 @application.task(name='tasks.get_location')
 def get_location(catalog_dict):
         print("h1")
         print(catalog_dict)
-        catalog = CatalogModel('celery', 'celery', 'celery', 804)
-        catalog.save_to_db()
+
         print("h2")
         # Get the location from the API
         # r = requests.get('http://freegeoip.net/json/' + address)

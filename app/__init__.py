@@ -36,6 +36,16 @@ def make_celery(application):
     return celery
 # DONE CELERY
 
+###Celery Task
+@celery.task(name='tasks.get_location')
+def get_location(user):
+        # Get the location from the API
+        from app.data.models.catalog import CatalogModel
+        catalog = CatalogModel('celery', 'celery', 'celery', 804)
+        catalog.save_to_db()
+        return
+###End Task
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -43,7 +53,7 @@ migrate = Migrate()
 mail = Mail()
 moment = Moment()
 bootstrap = Bootstrap()
-
+global celery
 # app = Flask(__name__)
 # app.config.from_object(Config)
 # db = SQLAlchemy(app)
