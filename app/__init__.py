@@ -18,11 +18,7 @@ from flask_menu import Menu
 # from flask_restful import Api
 # from redis import Redis
 # import rq
-
-
-
-
-
+from celery import Celery
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -67,6 +63,18 @@ def create_app(config_class=Config):
     # app.config.update(CELERY_BROKER_URL='sqs://sqs.us-west-1.amazonaws.com/892261348956/flask-es')
     app.config.update(CELERY_BROKER_URL='sqs://AKIAJOX2FI6TLU6VKXSA:jGvsUp1FVBW+O46ZbRT5lHAP4fsL8OyBUix5SJaX@')
     # Wrap the bootstrapped application in celery
+    celery = Celery("flask-es", broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    celery.conf.broker_transport_options = {'region': 'us-west-1'}
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+
+    celery.Task = ContextTask
 
 
     from app.data.models.company import CompanyModel
