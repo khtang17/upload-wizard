@@ -64,8 +64,8 @@ def create_app(config_class=Config):
 
     # Point to the new AWS SQS
     #   Be sure to change the URL to your CELERY_BROKER
-    app.config.update(CELERY_BROKER_URL='sqs://sqs.us-west-1.amazonaws.com/892261348956/flask-es')
-    # app.config.update(CELERY_BROKER_URL='sqs://AKIAJOX2FI6TLU6VKXSA:jGvsUp1FVBW+O46ZbRT5lHAP4fsL8OyBUix5SJaX@')
+    # app.config.update(CELERY_BROKER_URL='sqs://sqs.us-west-1.amazonaws.com/892261348956/flask-es')
+    app.config.update(CELERY_BROKER_URL='sqs://AKIAJOX2FI6TLU6VKXSA:jGvsUp1FVBW+O46ZbRT5lHAP4fsL8OyBUix5SJaX@')
     # Wrap the bootstrapped application in celery
 
 

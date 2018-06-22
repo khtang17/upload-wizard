@@ -5,8 +5,10 @@ from celery import Celery
 
 
 def make_celery(application):
-    celery = Celery(application.import_name, broker=application.config['CELERY_BROKER_URL'])
+    # celery = Celery(application.import_name, broker=application.config['CELERY_BROKER_URL'])
+    celery = Celery("flask-es", broker=application.config['CELERY_BROKER_URL'])
     celery.conf.update(application.config)
+    celery.conf.broker_transport_options = {'region': 'us-west-1'}
     TaskBase = celery.Task
     class ContextTask(TaskBase):
         abstract = True
@@ -22,7 +24,7 @@ application = create_app()
 celery = make_celery(application)
 
 #Celery Task
-@celery.task(name='tasks.get_location')
+@celery.task(name='tasks.get_location', queue="flask-es")
 def get_location(user):
         # Get the location from the API
         from app.data.models.catalog import CatalogModel
