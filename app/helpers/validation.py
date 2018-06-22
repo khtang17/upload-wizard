@@ -19,7 +19,7 @@ from flask import request, jsonify
 
 from flask import request, Response
 import json
-from app.tasks import get_location
+from app import get_location
 
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
