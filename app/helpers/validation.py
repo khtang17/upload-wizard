@@ -19,7 +19,7 @@ from flask import request, jsonify
 
 from flask import request, Response
 import json
-from app.tasks import get_location
+# from app.tasks import get_location
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
@@ -311,7 +311,7 @@ def excel_validation(request, form):
                     dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
     print("ttt line 304")
 
-    print("celery: {}".format(get_location.delay("")))
+    # print("celery: {}".format(get_location.delay("")))
     # try:
     #     print("t1")
     #     # store_in_dynamo(catalog_dict)
