@@ -29,7 +29,7 @@ def take_test():
     print("test1")
     get_location.delay("")
     print("test2")
-    return render_template('tests.html')
+    return render_template('test.html')
 
 #Celery Task
 @celery.task(name='tasks.get_location', queue="flask-es")
