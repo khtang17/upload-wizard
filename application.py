@@ -33,7 +33,9 @@ def get_location(user):
 
 @application.route('/test', methods=['GET', 'POST'])
 def take_test():
+    print("test1")
     get_location.delay("")
+    print("test2")
     return "test"
 
 if __name__ == '__main__':
