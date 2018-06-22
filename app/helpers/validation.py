@@ -19,8 +19,6 @@ from flask import request, jsonify
 
 from flask import request, Response
 import json
-from app import get_location
-
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
