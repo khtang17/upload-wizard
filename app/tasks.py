@@ -1,5 +1,3 @@
-from boto.connection import AWSAuthConnection
-import requests
 from celery import Celery
 
 # Be sure to add your SQS URL below!

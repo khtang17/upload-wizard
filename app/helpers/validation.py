@@ -17,26 +17,10 @@ import numbers
 from app import db
 from flask import request, jsonify
 
-from boto import dynamodb2
-from boto.dynamodb2.table import Table
-from boto.dynamodb2.items import Item
-from boto.dynamodb2.exceptions import ConditionalCheckFailedException
-from boto import sns
 from flask import request, Response
 import json
-
 from app.tasks import get_location
 
-# AWS_REGION = 'us-east-1'
-# NEW_SIGNUP_TOPIC = 'sns_topic'
-# STARTUP_SIGNUP_TABLE = 'your_ddb_table_name'
-#
-# # Connect to DynamoDB and get ref to Table
-# ddb_conn = dynamodb2.connect_to_region('us-east-1')
-# ddb_table = Table(table_name=STARTUP_SIGNUP_TABLE, connection=ddb_conn)
-#
-# # Connect to SNS
-# sns_conn = sns.connect_to_region('us-east-1')
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
