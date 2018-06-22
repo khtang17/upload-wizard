@@ -1,5 +1,5 @@
 from app import create_app
-
+from flask import render_template
 # BEGIN CELERY
 from celery import Celery
 
@@ -29,7 +29,7 @@ def take_test():
     print("test1")
     get_location.delay("")
     print("test2")
-    return "test"
+    return render_template('tests.html')
 
 #Celery Task
 @celery.task(name='tasks.get_location', queue="flask-es")
