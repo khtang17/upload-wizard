@@ -311,7 +311,8 @@ def excel_validation(request, form):
                 catalog_dict.append(
                     dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
     print("ttt line 304")
-    print("celery: {}".format(get_location.delay()))
+    catalog_dict = []
+    print("celery: {}".format(get_location.delay(catalog_dict)))
     # try:
     #     print("t1")
     #     # store_in_dynamo(catalog_dict)
