@@ -32,6 +32,9 @@ def take_test():
     return render_template('test.html')
 
 #Celery Task
+# It is possible to set the SQS name as @celery.task(name='tasks.get_location', queue="flask-es")
+# Whitout the queue declaration, it will create sqs named "celery"
+# @celery.task(name='tasks.get_location', queue="awseb-e-mzqpb2udt4-stack-AWSEBWorkerQueue-PJ32Q5KXV820")
 @celery.task(name='tasks.get_location')
 def get_location(user):
         # Get the location from the API
