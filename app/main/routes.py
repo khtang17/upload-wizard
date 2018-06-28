@@ -61,18 +61,21 @@ def company():
                                    cas=form.cas.data,
                                    price=form.price.data,
                                    job_notify_email=form.job_notify_email.data)
-
+            print("64")
             if form.file.data:
                 if check_img_type(form.file.data):
                     company.logo = save_file(form.file.data, form.name.data, True)
                     print(company.logo)
                 else:
+                    print("70")
                     return False
-
+            print("72")
             company.save_to_db()
+            print("74")
             user = UserModel.find_by_email(current_user.email)
             user.company_id = company.id
             user.save_to_db()
+            print("78")
         else:
             if company_name_duplication and company_name_duplication.id != int(form.id.data):
                 return jsonify({"message": "This company has already registered by other user"}, 400)

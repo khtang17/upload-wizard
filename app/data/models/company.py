@@ -31,7 +31,7 @@ class CompanyModel(db.Model):
     def __init__(self, name, description, address, telephone_number,
                  toll_free_number, fax_number, website, sales_email,
                  personal_contact_name, personal_contact_email,
-                 idnumber, cmpdname, cas, price):
+                 idnumber, cmpdname, cas, price, job_notify_email):
         self.name = name
         self.description = description
         self.address = address
@@ -46,6 +46,7 @@ class CompanyModel(db.Model):
         self.cmpdname = cmpdname
         self.cas = cas
         self.price = price
+        self.job_notify_email = job_notify_email
 
     @property
     def url(self):
