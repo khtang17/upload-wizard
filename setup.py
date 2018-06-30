@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.20180628.1',
+    version='0.20180628.8',
 
     description='Upload Wizard v1.0',
     long_description='',
@@ -159,7 +159,6 @@ setup(
     ],
 
     scripts=(
-        '.env',
         'application.py',
         'config.py',
         'setup.py',
@@ -192,9 +191,9 @@ setup(
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
-    entry_points={
-        'console_scripts': [
-            'sample=app.py:main',
-        ],
-    },
+    # entry_points={
+    #     'console_scripts': [
+    #         'sample=application.py:main',
+    #     ],
+    # },
 )

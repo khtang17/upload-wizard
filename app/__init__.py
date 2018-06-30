@@ -15,10 +15,10 @@ from flask_mail import Mail
 import flask_excel as excel
 
 from flask_menu import Menu
-# from flask_restful import Api
-# from redis import Redis
-# import rq
-from celery import Celery
+# # from flask_restful import Api
+# # from redis import Redis
+# # import rq
+# from celery import Celery
 
 db = SQLAlchemy()
 migrate = Migrate()
