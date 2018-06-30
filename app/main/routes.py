@@ -214,19 +214,20 @@ def job_logs():
 @roles_required('Vendor')
 @register_menu(application, '.second', 'File Upload', order=2)
 def upload():
-    # if current_app.config['ZINC_MODE']:
-    form = UploadForm()
-    formats = FileFormatModel.find_all()
-    if request.method == 'POST' and form.validate_on_submit():
-        if allowed_file2(form.file.data.filename):
-            #return jsonify({"result": request.get_book_dict(field_name='file')})
-            return jsonify(excel_validation(request, form))
-        return_msg = validate(form.file.data, form)
-        return jsonify(return_msg)
-    # else:
-    #     # return_msg = validate(form)
-    #     return jsonify(return_msg)
-    return render_template('upload.html', title='Upload File', form=form, formats=formats)
+    if current_app.config['ZINC_MODE']:
+        form = UploadForm()
+        formats = FileFormatModel.find_all()
+        if request.method == 'POST' and form.validate_on_submit():
+            return_msg = validate(form.file.data, form)
+            return jsonify(return_msg)
+        # else:
+        #     # return_msg = validate(form)
+        #     return jsonify(return_msg)
+        return render_template('upload.html', title='Upload File', form=form, formats=formats)
+    else:
+        if request.method == 'POST':
+            return jsonify(excel_validation(request))
+        return render_template('upload.html', title='Upload File')
 
 
 @application.route('/histories', methods=['GET', 'POST'])

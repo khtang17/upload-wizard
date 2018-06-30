@@ -60,6 +60,17 @@
                     </div>
                 </div>
             </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <form method="post" enctype="multipart/form-data">
+                        <div class="form-group  required"><label class="control-label" for="file">File:</label>
+                            <input class="form-control btn btn-outline-info" id="file" name="file" required="" type="file">
+                        </div>
+                        <input class="btn btn-success" id="submit" name="submit" type="submit" value="Upload">
+                        </form>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>

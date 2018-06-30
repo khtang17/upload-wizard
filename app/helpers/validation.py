@@ -157,7 +157,7 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
         return {"message": "1: " + str(sys.exc_info()[0])}, 500
 
 
-def excel_validation(request, form):
+def excel_validation(request):
     warning_msg = []
     error_msg = []
     mandatory_fields = [mand.field_name.lower() for mand in FieldModel.find_by_mandatory(True)]
@@ -187,13 +187,12 @@ def excel_validation(request, form):
     else:
         error_msg.append(["", "Mandatory field missing {}".format(set(mandatory_fields)-set(headers))])
 
-    form.file.data.seek(0, os.SEEK_END)
-    file_length = form.file.data.tell()
+    file = request.files['file']
+    file.seek(0, os.SEEK_END)
+    file_length = file.tell()
     file_size = size(file_length, system=alternative)
-    history = UploadHistoryModel(current_user.id, secure_filename(form.file.data.filename), file_size)
-    history.type = form.type.data
-    history.purchasability = form.purchasability.data
-    history.natural_products = form.natural_products.data
+    history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
+    history.data_dict = request.get_dict(field_name='file')
     history.save_to_db()
 
     decimal_fields = FieldDecimalModel.find_all()
