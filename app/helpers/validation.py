@@ -192,7 +192,7 @@ def excel_validation(request):
     file_length = file.tell()
     file_size = size(file_length, system=alternative)
     history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
-    history.data_dict = request.get_dict(field_name='file')
+    history.data_array = str(request.get_array(field_name='file'))
     history.save_to_db()
 
     decimal_fields = FieldDecimalModel.find_all()
