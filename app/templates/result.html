@@ -24,6 +24,9 @@
 {#                    <a href="{{ url_for('main.export', history_id=history.id, type='txt') }}" >.txt</a>#}
                 </p>
             {% endif %}
+            <p><b>Raw file: </b>
+                <a href="{{ url_for('main.export', history_id=history.id, type='raw') }}" >raw file as xlsx</a>,
+            </p>
             <br/>
             <div id="mCSB_5_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
                 <div class="m-timeline-2">

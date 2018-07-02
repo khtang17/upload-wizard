@@ -258,8 +258,11 @@ def get_histories():
 
 @application.route("/export/<history_id>/<type>", methods=['GET'])
 def export(history_id, type):
-    # history_id = request.args.get('id', type=int)
-    # type = request.args.get('type', type=str)
+    if str(type).startswith('raw'):
+        history = UploadHistoryModel.find_by_id(history_id)
+        return excel.make_response_from_array(eval(history.data_array), 'xlsx',
+                                              file_name="export_raw_data_{}".format(history_id))
+
     if not str(type).lower() in ['xls', 'xlsx', 'csv', 'tsv']:
         return render_template('errors/404.html'), 404
 
@@ -274,6 +277,7 @@ def export(history_id, type):
     data = [c.value for c in catalogs]
     values = [data[i:i + attr_count] for i in range(0, len(data), attr_count)]
     values.insert(0, title)
+    print(values)
     return excel.make_response_from_array(values, str(type).lower(),
                                           file_name="export_data_{}".format(history_id))
     # return excel.make_response_from_array(

@@ -27,7 +27,6 @@
                 </div>
             </div>
 
-
             {% if config['ZINC_MODE'] %}
             <div class="row">
                 <div class="col-md-4">
@@ -39,8 +38,11 @@
                 <div class="m-demo" data-code-preview="true" data-code-html="true" data-code-js="false">
                     <div class="m-demo__preview">
                         <p class="lead">
-                             <h5>Acceptable file formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv,
-                            .tsv, .xls, .xlsx, .xlsm</h5>
+                             <h5>Acceptable file formats:
+                                  {% if config['ZINC_MODE'] %}
+                                      .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi,
+                                  {% endif %}
+                                      .csv, .tsv, .xls, .xlsx, .xlsm</h5>
                             <h5>Special requirements for the <strong>.TXT</strong> file:</h5>
                             <ul>
                                 <li>
@@ -131,9 +133,14 @@
                                 $('.alert-danger').show();
                             }else{
                                 $('.progress').hide();
-                                $('.alert-danger .text').text('Please upload only allowed files! ' +
-                                    '(.bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, ' +
-                                    '.tsv, .xls, .xlsx, .xlsm)');
+                                {% if config['ZINC_MODE'] %}
+                                    var err_text = 'Please upload only allowed files! (.bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, ' +
+                                    '.csv, .tsv, .xls, .xlsx, .xlsm)';
+                                {% else %}
+                                    var err_text = 'Please upload only allowed files! (.csv, .tsv, .xls, .xlsx, .xlsm)';
+                                {% endif %}
+
+                                $('.alert-danger .text').text(err_text);
                                 $('.alert-danger').show();
                             }
                             $('#file').show();
@@ -153,14 +160,26 @@
 
                     var file = this.files[0];
                     var val = $(this).val().toLowerCase(),
-                        regex = new RegExp("(.*?)\.(bz2|7z|tar|gz|zip|sdf|txt|smi|csv|xls|xlsx|xlsm|tsv)$");
+                        {% if config['ZINC_MODE'] %}
+                            regex = new RegExp("(.*?)\.(bz2|7z|tar|gz|zip|sdf|txt|smi|csv|xls|xlsx|xlsm|tsv)$");
+                        {% else %}
+                            regex = new RegExp("(.*?)\.(csv|xls|xlsx|xlsm|tsv)$");
+                        {% endif %}
+
 
                     if (!(regex.test(val))) {
                         $(this).val('');
                         $('.progress').hide();
-                        $('.alert-danger .text').text('Invalid file format. ' +
-                            'Allowed formats: .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, .csv, ' +
-                            '.tsv, .xls, .xlsx, .xlsm');
+                        {% if config['ZINC_MODE'] %}
+                            var err_text = 'Invalid file format. Allowed formats: ' +
+                                ' .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, ' +
+                                '.csv, .tsv, .xls, .xlsx, .xlsm';
+                        {% else %}
+                             var err_text = 'Invalid file format. Allowed formats: ' +
+                            '.csv, .tsv, .xls, .xlsx, .xlsm';
+                        {% endif %}
+
+                        $('.alert-danger .text').text(err_text);
                         $('.alert-danger').show();
                         $('#submit').attr('disabled', '');
                         return false;

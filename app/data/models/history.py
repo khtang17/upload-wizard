@@ -57,9 +57,9 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     file_size = db.Column(db.String(200))
     type = db.Column(db.String(50))
     purchasability = db.Column(db.String(50))
-    natural_products = db.Column(db.Boolean(), nullable=False)
+    natural_products = db.Column(db.Boolean(), nullable=False, default=False)
     status = db.Column(db.Integer, index=True, nullable=False, default=1)
-    data_dict = db.Column(db.Text, nullable=True)
+    data_array = db.Column(db.Text, nullable=True)
     job_logs = db.relationship(JobLogModel,
                                order_by='asc(JobLogModel.date)',
                                backref='history',
