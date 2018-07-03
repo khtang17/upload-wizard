@@ -70,6 +70,10 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                                backref='history',
                                lazy='dynamic')
 
+    @classmethod
+    def get_last_by_user_id(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).order_by(cls.id.desc()).first()
+
     def to_dict(self):
         data = {
             'ID': self.id,

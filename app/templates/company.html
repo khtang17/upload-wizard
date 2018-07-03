@@ -45,7 +45,7 @@
                         <div class="col-md-6">
                             <div id="image-preview-div" style="display: none">
                                 {% if form.logo.data %}
-                                    <img id="preview-img" src="http://files.docking.org/vendorlogos/{{ form.logo.data }}">
+                                    <img id="preview-img" src="/static/vendorlogos/{{ form.logo.data }}">
                                 {% else %}
                                     <img id="preview-img" src="/static/images/empty-small.png">
                                 {% endif %}
@@ -188,6 +188,7 @@
                         </span>
                     </div>
                 </div>
+                {% if config['ZINC_MODE'] %}
                 <div class="form-group m-form__group row">
                     <div class="col-lg-6">
                         <label>
@@ -228,6 +229,7 @@
                         </span>
                     </div>
                 </div>
+                {% endif %}
             </div>
             <div class="m-portlet__foot m-portlet__no-border m-portlet__foot--fit">
                 <div class="m-form__actions m-form__actions--solid">
