@@ -165,6 +165,13 @@ def history():
                            pagestart=pagestart)
 
 
+@application.route('/last_result', methods=['GET', 'POST'])
+@login_required
+def last_result():
+    history = UploadHistoryModel.get_last_by_user_id(current_user.id)
+    return render_template('result.html', title='Job Result', history=history)
+
+
 @application.route('/result', methods=['GET', 'POST'])
 @login_required
 def result():

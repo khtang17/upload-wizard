@@ -110,6 +110,7 @@ def save_file(file, name, is_logo, id=""):
                 user_folder += "vendor"
             user_folder += "/" + str(id) + "/"
             folder = current_app.config['UPLOAD_FOLDER'] + user_folder
+        print(os.path.dirname(folder))
         file_dir = os.path.realpath(os.path.dirname(folder))
         pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
         file.stream.seek(0)
@@ -323,7 +324,9 @@ def excel_validation(request):
     # return Response(json.dumps(catalog_dict), status=201, mimetype='application/json')
     # print(catalog_dict)
     # CatalogModel.save_objects(catalog_objs)
-    # CatalogModel.save_mappings(catalog_dict)
+
+    CatalogModel.save_mappings(catalog_dict)
+
     # CatalogModel.save_in_one_transaction(catalog_objs)
     # catalog = CatalogModel('validation', 'mandatory', 'test', 804)
     # catalog.save_to_db()
