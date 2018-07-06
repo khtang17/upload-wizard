@@ -8,17 +8,19 @@ from app.data.models.user import UserModel
 from app.data.models.company import CompanyModel
 from app.data.models.history import UploadHistoryModel
 from app.data.models.job_log import JobLogModel
-from app.data.models.catalog import CatalogModel
 from flask import request
 
 from app.helpers.validation import validate, check_img_type, save_file, allowed_file2, excel_validation
-from app.email import notify_new_user_to_admin
+from app.email import notify_new_user_to_admin, send_password_reset_email
 from app.main import application
 import os
 from flask_menu import Menu, register_menu
 
 from flask import Flask, request, jsonify
 import flask_excel as excel
+
+from app.data.forms.reset_form import ResetPasswordRequestForm, ResetPasswordForm
+from app import db
 
 
 @user_confirmed_email.connect_via(application)
@@ -249,44 +251,74 @@ def get_histories():
     return jsonify(data)
 
 
-# @bp.route("/upload2", methods=['GET', 'POST'])
-# def upload_file2():
-#     if request.method == 'POST':
-#         return jsonify({"result": request.get_book_dict(field_name='file')})
-#     return '''
-#     <!doctype html>
-#     <title>Upload an excel file</title>
-#     <h1>Excel file upload (csv, tsv, csvz, tsvz only)</h1>
-#     <form action="" method=post enctype=multipart/form-data><p>
-#     <input type=file name=file><input type=submit value=Upload>
-#     </form>
-#     '''
+@application.route("/export/<history_id>", methods=['GET'])
+def export(history_id):
+    history = UploadHistoryModel.find_by_id(history_id)
+    return excel.make_response_from_array(eval(history.data_array), 'xlsx',
+                                          file_name="export_raw_data_{}".format(history_id))
 
 
-@application.route("/export/<history_id>/<type>", methods=['GET'])
-def export(history_id, type):
-    if str(type).startswith('raw'):
-        history = UploadHistoryModel.find_by_id(history_id)
-        return excel.make_response_from_array(eval(history.data_array), 'xlsx',
-                                              file_name="export_raw_data_{}".format(history_id))
+@application.route('/reset_password_request', methods=['POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        # return redirect(url_for('main.welcome'))
+        pass
+    form = ResetPasswordRequestForm()
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
+        user = UserModel.query.filter_by(email=form.email.data).first()
+        print("email3")
+        if user:
+            print("email4")
+            send_password_reset_email(user)
+        flash('Check your email for the instructions to reset your password')
+        return redirect(url_for('user.login'))
+    return render_template('reset_password_request.html',
+                           title='Reset Password', form=form)
 
-    if not str(type).lower() in ['xls', 'xlsx', 'csv', 'tsv']:
-        return render_template('errors/404.html'), 404
 
-    catalogs = CatalogModel.find_by_history_id(history_id)
-    # try:
-    #     attr_count = [c.field_name for c in catalogs].index(catalogs[0].field_name, 1)
-    # except ValueError:
-    #     attr_count = len(catalogs)
+@application.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        print("autehnticated")
+        return redirect(url_for('main.welcome'))
+    user = UserModel.verify_reset_password_token(token)
+    if not user:
+        print("not user")
+        return redirect(url_for('user.login'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Your password has been reset.')
+        return redirect(url_for('user.login'))
+    return render_template('reset_password.html', form=form)
 
-    attr_count = len(set(c.field_name for c in catalogs))
-    title = [c.field_name for c in catalogs[:attr_count]]
-    data = [c.value for c in catalogs]
-    values = [data[i:i + attr_count] for i in range(0, len(data), attr_count)]
-    values.insert(0, title)
-    print(values)
-    return excel.make_response_from_array(values, str(type).lower(),
-                                          file_name="export_data_{}".format(history_id))
+
+# @application.route("/export/<history_id>/<type>", methods=['GET'])
+# def export(history_id, type):
+#     if str(type).startswith('raw'):
+#         history = UploadHistoryModel.find_by_id(history_id)
+#         return excel.make_response_from_array(eval(history.data_array), 'xlsx',
+#                                               file_name="export_raw_data_{}".format(history_id))
+#
+#     if not str(type).lower() in ['xls', 'xlsx', 'csv', 'tsv']:
+#         return render_template('errors/404.html'), 404
+#
+#     catalogs = CatalogModel.find_by_history_id(history_id)
+#     # try:
+#     #     attr_count = [c.field_name for c in catalogs].index(catalogs[0].field_name, 1)
+#     # except ValueError:
+#     #     attr_count = len(catalogs)
+#
+#     attr_count = len(set(c.field_name for c in catalogs))
+#     title = [c.field_name for c in catalogs[:attr_count]]
+#     data = [c.value for c in catalogs]
+#     values = [data[i:i + attr_count] for i in range(0, len(data), attr_count)]
+#     values.insert(0, title)
+#     print(values)
+#     return excel.make_response_from_array(values, str(type).lower(),
+#                                           file_name="export_data_{}".format(history_id))
     # return excel.make_response_from_array(
     #     values, 'handsontable.html')
     # title.append(catalogs[0].field_name)

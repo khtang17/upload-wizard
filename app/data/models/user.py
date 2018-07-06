@@ -10,7 +10,10 @@ import base64
 from datetime import datetime, timedelta
 import os
 from flask import current_app
-
+from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from time import time
+from passlib.hash import bcrypt
 
 # Define models
 roles_users = db.Table(
@@ -49,13 +52,18 @@ class UserModel(db.Model, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
-    # tasks = db.relationship('TaskModel', backref='user', lazy='dynamic')
 
     # def __init__(self, username, email, password, active):
     #     self.email = email
     #     self.username = username
     #     self.password = password
     #     self.active = False
+
+    def set_password(self, password):
+        self.password = bcrypt.encrypt(password)
+
+    def check_password(self, password):
+        return bcrypt.verify(self.password, password)
 
     def save_to_db(self):
         db.session.add(self)
@@ -103,29 +111,19 @@ class UserModel(db.Model, UserMixin):
             return None
         return user
 
-    # def launch_task(self, name, description, *args, **kwargs):
-    #     rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
-    #                                             *args, **kwargs)
-    #     task = TaskModel(id=rq_job.get_id(), name=name, description=description, user=self)
-    #     db.session.add(task)
-    #     return task
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
-    # def launch_task(self, name, description, *args, **kwargs):
-    #     print('description:'+description)
-    #     rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
-    #                                             *args, **kwargs)
-    #     print('test2')
-    #     task = TaskModel(id=rq_job.get_id(), name=name, description=description, user=self)
-    #     db.session.add(task)
-    #     print('test3')
-    #     return task
-    #
-    # def get_tasks_in_progress(self):
-    #     return TaskModel.query.filter_by(user=self, complete=False).all()
-    #
-    # def get_task_in_progress(self, name):
-    #     return TaskModel.query.filter_by(name=name, user=self, complete=False).first()
-
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return UserModel.query.get(id)
 
 def my_append_listener(target, value, initiator):
     from app.email import notify_new_role_to_user

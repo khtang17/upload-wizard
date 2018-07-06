@@ -1,7 +1,6 @@
 from datetime import datetime
 from app import db
 from app.data.models.job_log import JobLogModel
-from app.data.models.catalog import CatalogModel
 from flask import url_for, jsonify
 
 
@@ -65,10 +64,6 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                                backref='history',
                                lazy='dynamic')
 
-    catalogs = db.relationship(CatalogModel,
-                               order_by='asc(CatalogModel.id)',
-                               backref='history',
-                               lazy='dynamic')
 
     @classmethod
     def get_last_by_user_id(cls, user_id):

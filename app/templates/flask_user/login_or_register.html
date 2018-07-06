@@ -135,7 +135,7 @@
             Enter your email to reset your password:
         </div>
     </div>
-    <form class="form m-login__form m-form" action="{{ url_for('user.forgot_password') }}" method="POST" role="form">
+    <form class="form m-login__form m-form" action="{{ url_for('main.reset_password_request') }}" method="POST" role="form">
         {{ form.hidden_tag() }}
         <div class="form-group m-form__group  ">
             <input class="form-control m-input" id="email" name="email" placeholder="Email" tabindex="10" type="text" value="">

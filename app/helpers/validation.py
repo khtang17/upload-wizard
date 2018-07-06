@@ -5,7 +5,6 @@ from app.data.models.format import FileFormatModel
 from werkzeug.utils import secure_filename
 from flask_login import current_user
 from app.data.models.history import UploadHistoryModel
-from app.data.models.catalog import CatalogModel
 from app.data.models.job_log import JobLogModel
 from app.data.models.field import FieldModel
 from app.data.models.field_allowed_value import FieldAllowedValueModel
@@ -110,7 +109,6 @@ def save_file(file, name, is_logo, id=""):
                 user_folder += "vendor"
             user_folder += "/" + str(id) + "/"
             folder = current_app.config['UPLOAD_FOLDER'] + user_folder
-        print(os.path.dirname(folder))
         file_dir = os.path.realpath(os.path.dirname(folder))
         pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
         file.stream.seek(0)
@@ -296,66 +294,27 @@ def excel_validation(request):
         job_log.save_to_db()
         return {"message": '<br>'.join(str(s) for s in error_msg_set)}, 400
 
-    print("ttt line 296")
-    catalog_objs = []
-    catalog_dict = []
-    for item_list in dict_value[1:]:
-        for index, value in enumerate(item_list):
-            if headers[index] in mandatory_fields:
-                # catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
-                catalog_dict.append(
-                    dict(field_name=headers[index], type='mandatory', value=value, history_id=history.id))
-            if headers[index] in optional_fields:
-                # catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
-                catalog_dict.append(
-                    dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
-    print("ttt line 304")
+    # print("ttt line 296")
+    # catalog_objs = []
+    # catalog_dict = []
+    # for item_list in dict_value[1:]:
+    #     for index, value in enumerate(item_list):
+    #         if headers[index] in mandatory_fields:
+    #             # catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
+    #             catalog_dict.append(
+    #                 dict(field_name=headers[index], type='mandatory', value=value, history_id=history.id))
+    #         if headers[index] in optional_fields:
+    #             # catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
+    #             catalog_dict.append(
+    #                 dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
+    # print("ttt line 304")
 
-    # print("celery: {}".format(get_location.delay("")))
-    # try:
-    #     print("t1")
-    #     # store_in_dynamo(catalog_dict)
-    #     print("t2")
-    #     publish_to_sns(catalog_dict)
-    #     print("t3")
-    # except ConditionalCheckFailedException:
-    #     return Response("aldaa", status=409, mimetype='application/json')
-    #
-    # return Response(json.dumps(catalog_dict), status=201, mimetype='application/json')
-    # print(catalog_dict)
-    # CatalogModel.save_objects(catalog_objs)
-
-    CatalogModel.save_mappings(catalog_dict)
-
-    # CatalogModel.save_in_one_transaction(catalog_objs)
-    # catalog = CatalogModel('validation', 'mandatory', 'test', 804)
-    # catalog.save_to_db()
-    # current_user.launch_task('save_catalog_bulk_data', catalog_objs, 'Validating an input...')
-    # current_user.launch_task('export_posts', 'Validating an input...')
-    # db.session.commit()
     job_log = JobLogModel()
     job_log.status = "Finished"
     job_log.status_type = 4
     job_log.history_id = history.id
     job_log.save_to_db()
-    # catalogs = CatalogModel.find_by_history_id(history.id)
-    # res = {c.field_name: c.value for c in catalogs}
-    # print("catalog as dict")
-    # print(res)
+
 
     return {"message": "Your excel file has been submitted!"}, 200
 
-
-# def store_in_dynamo(signup_data):
-#     print("t4")
-#     # signup_item = Item(ddb_table, data=signup_data)
-#     print("t5")
-#     # signup_item.save()
-#     print("t6")
-#
-#
-# def publish_to_sns(signup_data):
-#     try:
-#          sns_conn.publish('sns_topic', json.dumps(signup_data), "New signup: %s" % 'chinzo.dandar@gmail.com')
-#     except Exception as ex:
-#         sys.stderr.write("Error publishing subscription message to SNS: %s" % ex)

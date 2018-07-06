@@ -75,16 +75,7 @@ var SnippetLogin = function() {
                             email: !0
                         }
                     }
-                }), r.valid() && (t.addClass("m-loader m-loader--right m-loader--light").attr("disabled", !0), r.ajaxSubmit({
-                    url: "/user/forgot-password",
-                    success: function(e, i, a, l) {
-                        setTimeout(function() {
-                            t.removeClass("m-loader m-loader--right m-loader--light").attr("disabled", !1), r.clearForm(), r.validate().resetForm(), o();
-                            var e = s.find(".m-login__signin form");
-                            e.clearForm(), e.validate().resetForm(), n(e, "success", "Password recovery instruction has been sent to your email.")
-                        }, 2e3)
-                    }
-                }))
+                }), r.valid() && (t.addClass("m-loader m-loader--right m-loader--light").attr("disabled", !0), r.submit())
             })
         }
     }
