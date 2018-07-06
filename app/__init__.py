@@ -16,9 +16,6 @@ import flask_excel as excel
 
 from flask_menu import Menu
 # # from flask_restful import Api
-# # from redis import Redis
-# # import rq
-# from celery import Celery
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -54,28 +51,6 @@ def create_app(config_class=Config):
     bootstrap.init_app(app)
     moment.init_app(app)
     excel.init_excel(app)
-
-    # app.redis = Redis.from_url(app.config['REDIS_URL'])
-    # app.task_queue = rq.Queue('upload-tasks', connection=app.redis)
-
-    # Point to the new AWS SQS
-    #   Be sure to change the URL to your CELERY_BROKER
-    # app.config.update(CELERY_BROKER_URL='sqs://sqs.us-west-1.amazonaws.com/892261348956/flask-es')
-    app.config.update(CELERY_BROKER_URL='sqs://AKIAJOX2FI6TLU6VKXSA:jGvsUp1FVBW+O46ZbRT5lHAP4fsL8OyBUix5SJaX@')
-    # Wrap the bootstrapped application in celery
-    # app.celery = Celery("flask-es", broker=app.config['CELERY_BROKER_URL'])
-    # app.celery.conf.update(app.config)
-    # app.celery.conf.broker_transport_options = {'region': 'us-west-1'}
-    # TaskBase = app.celery.Task
-    # class ContextTask(TaskBase):
-    #     abstract = True
-    #
-    #     def __call__(self, *args, **kwargs):
-    #         with app.app_context():
-    #             return TaskBase.__call__(self, *args, **kwargs)
-    #
-    # app.celery.Task = ContextTask
-
 
     from app.data.models.company import CompanyModel
     from app.data.models.user import RoleModel
