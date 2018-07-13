@@ -46,6 +46,7 @@ def create_app(config_class=Config):
 
     db_adapter = SQLAlchemyAdapter(db, UserModel)
     user_manager = UserManager(db_adapter, app)
+    user_manager.resend_confirm_email_view_function
     # api.init_app(app)
     mail.init_app(app)
     bootstrap.init_app(app)
@@ -72,10 +73,13 @@ def create_app(config_class=Config):
     admin.add_view(HistoryView(UploadHistoryModel, db.session, "History"))
     admin.add_view(CompanyView(CompanyModel, db.session, "Companies"))
     admin.add_view(UserView(UserModel, db.session, "Users"))
-    admin.add_view(AdminModelView(FileFormatModel, db.session, "Column name"))
-    admin.add_view(FieldView(FieldModel, db.session, "Excel file fields"))
-    admin.add_view(AdminModelView(FieldDecimalModel, db.session, "Excel file Decimal column filter"))
-    admin.add_view(AdminModelView(FieldAllowedValueModel, db.session, "Excel file column allowed values"))
+
+    if app.config['ZINC_MODE']:
+        admin.add_view(AdminModelView(FileFormatModel, db.session, "Column name"))
+
+    admin.add_view(FieldView(FieldModel, db.session, "File fields"))
+    admin.add_view(AdminModelView(FieldDecimalModel, db.session, "File Decimal column filter"))
+    admin.add_view(AdminModelView(FieldAllowedValueModel, db.session, "File column allowed values"))
 
     # from flask_jwt import JWT
     # from security import authenticate, identity

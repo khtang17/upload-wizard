@@ -58,6 +58,9 @@
                                     {% if category=='error' %}
                                         {% set category='danger' %}
                                     {% endif %}
+                                    {% if category=='' %}
+                                        {% set category='success' %}
+                                    {% endif %}
                                     <div class="alert alert-{{ category }} alert-dismissible" role="alert">
                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">
                                         <span aria-hidden="true" >&times;</span></button>

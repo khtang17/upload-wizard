@@ -91,7 +91,7 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
 
     def __init__(self, user_id, file_name, file_size):
         self.user_id = user_id
-        self.file_name = "{}_{}".format(self.get_miliseconds(), file_name.replace(" ", "_"))
+        self.file_name = "{}_{}".format(self.get_miliseconds(), file_name.replace(" ", "_").rsplit('.', 1)[0])
         self.file_size = file_size
 
     def get_status_type(self):

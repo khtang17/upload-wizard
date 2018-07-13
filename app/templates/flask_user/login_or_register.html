@@ -12,7 +12,7 @@
     </div>
 
     {# ** Login form ** #}
-    <form method="POST" class="form m-login__form m-form" role="form">
+    <form action="{{ url_for('user.login') }}" method="POST" class="form m-login__form m-form" role="form">
         {{ login_form.hidden_tag() }}
         {% set field1 = form.username %}
         {% if field1.errors %}
@@ -73,7 +73,7 @@
             Enter your details to create your account:
         </div>
     </div>
-    <form action="{{ url_for('user.register') }}" method="POST" novalidate formnovalidate
+    <form action="{{ url_for('main.register') }}" method="POST" novalidate formnovalidate
           class="form m-login__form m-form" role="form">
         {{ register_form.hidden_tag() }}
         {% set field3 = register_form.email %}
@@ -110,7 +110,7 @@
             <input class="form-control m-input" id="email" name="email" placeholder="Email" tabindex="220" type="text" value="">
         </div>
         <div class="form-group m-form__group  ">
-            <input class="form-control m-input" id="password" name="password" placeholder="Password" tabindex="230" type="password" value="">
+            <input class="form-control m-input password1" id="password" name="password" placeholder="Password" tabindex="230" type="password" value="">
         </div>
         <div class="form-group m-form__group  ">
             <input class="form-control m-input" id="retype_password" name="retype_password" placeholder="Retype Password" tabindex="240" type="password" value="">

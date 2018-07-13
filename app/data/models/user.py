@@ -14,6 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from time import time
 from passlib.hash import bcrypt
+from itsdangerous import URLSafeTimedSerializer
 
 # Define models
 roles_users = db.Table(
@@ -41,7 +42,7 @@ class UserModel(db.Model, UserMixin):
     short_name = db.Column(db.String(64), index=True, unique=True, nullable=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password = db.Column(db.String(255), nullable=False, server_default='')
-    active = db.Column(db.Boolean(), default=False)
+    active = db.Column(db.Boolean(), default=True)
     confirmed_at = db.Column(db.DateTime, index=True)
     upload_histories = db.relationship(UploadHistoryModel,
                                        order_by='desc(UploadHistoryModel.date_uploaded)',
@@ -53,11 +54,9 @@ class UserModel(db.Model, UserMixin):
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
 
-    # def __init__(self, username, email, password, active):
-    #     self.email = email
-    #     self.username = username
-    #     self.password = password
-    #     self.active = False
+    def __init__(self, username, email):
+        self.email = email
+        self.username = username
 
     def set_password(self, password):
         self.password = bcrypt.encrypt(password)
@@ -125,8 +124,26 @@ class UserModel(db.Model, UserMixin):
             return
         return UserModel.query.get(id)
 
+    def generate_confirmation_token(self):
+        serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        return serializer.dumps(self.email, salt=current_app.config['SECURITY_PASSWORD_SALT'])
+
+    def confirm_token(token, expiration=3600):
+        serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        try:
+            email = serializer.loads(
+                token,
+                salt=current_app.config['SECURITY_PASSWORD_SALT'],
+                max_age=expiration
+            )
+        except:
+            return False
+        return email
+
+
 def my_append_listener(target, value, initiator):
     from app.email import notify_new_role_to_user
+    print(value)
     if str(value).startswith("Vendor"):
         notify_new_role_to_user(target)
 

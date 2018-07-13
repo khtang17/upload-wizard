@@ -48,15 +48,15 @@ class CompanyModel(db.Model):
         self.price = price
         self.job_notify_email = job_notify_email
 
-    @property
-    def url(self):
-        return current_app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
-
-    @property
-    def filepath(self):
-        if self.logo is None:
-            return
-        return current_app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
+    # @property
+    # def url(self):
+    #     return 'http://{}.s3.amazonaws.com/'.format(current_app.config['S3_BUCKET_LOGO']) + self.logo
+    #
+    # @property
+    # def filepath(self):
+    #     if self.logo is None:
+    #         return
+    #     return 'http://{}.s3.amazonaws.com/'.format(current_app.config['S3_BUCKET_LOGO']) + self.logo
 
     def save_to_db(self):
         db.session.add(self)
