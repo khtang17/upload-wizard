@@ -14,14 +14,63 @@ import sys
 import subprocess
 import numbers
 from app import db
-from flask import request, jsonify
+from flask import request, jsonify, Response
 
-from flask import request, Response
+from datetime import datetime
 import json
-# from app.tasks import get_location
+from botocore.client import Config
+import boto3
+import flask_excel as excel
+from collections import OrderedDict
+
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
+
+config = Config(connect_timeout=5, retries={'max_attempts': 0})
+s3 = boto3.client(
+    "s3",
+    config=config,
+    aws_access_key_id="AKIAIPU6RC7HZBRSWKPQ",
+    aws_secret_access_key="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"
+)
+
+
+def get_miliseconds():
+    (dt, micro) = datetime.utcnow().strftime('%Y%m%d%H%M%S.%f').split('.')
+    dt = "%s%03d" % (dt, int(micro) / 1000)
+    return dt
+
+
+def upload_logo_to_s3(file, bucket_name, acl="public-read"):
+    try:
+        file_name = "company-logos/{}_{}".format(get_miliseconds(), file.filename.replace(" ", "_"))
+        s3.upload_fileobj(
+            file,
+            bucket_name,
+            file_name,
+            ExtraArgs={
+                "ACL": acl,
+                "ContentType": file.content_type
+            }
+        )
+    except Exception as e:
+        # This is a catch all exception, edit this part to fit your needs.
+        print("Something Happened: ", e)
+        return e
+    return "http://{}.s3.amazonaws.com/{}".format(bucket_name, file_name)
+
+
+def upload_data_to_s3(data, filename, bucket_name, acl="public-read"):
+    file_name = "raw-data/{}.json".format(filename)
+    try:
+        s3.put_object(Body=data, Bucket=bucket_name, Key=file_name)
+
+    except Exception as e:
+        # This is a catch all exception, edit this part to fit your needs.
+        print("Something Happened: ", e)
+        return e
+    return "http://{}.s3.amazonaws.com/{}".format(bucket_name, file_name)
 
 
 def allowed_file(filename):
@@ -159,6 +208,7 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
 def excel_validation(request):
     warning_msg = []
     error_msg = []
+
     mandatory_fields = [mand.field_name.lower() for mand in FieldModel.find_by_mandatory(True)]
     mandatory_field_ids = []
     optional_fields = [mand.field_name.lower() for mand in FieldModel.find_by_mandatory(False)]
@@ -177,9 +227,7 @@ def excel_validation(request):
     if set(mandatory_fields).issubset(set(headers)):
         for m_field in mandatory_fields:
             mandatory_field_ids.append(headers.index(m_field))
-        for index, item in enumerate(dict_value[1:]):
-            # if validation_row_limit == index + 1:
-            #     break
+        for index, item in enumerate(dict_value[1:validation_row_limit]):
             for m_field_id in mandatory_field_ids:
                 if not item[m_field_id]:
                     error_msg.append(["Line {}: ".format(index + 1), "Mandatory field [{}] has no value".format(headers[m_field_id])])
@@ -191,8 +239,11 @@ def excel_validation(request):
     file_length = file.tell()
     file_size = size(file_length, system=alternative)
     history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
-    history.data_array = str(request.get_array(field_name='file'))
+    # history.data_array = str(request.get_array(field_name='file'))
     history.save_to_db()
+    print("t1")
+    upload_data_to_s3(str(dict(request.get_dict(field_name='file'))), history.file_name, current_app.config['S3_BUCKET'])
+    print("t2")
 
     decimal_fields = FieldDecimalModel.find_all()
     for dec_field in decimal_fields:
@@ -203,7 +254,7 @@ def excel_validation(request):
             break
 
         if field_index:
-            for row, item_list in enumerate(dict_value[1:]):
+            for row, item_list in enumerate(dict_value[1:validation_row_limit]):
                 if isinstance(item_list[field_index], numbers.Real):
                     if float(item_list[field_index]) < dec_field.min_val:
                         error_msg.append(["Line {}: ".format(row + 1),
@@ -232,7 +283,7 @@ def excel_validation(request):
             break
 
         if field_index:
-            for row, item_list in enumerate(dict_value[1:]):
+            for row, item_list in enumerate(dict_value[1:validation_row_limit]):
                 try:
                     if str(item_list[field_index]).lower() not in \
                             [str(x.strip().lower()) for x in str_field.allowed_values.split(',')]:
@@ -266,14 +317,6 @@ def excel_validation(request):
     # warning_msg_set.update(set([x[1] + " (same errors at the {} more lines)".format(
     #     warning_msg.count(x)) for x in warning_msg if warning_msg.count(x) > 1]))
 
-
-
-    print("ERROR")
-    print(error_msg)
-    print(error_msg_set)
-    print("WARNING")
-    # print(warning_msg)
-    print(warning_msg_set)
     if warning_msg:
         job_log = JobLogModel()
         job_log.status = '<br>'.join(str(s) for s in warning_msg_set)

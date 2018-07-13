@@ -1,0 +1,12 @@
+Dear {{ user.username }},
+
+You will need to confirm your email to start using Upload Wizard.
+
+If you initiated this registration, please visit the link below:
+    {{ url_for('main.confirm', token=token, _external=True) }}
+
+If you did not initiate this registration, you may safely ignore this email.
+
+Sincerely,
+
+Upload Wizard Team

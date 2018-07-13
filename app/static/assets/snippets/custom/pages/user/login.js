@@ -60,7 +60,8 @@ var SnippetLogin = function() {
                             required: !0
                         },
                         retype_password: {
-                            required: !0
+                            required: !0,
+                            equalTo : ".password1"
                         }
                     }
                 }), r.valid() && (t.addClass("m-loader m-loader--right m-loader--light").attr("disabled", !0), r.submit())

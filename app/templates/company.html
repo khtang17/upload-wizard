@@ -45,7 +45,7 @@
                         <div class="col-md-6">
                             <div id="image-preview-div" style="display: none">
                                 {% if form.logo.data %}
-                                    <img id="preview-img" src="/static/vendorlogos/{{ form.logo.data }}">
+                                    <img id="preview-img" src="{{ form.logo.data }}">
                                 {% else %}
                                     <img id="preview-img" src="/static/images/empty-small.png">
                                 {% endif %}
