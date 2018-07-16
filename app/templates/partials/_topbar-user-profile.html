@@ -2,7 +2,7 @@
 	<a href="#" class="m-nav__link m-dropdown__toggle">
         <div class="circular--landscape">
             {% if current_user.company.logo %}
-                <img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" >
+                <img src="{{ current_user.company.logo}}" >
             {% else %}
                 <span class="m-nav__link-icon m-topbar__usericon">
                     <span class="m-nav__link-icon-wrapper"><i class="flaticon-user-ok"></i></span>
@@ -18,7 +18,7 @@
 				<div class="m-card-user m-card-user--skin-light">
 					<div class="circular--landscape">
                         {% if current_user.company.logo %}
-                            <img src="http://files.docking.org/vendorlogos/{{ current_user.company.logo}}" >
+                            <img src="{{ current_user.company.logo}}" >
                         {% else %}
                             <span class="m-nav__link-icon m-topbar__usericon">
                                 <span class="m-nav__link-icon-wrapper"><i class="flaticon-user-ok"></i></span>
