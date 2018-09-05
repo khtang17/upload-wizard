@@ -91,4 +91,9 @@ class HistoryView(AdminModelView):
 
 
 class FieldView(AdminModelView):
-    form_excluded_columns = ('field_decimal', 'field_allowed_value')
+    # form_excluded_columns = ('field_decimal', 'field_allowed_value')
+    column_list = ['order', 'field_name', 'mandatory']
+    column_default_sort = ('order', False)
+    can_create = False
+    can_delete = False
+    can_edit = False

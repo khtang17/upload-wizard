@@ -40,9 +40,11 @@
                         <p class="lead">
                              <h5>Acceptable file formats:
                                   {% if config['ZINC_MODE'] %}
-                                      .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi,
+                                      .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi
+                                  {% else %}
+                                      .csv, .tsv, .xls, .xlsx, .xlsm
                                   {% endif %}
-                                      .csv, .tsv, .xls, .xlsx, .xlsm</h5>
+                                      </h5>
                             <h5>Special requirements for the <strong>.TXT</strong> file:</h5>
                             <ul>
                                 <li>

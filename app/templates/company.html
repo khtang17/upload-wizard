@@ -45,7 +45,11 @@
                         <div class="col-md-6">
                             <div id="image-preview-div" style="display: none">
                                 {% if form.logo.data %}
-                                    <img id="preview-img" src="{{ form.logo.data }}">
+                                    {% if config['ZINC_MODE'] %}
+                                        <img id="preview-img" src="{{config['LOGO_UPLOAD_FOLDER_URL']}}{{ form.logo.data }}">
+                                    {%  else %}
+                                        <img id="preview-img" src="{{ form.logo.data }}" >
+                                    {% endif %}
                                 {% else %}
                                     <img id="preview-img" src="/static/images/empty-small.png">
                                 {% endif %}

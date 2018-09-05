@@ -76,10 +76,10 @@ def create_app(config_class=Config):
 
     if app.config['ZINC_MODE']:
         admin.add_view(AdminModelView(FileFormatModel, db.session, "Column name"))
-
-    admin.add_view(FieldView(FieldModel, db.session, "File fields"))
-    admin.add_view(AdminModelView(FieldDecimalModel, db.session, "File Decimal column filter"))
-    admin.add_view(AdminModelView(FieldAllowedValueModel, db.session, "File column allowed values"))
+    else:
+        admin.add_view(FieldView(FieldModel, db.session, "File fields"))
+        admin.add_view(AdminModelView(FieldDecimalModel, db.session, "File Decimal column filter"))
+        admin.add_view(AdminModelView(FieldAllowedValueModel, db.session, "File column allowed values"))
 
     # from flask_jwt import JWT
     # from security import authenticate, identity

@@ -17,11 +17,13 @@ from app import db
 from flask import request, jsonify, Response
 
 from datetime import datetime
+import time
 import json
 from botocore.client import Config
 import boto3
 import flask_excel as excel
 from collections import OrderedDict
+
 
 
 ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
@@ -35,6 +37,13 @@ s3 = boto3.client(
     aws_secret_access_key="Q89REI5pKC4RBMlodMyC8bSzM1liJzpxgFqJubwE"
 )
 
+s3_res = boto3.resource(
+    "s3",
+    config=config,
+    aws_access_key_id="AKIAIPU6RC7HZBRSWKPQ",
+    aws_secret_access_key="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"
+)
+
 
 def get_miliseconds():
     (dt, micro) = datetime.utcnow().strftime('%Y%m%d%H%M%S.%f').split('.')
@@ -42,35 +51,43 @@ def get_miliseconds():
     return dt
 
 
-def upload_logo_to_s3(file, bucket_name, acl="public-read"):
+def upload_file_to_s3(file, file_name, dir_name, acl="public-read"):
     try:
-        file_name = "company-logos/{}_{}".format(get_miliseconds(), file.filename.replace(" ", "_"))
+        # dir_name = "company-logos"
+        content_type = file.content_type
+        if allowed_file2(file.filename):
+            # dir_name = "raw-data"
+            content_type = "application/csv; charset=utf-8"
+            file_name = "{}/{}.csv".format(dir_name, file_name)
+        else:
+            file_name = "{}/{}_{}".format(dir_name, get_miliseconds(), file_name.replace(" ", "_"))
+
         s3.upload_fileobj(
             file,
-            bucket_name,
+            current_app.config['S3_BUCKET'],
             file_name,
             ExtraArgs={
                 "ACL": acl,
-                "ContentType": file.content_type
+                "ContentType": content_type
             }
         )
     except Exception as e:
         # This is a catch all exception, edit this part to fit your needs.
         print("Something Happened: ", e)
-        return e
-    return "http://{}.s3.amazonaws.com/{}".format(bucket_name, file_name)
+        return None
+    return "http://{}.s3.amazonaws.com/{}".format(current_app.config["S3_BUCKET"], file_name)
 
 
-def upload_data_to_s3(data, filename, bucket_name, acl="public-read"):
-    file_name = "raw-data/{}.json".format(filename)
+def upload_data_to_s3(data, filename, dir_name, acl="public-read"):
+    file_name = "{}/{}.csv".format(dir_name, filename)
     try:
-        s3.put_object(Body=data, Bucket=bucket_name, Key=file_name)
+        s3.put_object(Body=data, Bucket=current_app.config["S3_BUCKET"], Key=file_name)
 
     except Exception as e:
         # This is a catch all exception, edit this part to fit your needs.
         print("Something Happened: ", e)
         return e
-    return "http://{}.s3.amazonaws.com/{}".format(bucket_name, file_name)
+    return "http://{}.s3.amazonaws.com/{}".format(current_app.config["S3_BUCKET"], file_name)
 
 
 def allowed_file(filename):
@@ -85,7 +102,7 @@ def allowed_file2(filename):
 
 def validate(file, form):
     if file and allowed_file(file.filename):
-        test=""
+        pass
         # if file.mimetype.startswith('text/plain'):
         #     formats = FileFormatModel.find_all()
         #     line_number = 0
@@ -163,6 +180,7 @@ def save_file(file, name, is_logo, id=""):
         file.stream.seek(0)
         print(name)
         print(secure_filename(name))
+        print(os.path.join(file_dir, secure_filename(name)))
         file.save(os.path.join(file_dir, secure_filename(name)))
     except:
         print(sys.exc_info())
@@ -182,6 +200,8 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
     try:
         print(current_user.get_token())
         print(current_user.company.idnumber)
+        print(str_mandatory_columns)
+        print(str_optional_columns)
         if len(current_user.company.idnumber) > 0:
             script_dir = current_app.config['UPLOAD_FOLDER'] + "script/"
             os.chdir(current_app.config['UPLOAD_FOLDER']+user_folder)
@@ -205,24 +225,47 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
         return {"message": "1: " + str(sys.exc_info()[0])}, 500
 
 
+# def save_excel_file(request):
+#     file = request.files['file']
+#     file.seek(0, os.SEEK_END)
+#     file_length = file.tell()
+#     file_size = size(file_length, system=alternative)
+#     history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
+#     history.save_to_db()
+#
+#     file.stream.seek(0)
+#     s3_result = upload_file_to_s3(file, history.id)
+#     if s3_result:
+#         history.status = 2
+#         history.save_to_db()
+
 def excel_validation(request):
+    start_time_whole = time.time()
     warning_msg = []
     error_msg = []
 
+    start_time_readsql = time.time()
     mandatory_fields = [mand.field_name.lower() for mand in FieldModel.find_by_mandatory(True)]
     mandatory_field_ids = []
     optional_fields = [mand.field_name.lower() for mand in FieldModel.find_by_mandatory(False)]
     validation_row_limit = int(current_app.config['FILE_VALIDATION_LIMIT'])
+    end_readsql = time.time()
+    elapsed_readsql = end_readsql - start_time_readsql
+    print("read SQL spent {} seconds".format(elapsed_readsql))
 
+    start_time_readasarray = time.time()
     dict_value = request.get_array(field_name='file')
+    end_readasarray = time.time()
+    elapsed_readasarray = end_readasarray - start_time_readasarray
+    print("Read as ARRAY  spent {} seconds".format(elapsed_readasarray))
     if len(dict_value) <= 1:
         return {"message": "No data error!"}, 400
     headers = [h.lower() for h in dict_value[0]]
     print("headers")
     print(headers)
-    diplicated_fields = set([x for x in headers if headers.count(x) > 1])
-    if len(diplicated_fields) > 0:
-        error_msg.append([0, "Field duplication error: {} \n".format(list(diplicated_fields))])
+    duplicated_fields = set([x for x in headers if headers.count(x) > 1])
+    if len(duplicated_fields) > 0:
+        error_msg.append([0, "Field duplication error: {} \n".format(list(duplicated_fields))])
 
     if set(mandatory_fields).issubset(set(headers)):
         for m_field in mandatory_fields:
@@ -239,11 +282,10 @@ def excel_validation(request):
     file_length = file.tell()
     file_size = size(file_length, system=alternative)
     history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
+    # No need to add miliseconds for this file name because it was saved to s3 with history id
+    history.file_name = secure_filename(file.filename)
     # history.data_array = str(request.get_array(field_name='file'))
     history.save_to_db()
-    print("t1")
-    upload_data_to_s3(str(dict(request.get_dict(field_name='file'))), history.file_name, current_app.config['S3_BUCKET'])
-    print("t2")
 
     decimal_fields = FieldDecimalModel.find_all()
     for dec_field in decimal_fields:
@@ -312,10 +354,51 @@ def excel_validation(request):
         [y[0] for y in warning_msg if y[1] == x[1]][0], x[1], len([y for y in warning_msg if y[1] == x[1]]))
         for x in warning_msg if len([y for y in warning_msg if y[1] == x[1]]) > 1]))
 
-    # error_msg_set.update(set([x[1] + " (same errors at the {} more lines)".format(
-    #     error_msg.count(x)) for x in error_msg if error_msg.count(x) > 1]))
-    # warning_msg_set.update(set([x[1] + " (same errors at the {} more lines)".format(
-    #     warning_msg.count(x)) for x in warning_msg if warning_msg.count(x) > 1]))
+    # catalog_objs = []
+    # catalog_dict = []
+    str_data = ""
+    print(mandatory_fields)
+    for item_list in dict_value:
+        data_dict = {}
+        for index, value in enumerate(item_list):
+            if headers[index] in mandatory_fields:
+                data_dict[mandatory_fields.index(headers[index])] = value
+                # catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
+                # catalog_dict.append(
+                #     dict(field_name=headers[index], type='mandatory', value=value, history_id=history.id))
+            if headers[index] in optional_fields:
+                # used mandatory_fields.count()+index) in order to place optional field after mandatory fields
+                print(len(mandatory_fields)+index)
+                data_dict[len(mandatory_fields)+index] = value
+            # catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
+            # catalog_dict.append(
+            #     dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
+
+        str_line = ','.join(str(data_dict[key]) for key in sorted(data_dict.keys()))
+        str_data = str_data + str_line + '\n'
+
+    s3_dir = "validated"
+    history.status = 1
+    if error_msg:
+        s3_dir = "validation-error"
+        history.status = 2
+
+    # Unvalidated
+    # s3_dir = "unvalidated"
+    # history.status = 3
+    history.save_to_db()
+
+    start_time_s3 = time.time()
+    file.stream.seek(0)
+    # s3_result = upload_file_to_s3(file, history.id, s3_dir)
+    upload_data_to_s3(str_data, history.id, s3_dir)
+    end_s3 = time.time()
+    elapsed_s3 = end_s3 - start_time_s3
+    print("S3 upload spent {} seconds".format(elapsed_s3))
+
+
+
+
 
     if warning_msg:
         job_log = JobLogModel()
@@ -337,27 +420,14 @@ def excel_validation(request):
         job_log.save_to_db()
         return {"message": '<br>'.join(str(s) for s in error_msg_set)}, 400
 
-    # print("ttt line 296")
-    # catalog_objs = []
-    # catalog_dict = []
-    # for item_list in dict_value[1:]:
-    #     for index, value in enumerate(item_list):
-    #         if headers[index] in mandatory_fields:
-    #             # catalog_objs.append(CatalogModel(headers[index], 'mandatory', value, history.id))
-    #             catalog_dict.append(
-    #                 dict(field_name=headers[index], type='mandatory', value=value, history_id=history.id))
-    #         if headers[index] in optional_fields:
-    #             # catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
-    #             catalog_dict.append(
-    #                 dict(field_name=headers[index], type='optional', value=value, history_id=history.id))
-    # print("ttt line 304")
-
     job_log = JobLogModel()
     job_log.status = "Finished"
     job_log.status_type = 4
     job_log.history_id = history.id
     job_log.save_to_db()
 
-
+    end_whole = time.time()
+    elapsed_whole = end_whole - start_time_whole
+    print("Whole process spent {} seconds without file uploading".format(elapsed_whole))
     return {"message": "Your excel file has been submitted!"}, 200
 

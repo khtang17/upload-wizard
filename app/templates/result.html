@@ -13,20 +13,16 @@
             <p><b>File Name: </b>{{ history.file_name }}</p>
             <p><b>File Size: </b>{{ history.file_size }}</p>
             <p><b>Upload Date: </b>{{ moment(history.date_uploaded).format('LLL') }}</p>
-            <p><b>Type: </b>{{ history.type }}</p>
-            <p><b>Purchasability: </b>{{ history.purchasability }}</p>
-            <p><b>Natural products: </b>{{ history.natural_products }}</p>
-{#            {% if history.catalogs.all()|length > 0 %}#}
-{#                <p><b>Export files: </b>#}
-{#                    <a href="{{ url_for('main.export', history_id=history.id, type='csv') }}" >.csv</a>,#}
-{#                    <a href="{{ url_for('main.export', history_id=history.id, type='xls') }}" >.xls</a>,#}
-{#                    <a href="{{ url_for('main.export', history_id=history.id, type='xlsx') }}" >.xlsx</a>,#}
-{#                    <a href="{{ url_for('main.export', history_id=history.id, type='txt') }}" >.txt</a>#}
-{#                </p>#}
-{#            {% endif %}#}
-            <p><b>Raw file: </b>
-                <a href="{{ url_for('main.export', history_id=history.id) }}" >Download raw file as xlsx</a>,
-            </p>
+            {% if config['ZINC_MODE'] %}
+                <p><b>Type: </b>{{ history.type }}</p>
+                <p><b>Purchasability: </b>{{ history.purchasability }}</p>
+                <p><b>Natural products: </b>{{ history.natural_products }}</p>
+            {% else %}
+                 <p><b>Raw file: </b>
+                    <a href="{{ url_for('main.export', history_id=history.id, status_id=history.status) }}" >Download raw file as csv</a>,
+                </p>
+            {% endif %}
+
             <br/>
             <div id="mCSB_5_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
                 <div class="m-timeline-2">
