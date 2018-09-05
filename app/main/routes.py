@@ -10,18 +10,18 @@ from app.data.models.history import UploadHistoryModel
 from app.data.models.job_log import JobLogModel
 from flask_user.forms import RegisterForm, ResendConfirmEmailForm, ForgotPasswordForm, ResetPasswordForm
 
-from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_logo_to_s3, s3
+from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_file_to_s3, s3
 from app.email import notify_new_user_to_admin, send_password_reset_email, email_confirmation
 from app.main import application
 
 from flask_menu import Menu, register_menu
 from datetime import datetime
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file, make_response
 import flask_excel as excel
 
 from app import db
-
+import boto3
 
 # @user_confirmed_email.connect_via(application)
 # def _after_confirmed_hook(sender, user, **extra):
@@ -79,8 +79,10 @@ def company():
             company = CompanyModel.find_by_id(int(form.id.data))
             if form.file.data:
                 if check_img_type(form.file.data):
-                    # company.logo = save_file(form.file.data, form.name.data, True)
-                    company.logo = upload_logo_to_s3(form.file.data, current_app.config['S3_BUCKET'])
+                    if current_app.config["ZINC_MODE"]:
+                        company.logo = save_file(form.file.data, "{}_{}".format(current_user.id, form.name.data), True)
+                    else:
+                        company.logo = upload_file_to_s3(form.file.data, form.name.data, "company-logos")
                 else:
                     return False
             company.name = form.name.data
@@ -246,12 +248,27 @@ def get_histories():
     return jsonify(data)
 
 
-@application.route("/export/<history_id>", methods=['GET'])
-def export(history_id):
-    history = UploadHistoryModel.find_by_id(history_id)
-    obj = s3.get_object(Bucket=current_app.config['S3_BUCKET'], Key='raw-data/{}.json'.format(history.file_name))
-    return excel.make_response_from_dict(eval(obj['Body'].read()), 'xlsx',
-                                          file_name="export_raw_data_{}".format(history_id))
+@application.route("/export/<history_id>/<status_id>", methods=['GET'])
+def export(history_id, status_id):
+    # 1 - Validated
+    # 2 - Validation-err
+    # 3 - Unvalidated
+    status = ""
+
+    if status_id.startswith('1'):
+        status = 'validated'
+    elif status_id.startswith('2'):
+        status = 'validation-error'
+    elif status_id.startswith('3'):
+        status = 'unvalidated'
+
+    file = s3.get_object(Bucket=current_app.config['S3_BUCKET'], Key='{}/{}.csv'.format(status, history_id))
+
+    return Response(
+        file['Body'].read(),
+        mimetype='application/csv',
+        headers={"Content-Disposition": "attachment;filename=export_raw_data_{}.csv".format(history_id)}
+    )
 
 
 @application.route('/reset_password_request', methods=['POST'])
@@ -334,6 +351,56 @@ def resend_confirmation_email():
             flash('Your email not registered in our system', category='danger')
     return redirect(url_for('user.login'))
 
+
+@application.route('/athena', methods=['GET'])
+def athena():
+    # from pyathenajdbc import connect
+    # conn_str = 'awsathena+jdbc://{}:{}@athena.{}.amazonaws.com:443/{}?s3_staging_dir={}'.format(
+    #     current_app.config['S3_KEY'],
+    #     current_app.config['S3_SECRET'],
+    #     'us-west-2',
+    #     'default',
+    #     's3://aws-athena-query-results-upw/')
+    # conn = connect(conn_str)
+    # try:
+    #     with conn.cursor() as cursor:
+    #         cursor.execute("""
+    #             SELECT * FROM one_row
+    #             """)
+    #         print(cursor.description)
+    #         print(cursor.fetchall())
+    # finally:
+    #     conn.close()
+    res = ""
+    import contextlib
+    from urllib.parse import quote_plus  # PY2: from urllib import quote_plus
+    from sqlalchemy.engine import create_engine
+    from sqlalchemy.sql.expression import select
+    from sqlalchemy.sql.functions import func
+    from sqlalchemy.sql.schema import Table, MetaData
+
+    conn_str = 'awsathena+jdbc://{}:{}@athena.{}.amazonaws.com:443/{}?s3_staging_dir={}'.format(
+        current_app.config['S3_KEY'],
+        current_app.config['S3_SECRET'],
+        'us-west-2',
+        'uploadwizard',
+        's3://aws-athena-query-results-upw/')
+    engine = create_engine(conn_str.format(
+        access_key=quote_plus(current_app.config['S3_KEY']),
+        secret_key=quote_plus(current_app.config['S3_SECRET']),
+        region_name='us-west-2',
+        schema_name='uploadwizard',
+        s3_staging_dir=quote_plus('s3://aws-athena-query-results-upw/')))
+    try:
+        with contextlib.closing(engine.connect()) as conn:
+            many_rows = Table('file', MetaData(bind=engine), autoload=True)
+            rs = select([many_rows.c.manufacturerpartid]).execute()
+            res = ""
+            for row in rs:
+                res += str(row) +"\n<br/>"
+    finally:
+        engine.dispose()
+    return res
 
 # @app.errorhandler(InvalidUsage)
 # def handle_invalid_usage(error):

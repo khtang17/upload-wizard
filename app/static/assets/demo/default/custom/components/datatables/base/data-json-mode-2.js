@@ -21,12 +21,28 @@ var DatatableJsonRemoteDemo= {
                     }
             }
              , {
-                field: "FileName", title: "File Name", width: 210, template:function(t) {
+                field: "FileName", title: "File Name", template:function(t) {
                         return'<a class="m-link popovers" data-toggle="popover" href="/result?id='+t.ID+'">'+t.FileName+"</a>"
                     }
             }
              , {
                 field:"FileSize", title:"File Size", width: 60
+            }, {
+                field:"Status", title:"Status", width: 130, template:function(t) {
+                    var e= {
+                        1: {
+                            title: "Validated", class: "m-badge--brand"
+                        }
+                        , 2: {
+                            title: "Validation Error", class: " m-badge--warning"
+                        }
+                        , 3: {
+                            title: "Unvalidated", class: " m-badge--danger"
+                        }
+                    }
+                    ;
+                    return'<span class="m-badge '+e[t.Status].class+' m-badge--wide">'+e[t.Status].title+"</span>"
+                }
             }
             ]
         }

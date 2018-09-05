@@ -22,9 +22,9 @@ class CompanyModel(db.Model):
     personal_contact_email = db.Column(db.String(100), index=True)
     date_created = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     users = db.relationship(UserModel, backref='company', lazy='dynamic')
-    idnumber = db.Column(db.String(20))
-    cmpdname = db.Column(db.String(20))
-    cas = db.Column(db.String(20))
+    idnumber = db.Column(db.String(100))
+    cmpdname = db.Column(db.String(100))
+    cas = db.Column(db.String(100))
     price = db.Column(db.String(20))
     job_notify_email = db.Column(db.Boolean(), nullable=True, default=False)
 
@@ -48,15 +48,18 @@ class CompanyModel(db.Model):
         self.price = price
         self.job_notify_email = job_notify_email
 
+    @property
+    def url(self):
+        if current_app.config["ZINC_MODE"]:
+            return current_app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
+        else:
+            return self.logo
+
     # @property
-    # def url(self):
-    #     return 'http://{}.s3.amazonaws.com/'.format(current_app.config['S3_BUCKET_LOGO']) + self.logo
-    #
-    # @property
-    # def filepath(self):
+    # def zinc_filepath(self):
     #     if self.logo is None:
     #         return
-    #     return 'http://{}.s3.amazonaws.com/'.format(current_app.config['S3_BUCKET_LOGO']) + self.logo
+    #     return current_app.config['LOGO_UPLOAD_FOLDER_URL'] + self.logo
 
     def save_to_db(self):
         db.session.add(self)

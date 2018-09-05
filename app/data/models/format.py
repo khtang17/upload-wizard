@@ -11,10 +11,10 @@ class FileFormatModel(db.Model):
     # separator = db.Column(db.String(10))
     order = db.Column(db.Integer, index=True)
 
-    def __init__(self, title, col_type, order):
-        self.title = title
-        self.col_type = col_type
-        self.order = order
+    # def __init__(self, title, col_type, order):
+    #     self.title = title
+    #     self.col_type = col_type
+    #     self.order = order
 
     @classmethod
     def find_all(cls):
