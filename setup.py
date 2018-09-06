@@ -11,7 +11,7 @@ from os import path
 #     long_description = f.read()
 
 setup(
-    name='VENDOR-UPLOAD',
+    name='UPLOAD-WIZARD',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -31,7 +31,7 @@ setup(
     author_email='chinzo.dandar@gmail.com',
 
     # Choose your license
-    license='Chinzorig Dandarchuluun',
+    license='Apache License 2.0',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
