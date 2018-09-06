@@ -45,7 +45,7 @@ class Config(object):
     MAIL_DEFAULT_SENDER = 'upload.vendor@gmail.com'
 
     # Flask-User settings
-    USER_APP_NAME = "Irwin and Shoichet Laboratories at UCSF"  # Shown in and email templates and page footers
+    USER_APP_NAME = "Upload Wizard Team"  # Shown in and email templates and page footers
     USER_ENABLE_EMAIL = True  # Enable email authentication
     USER_ENABLE_USERNAME = True  # Register and Login with username
     USER_LOGIN_TEMPLATE = 'flask_user/login_or_register.html'
