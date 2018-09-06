@@ -1,4 +1,4 @@
-# vendor-upload
+# Upload-wizard
 Upload wizard web application
 
 
