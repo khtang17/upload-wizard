@@ -1,5 +1,5 @@
 __author__ = 'Chinzorig Dandarchuluun'
-__copyright__ = "Copyright, UC Regents"
+__copyright__ = ""
 
 
 from flask import Flask

@@ -78,7 +78,8 @@ def send_password_reset_email(user):
                                          user=user, token=token),
                html_body=render_template('email/reset_password.html',
                                          user=user, token=token),
-               bcc=['jir322@gmail.com'],)
+               # bcc=[''],
+               )
 
 
 def email_confirmation(user):
