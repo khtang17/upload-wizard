@@ -9,4 +9,4 @@ Vendor company file registration web application
 
 ## License
 
-Copyright © 2018 The UC Regents
+Copyright © 2018
