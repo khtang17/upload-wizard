@@ -10,7 +10,7 @@ class Config(object):
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT")
     #SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
                               # 'sqlite:///' + os.path.join(basedir, 'app.db')
-    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI_AWS")
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI_AWS") or 'your_db_URI'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_POOL_SIZE = 20
     SQLALCHEMY_MAX_OVERFLOW = 5
@@ -25,8 +25,8 @@ class Config(object):
 
     # REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
     AWS_REGION = 'us-east-1'
-    NEW_SIGNUP_TOPIC = 'your_sns_topic_name'
-    STARTUP_SIGNUP_TABLE = 'your_ddb_table_name'
+    # NEW_SIGNUP_TOPIC = 'your_sns_topic_name'
+    # STARTUP_SIGNUP_TABLE = 'your_ddb_table_name'
     THEME = 'default'
     FLASK_DEBUG = 'true'
 
@@ -40,9 +40,9 @@ class Config(object):
     FILE_VALIDATION_LIMIT = 500000
 
     # Flask-Mail SMTP account settings
-    MAIL_USERNAME = 'upload.vendor@gmail.com'
-    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-    MAIL_DEFAULT_SENDER = 'upload.vendor@gmail.com'
+    MAIL_USERNAME = 'upload.vendor@gmail.com' or 'your_email'
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD") or 'your_email_password'
+    MAIL_DEFAULT_SENDER = 'upload.vendor@gmail.com' or 'your_email'
 
     # Flask-User settings
     USER_APP_NAME = "Upload Wizard Team"  # Shown in and email templates and page footers
@@ -61,7 +61,7 @@ class Config(object):
 
     SCRIPT_SOURCE = os.getenv("SCRIPT_SOURCE")
 
-    S3_BUCKET = os.getenv("S3_BUCKET")
-    S3_KEY = os.getenv("S3_KEY")
-    S3_SECRET = os.getenv("S3_SECRET")
-    S3_LOCATION = os.getenv("S3_LOCATION")
+    S3_BUCKET = os.getenv("S3_BUCKET") or 'S3_BUCKET'
+    S3_KEY = os.getenv("S3_KEY") or 'S3_KEY'
+    S3_SECRET = os.getenv("S3_SECRET") or 'S3_SECRET'
+    S3_LOCATION = os.getenv("S3_LOCATION") or 'S3_LOCATION'
