@@ -27,8 +27,8 @@ setup(
     url='https://github.com/chinzod/vendor-upload',
 
     # Author details
-    author='UCSF',
-    author_email='UCSF',
+    author='Chinzorig Dandarchuluun',
+    author_email='chinzo.dandar@gmail.com',
 
     # Choose your license
     license='UC Regents',
