@@ -1,16 +1,16 @@
 import os
 from dotenv import load_dotenv
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, '.env'))
+#basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv()
 
 
 class Config(object):
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'secret'
-    SECURITY_PASSWORD_SALT = 'Nuut9davs'
+    SECRET_KEY = os.getenv("SECRET_KEY") or 'secret'
+    SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT")
     #SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
                               # 'sqlite:///' + os.path.join(basedir, 'app.db')
-    SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://uploadwrite:@localhost:6543/uploaddb"
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI_AWS")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_POOL_SIZE = 20
     SQLALCHEMY_MAX_OVERFLOW = 5
@@ -41,7 +41,7 @@ class Config(object):
 
     # Flask-Mail SMTP account settings
     MAIL_USERNAME = 'upload.vendor@gmail.com'
-    MAIL_PASSWORD = ''
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = 'upload.vendor@gmail.com'
 
     # Flask-User settings
@@ -59,9 +59,9 @@ class Config(object):
 
     CSRF_ENABLED = True
 
-    SCRIPT_SOURCE = ''
+    SCRIPT_SOURCE = os.getenv("SCRIPT_SOURCE")
 
-    S3_BUCKET = ""
-    S3_KEY = ""
-    S3_SECRET = ""
-    S3_LOCATION = ""
+    S3_BUCKET = os.getenv("S3_BUCKET")
+    S3_KEY = os.getenv("S3_KEY")
+    S3_SECRET = os.getenv("S3_SECRET")
+    S3_LOCATION = os.getenv("S3_LOCATION")
