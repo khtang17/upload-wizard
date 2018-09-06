@@ -31,7 +31,7 @@ setup(
     author_email='chinzo.dandar@gmail.com',
 
     # Choose your license
-    license='UC Regents',
+    license='Chinzorig Dandarchuluun',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
