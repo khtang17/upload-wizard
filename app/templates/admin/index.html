@@ -1,19 +1,20 @@
 {% extends 'admin/master.html' %}
 {% block body %}
-    <h3>Welcome to the Upload Wizard Tool.</h3>
-    <p>You have have logged in as an administrator. Please be careful. You can</p>
-    <ul>
-    <li> review recent account applications </li>
-    <li> monitor recent uploads </li>
-    <li> curate vendors </li>
-    <li> curate other parameters </li>
-    </ul>
-    <p>During the development please direct questions to Chinzo D via
-        <a href="https://github.com/ChinzoD/vendor-upload/issues" target="_blank">
-        https://github.com/ChinzoD/vendor-upload/issues</a>
-    </p>
-    <p>
-    Please direct big picture questions and chemistry questions to John
-    Irwin via the same issues mechanism above or via <a href="mailto:chemistry4biology@gmail.com">chemistry4biology</a> at
-        gmail dot com.</p>
+    {% if current_user.has_role('Admin') %}
+        <h3>Welcome to the Upload Wizard Tool.</h3>
+        <p>You have have logged in as an administrator. Please be careful. You can</p>
+        <ul>
+        <li> review recent account applications </li>
+        <li> monitor recent uploads </li>
+        <li> curate vendors </li>
+        <li> curate other parameters </li>
+        </ul>
+        <p>During the development please direct questions to Chinzo D via
+            <a href="https://github.com/ChinzoD/upload-wizard/issues" target="_blank">
+            https://github.com/ChinzoD/upload-wizard/issues</a>
+        </p>
+    {% else %}
+        <meta http-equiv="refresh" content="0; url=/404" />
+    {% endif %}
+
 {% endblock %}
