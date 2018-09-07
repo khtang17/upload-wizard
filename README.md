@@ -23,7 +23,10 @@ vim .env
 Copy and paste below variables with your value into .env file
 
 ```shell
-MAIL_PASSWORD = "your_mail_password"
+# Default email server is GMAIL. If you want to use other email, you need to 
+# change MAIL_SERVER and MAIL_PORT in config.py
+EMAIL = "your_email"
+EMAIL_PASSWORD = "your_mail_password"
 S3_BUCKET = "your_s3_bucket"
 S3_KEY = "your_access_key_id"
 S3_SECRET = "your_secret_access_key "
