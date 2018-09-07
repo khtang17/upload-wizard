@@ -13,7 +13,7 @@ import pathlib
 import sys
 import subprocess
 import numbers
-from app import db
+from app import db, create_app
 from flask import request, jsonify, Response
 
 from datetime import datetime
@@ -30,18 +30,19 @@ ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
 
 config = Config(connect_timeout=5, retries={'max_attempts': 0})
+app = create_app()
 s3 = boto3.client(
     "s3",
     config=config,
-    aws_access_key_id="AKIAIPU6RC7HZBRSWKPQ",
-    aws_secret_access_key="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"
+    aws_access_key_id=app.config['S3_KEY'],
+    aws_secret_access_key=app.config['S3_SECRET']
 )
 
 s3_res = boto3.resource(
     "s3",
     config=config,
-    aws_access_key_id="AKIAIPU6RC7HZBRSWKPQ",
-    aws_secret_access_key="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"
+    aws_access_key_id=app.config['S3_KEY'],
+    aws_secret_access_key=app.config['S3_SECRET']
 )
 
 
@@ -178,9 +179,9 @@ def save_file(file, name, is_logo, id=""):
         file_dir = os.path.realpath(os.path.dirname(folder))
         pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
         file.stream.seek(0)
-        print(name)
-        print(secure_filename(name))
-        print(os.path.join(file_dir, secure_filename(name)))
+        # print(name)
+        # print(secure_filename(name))
+        # print(os.path.join(file_dir, secure_filename(name)))
         file.save(os.path.join(file_dir, secure_filename(name)))
     except:
         print(sys.exc_info())
@@ -198,10 +199,10 @@ def save_file(file, name, is_logo, id=""):
 
 def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, history_id):
     try:
-        print(current_user.get_token())
-        print(current_user.company.idnumber)
-        print(str_mandatory_columns)
-        print(str_optional_columns)
+        # print(current_user.get_token())
+        # print(current_user.company.idnumber)
+        # print(str_mandatory_columns)
+        # print(str_optional_columns)
         if len(current_user.company.idnumber) > 0:
             script_dir = current_app.config['UPLOAD_FOLDER'] + "script/"
             os.chdir(current_app.config['UPLOAD_FOLDER']+user_folder)
@@ -357,7 +358,7 @@ def excel_validation(request):
     # catalog_objs = []
     # catalog_dict = []
     str_data = ""
-    print(mandatory_fields)
+    # print(mandatory_fields)
     for item_list in dict_value:
         data_dict = {}
         for index, value in enumerate(item_list):
@@ -368,7 +369,7 @@ def excel_validation(request):
                 #     dict(field_name=headers[index], type='mandatory', value=value, history_id=history.id))
             if headers[index] in optional_fields:
                 # used mandatory_fields.count()+index) in order to place optional field after mandatory fields
-                print(len(mandatory_fields)+index)
+                # print(len(mandatory_fields)+index)
                 data_dict[len(mandatory_fields)+index] = value
             # catalog_objs.append(CatalogModel(headers[index], 'optional', value, history.id))
             # catalog_dict.append(

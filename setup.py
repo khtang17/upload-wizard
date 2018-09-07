@@ -10,13 +10,17 @@ from os import path
 # with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 #     long_description = f.read()
 
+DEPENDENCIES_FILE = 'requirements.txt'
+dependencies = [pkg for line in open(DEPENDENCIES_FILE) if not line.startswith('#')
+                        for pkg in map(str.strip, line.split('#')) if pkg != '']
+
 setup(
     name='UPLOAD-WIZARD',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.20180808.2',
+    version='0.20180906.1',
 
     description='Upload Wizard v1.0',
     long_description='',
@@ -31,7 +35,7 @@ setup(
     author_email='chinzo.dandar@gmail.com',
 
     # Choose your license
-    license='Apache License 2.0',
+    license='',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -64,105 +68,14 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=[
-        'alembic==0.9.9',
-        'amqp==2.3.2',
-        'asn1crypto==0.24.0',
-        'awsebcli==3.14.1',
-        'Babel==2.6.0',
-        'bcrypt==3.1.4',
-        'billiard==3.5.0.3',
-        'blessed==1.15.0',
-        'blinker==1.4',
-        'boto3==1.7.44',
-        'botocore==1.10.44',
-        'cached-property==1.4.3',
-        'celery==4.2.0',
-        'cement==2.8.2',
-        'certifi==2018.4.16',
-        'cffi==1.11.5',
-        'chardet==3.0.4',
-        'click==6.7',
-        'colorama==0.3.9',
-        'cryptography==2.2.2',
-        'docker==3.4.0',
-        'docker-compose==1.21.2',
-        'docker-pycreds==0.3.0',
-        'dockerpty==0.4.1',
-        'docopt==0.6.2',
-        'docutils==0.14',
-        'dominate==2.3.1',
-        'et-xmlfile==1.0.1',
-        'Flask==1.0.2',
-        'Flask-Admin==1.5.1',
-        'Flask-BabelEx==0.9.3',
-        'Flask-Bootstrap==3.3.7.1',
-        'Flask-Excel==0.0.7',
-        'Flask-HTTPAuth==3.2.4',
-        'Flask-Login==0.4.1',
-        'Flask-Mail==0.9.1',
-        'Flask-Menu==0.7.0',
-        'Flask-Migrate==2.2.1',
-        'Flask-Moment==0.6.0',
-        'Flask-Principal==0.4.0',
-        'Flask-Security==3.0.0',
-        'Flask-SQLAlchemy==2.3.2',
-        'Flask-User==0.6.21',
-        'Flask-WTF==0.14.2',
-        'hurry==1.0',
-        'hurry.filesize==0.9',
-        'idna==2.6',
-        'itsdangerous==0.24',
-        'jdcal==1.4',
-        'Jinja2==2.10',
-        'jmespath==0.9.3',
-        'jsonschema==2.6.0',
-        'kombu==4.2.1',
-        'lml==0.0.1',
-        'Mako==1.0.7',
-        'MarkupSafe==1.0',
-        'openpyxl==2.5.4',
-        'passlib==1.7.1',
-        'pathspec==0.5.5',
-        'psycopg2==2.7.5',
-        'py==1.4.34',
-        'pycparser==2.18',
-        'pycryptodome==3.6.3',
-        'pyexcel==0.5.8',
-        'pyexcel-io==0.5.7',
-        'pyexcel-webio==0.1.4',
-        'pyexcel-xls==0.5.7',
-        'pyexcel-xlsx==0.5.6',
-        'python-dateutil==2.7.3',
-        'python-dotenv==0.8.2',
-        'python-editor==1.0.3',
-        'pytz==2018.4',
-        'PyYAML==3.12',
-        'requests==2.18.4',
-        's3transfer==0.1.13',
-        'semantic-version==2.5.0',
-        'six==1.11.0',
-        'speaklater==1.3',
-        'SQLAlchemy==1.2.8',
-        'tabulate==0.7.5',
-        'termcolor==1.1.0',
-        'texttable==0.9.1',
-        'urllib3==1.22',
-        'vine==1.1.4',
-        'visitor==0.1.3',
-        'wcwidth==0.1.7',
-        'websocket-client==0.48.0',
-        'Werkzeug==0.14.1',
-        'WTForms==2.2.1',
-        'xlrd==1.1.0',
-        'xlwt==1.3.0',
-    ],
+    install_requires=dependencies,
 
     scripts=(
         'application.py',
         'config.py',
         'setup.py',
         'requirements.txt',
+        '.env',
     ),
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
