@@ -4,6 +4,8 @@ Upload wizard web application
 # Dependencies
 
 * Python 3
+* PostgreSQL
+* SQLAlchemy
 
 # Installation on Linux 
 
