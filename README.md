@@ -32,7 +32,7 @@ EMAIL_PASSWORD = "your_mail_password"
 S3_BUCKET = "your_s3_bucket"
 S3_KEY = "your_access_key_id"
 S3_SECRET = "your_secret_access_key "
-S3_LOCATION = "your_s3_location" // http://folder.s3.amazonaws.com/sub_folder/
+S3_LOCATION = "your_s3_location" # http://folder.s3.amazonaws.com/sub_folder/
 
 # You can use your local database or aws rds
 SQLALCHEMY_DATABASE_URI_LOCAL = "postgresql+psycopg2://user:password:@localhost:5432/yout_database"
