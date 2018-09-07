@@ -32,7 +32,7 @@ SQLALCHEMY_DATABASE_URI_AWS = "postgresql+psycopg2://user:password@your_db_insta
 SECRET_KEY = ""
 SECURITY_PASSWORD_SALT = ""
 ```
-To run project 
+To install packages and run project 
 
 ```shell
 pip install -r requirements.txt
