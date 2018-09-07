@@ -40,9 +40,9 @@ class Config(object):
     FILE_VALIDATION_LIMIT = 500000
 
     # Flask-Mail SMTP account settings
-    MAIL_USERNAME = 'upload.vendor@gmail.com' or 'your_email'
-    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD") or 'your_email_password'
-    MAIL_DEFAULT_SENDER = 'upload.vendor@gmail.com' or 'your_email'
+    MAIL_USERNAME = os.getenv("EMAIL") or 'your_email'
+    MAIL_PASSWORD = os.getenv("EMAIL_PASSWORD") or 'your_email_password'
+    MAIL_DEFAULT_SENDER = os.getenv("EMAIL") or 'your_email'
 
     # Flask-User settings
     USER_APP_NAME = "Upload Wizard Team"  # Shown in and email templates and page footers
@@ -55,7 +55,7 @@ class Config(object):
     USER_ENABLE_FORGOT_PASSWORD = True
     USER_AFTER_LOGIN_ENDPOINT = 'main.index'
     USER_EMAIL_SENDER_NAME = USER_APP_NAME
-    USER_EMAIL_SENDER_EMAIL = "upload.vendor@gmail.com"
+    USER_EMAIL_SENDER_EMAIL = os.getenv("EMAIL")
 
     CSRF_ENABLED = True
 

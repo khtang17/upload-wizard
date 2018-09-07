@@ -10,7 +10,7 @@ from flask_bootstrap import Bootstrap
 from flask_user import UserManager, SQLAlchemyAdapter
 from flask_moment import Moment
 import flask_admin
-from app.data.views.model_views import AdminModelView, UserView, RoleView, CompanyView, HistoryView, FieldView
+from app.data.views.model_views import AdminModelView, UserView, RoleView, CompanyView, HistoryView, FieldView, MyHomeView
 from flask_mail import Mail
 import flask_excel as excel
 
@@ -65,6 +65,7 @@ def create_app(config_class=Config):
     admin = flask_admin.Admin(
         app,
         'Upload Wizard v1.0: Admin Panel',
+        index_view=MyHomeView(),
         base_template='master.html',
         template_mode='bootstrap3',
     )
