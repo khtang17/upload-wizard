@@ -1,6 +1,8 @@
 # Upload-wizard
 Upload wizard web application
 
+# Dependencies
+
 Python 3
 
 # Installation on Linux 
