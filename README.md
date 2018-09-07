@@ -39,6 +39,12 @@ pip install -r requirements.txt
 python application.py
 ```
 
+To export tar.gz archive file
+
+```shell
+python setup.py dir_name
+```
+
 ## Authors
 
 * **Chinzorig Dandarchuluun**
