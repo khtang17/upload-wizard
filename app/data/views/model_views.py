@@ -1,6 +1,7 @@
 from flask_user import current_user
 from flask import url_for, redirect, request, abort
 from flask_admin.contrib import sqla
+from flask_admin import AdminIndexView, expose
 from flask import Markup
 from datetime import timezone
 
@@ -27,6 +28,18 @@ class AdminModelView(sqla.ModelView):
             else:
                 # login
                 return redirect(url_for('user.login', next=request.url))
+
+
+class MyHomeView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        if not current_user.is_active or not current_user.is_authenticated:
+            return redirect(url_for('user.login'))
+        else:
+            if current_user.has_role('Admin'):
+                return self.render('admin/myhome.html')
+            else:
+                return self.render('errors/404.html'), 404
 
 
 class UserView(AdminModelView):
