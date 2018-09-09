@@ -35,7 +35,7 @@ S3_SECRET = "your_secret_access_key "
 S3_LOCATION = "your_s3_location" # http://folder.s3.amazonaws.com/sub_folder/
 
 # You can use your local database or aws rds
-SQLALCHEMY_DATABASE_URI_LOCAL = "postgresql+psycopg2://user:password:@localhost:5432/yout_database"
+SQLALCHEMY_DATABASE_URI_LOCAL = "postgresql+psycopg2://user:password:@localhost:5432/your_database"
 SQLALCHEMY_DATABASE_URI_AWS = "postgresql+psycopg2://user:password@your_db_instance_name:5432/db_name"
 
 SECRET_KEY = ""
