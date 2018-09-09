@@ -10,7 +10,8 @@ from flask_bootstrap import Bootstrap
 from flask_user import UserManager, SQLAlchemyAdapter
 from flask_moment import Moment
 import flask_admin
-from app.data.views.model_views import AdminModelView, UserView, RoleView, CompanyView, HistoryView, FieldView, MyHomeView
+from app.data.views.model_views import AdminModelView, UserView, RoleView, \
+    CompanyView, HistoryView, FieldView, MyHomeView
 from flask_mail import Mail
 import flask_excel as excel
 
@@ -78,6 +79,7 @@ def create_app(config_class=Config):
     if app.config['ZINC_MODE']:
         admin.add_view(AdminModelView(FileFormatModel, db.session, "Column name"))
     else:
+        # admin.add_view(ResultView(name='result', endpoint='result'))
         admin.add_view(FieldView(FieldModel, db.session, "File fields"))
         admin.add_view(AdminModelView(FieldDecimalModel, db.session, "File Decimal column filter"))
         admin.add_view(AdminModelView(FieldAllowedValueModel, db.session, "File column allowed values"))
