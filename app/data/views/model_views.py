@@ -1,7 +1,7 @@
 from flask_user import current_user
 from flask import url_for, redirect, request, abort
 from flask_admin.contrib import sqla
-from flask_admin import AdminIndexView, expose
+from flask_admin import AdminIndexView, expose, BaseView
 from flask import Markup
 from datetime import timezone
 
@@ -41,6 +41,13 @@ class MyHomeView(AdminIndexView):
             else:
                 return self.render('errors/404.html'), 404
 
+    # @expose('/result', methods=['GET'])
+    # def result(self):
+    #     from app.data.models.history import UploadHistoryModel
+    #     id = request.args.get('id', type=int)
+    #     history = UploadHistoryModel.find_by_id(id)
+    #     return self.render('admin/result.html', history=history)
+
 
 class UserView(AdminModelView):
     column_list = ['active', 'username', 'short_name', 'roles', 'email', 'confirmed_at', 'company']
@@ -77,6 +84,13 @@ def _date_format(view, context, model, name):
 
     return utc_to_local(model.date_uploaded).strftime("%b %d %Y %H:%M")
 
+def _file_name_link(view, context, model, name):
+    if not model.file_name:
+        return ''
+
+    return Markup(
+        '<a href="/result?id={model.id}">{model.file_name}</a>'.format(model=model)
+    )
 
 class CompanyView(AdminModelView):
     column_list = ['logo', 'name', 'telephone_number', 'toll_free_number',
@@ -99,7 +113,8 @@ class HistoryView(AdminModelView):
     page_size = 20
 
     column_formatters = {
-        'date': _date_format
+        'date': _date_format,
+        'file_name': _file_name_link
     }
 
 

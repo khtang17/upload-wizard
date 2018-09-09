@@ -4,18 +4,30 @@
 </button>
 <div id="m_header_menu" class="m-header-menu m-aside-header-menu-mobile m-aside-header-menu-mobile--offcanvas  m-header-menu--skin-light m-header-menu--submenu-skin-light m-aside-header-menu-mobile--skin-light m-aside-header-menu-mobile--submenu-skin-light "  >
 	<ul class="m-menu__nav  m-menu__nav--submenu-arrow ">
-         {%- for item in current_menu.children %}
-             <li class="m-menu__item
-             {% if item.active %} m-menu__item--active{% endif %}"  m-menu-link-redirect="1" aria-haspopup="true">
-                <a  href="{{ item.url }}" class="m-menu__link">
-                    <span class="m-menu__item-here"></span>
-                    <span class="m-menu__link-text">
-                        {{ item.text }}
-                    </span>
-                    <i class="m-menu__ver-arrow la la-angle-right"></i>
-                </a>
+        {% if current_user.has_role('Admin') %}
+            <li class="m-menu__item" m-menu-link-redirect="1" aria-haspopup="true">
+                <a  href="/admin/uploadhistorymodel/" class="m-menu__link">
+                        <span class="m-menu__item-here"></span>
+                        <span class="m-menu__link-text">
+                            Back to History
+                        </span>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
             </li>
-        {% endfor -%}
+        {% else %}
+            {%- for item in current_menu.children %}
+                 <li class="m-menu__item
+                 {% if item.active %} m-menu__item--active{% endif %}"  m-menu-link-redirect="1" aria-haspopup="true">
+                    <a  href="{{ item.url }}" class="m-menu__link">
+                        <span class="m-menu__item-here"></span>
+                        <span class="m-menu__link-text">
+                            {{ item.text }}
+                        </span>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
+                </li>
+            {% endfor -%}
+        {% endif %}
 	</ul>
 </div>
 <!-- END: Horizontal Menu -->

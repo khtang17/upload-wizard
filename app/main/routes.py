@@ -166,6 +166,7 @@ def history():
 
 @application.route('/last_result', methods=['GET', 'POST'])
 @login_required
+@roles_required('Vendor')
 def last_result():
     history = UploadHistoryModel.get_last_by_user_id(current_user.id)
     return render_template('result.html', title='Job Result', history=history)
@@ -176,7 +177,7 @@ def last_result():
 def result():
     id = request.args.get('id', type=int)
     history = UploadHistoryModel.find_by_id(id)
-    if history.user.id != current_user.id:
+    if history.user.id != current_user.id and current_user.has_role('Vendor'):
         return render_template('errors/404.html'), 404
     # stdout = ""
     # stderr = ""
@@ -249,7 +250,12 @@ def get_histories():
 
 
 @application.route("/export/<history_id>/<status_id>", methods=['GET'])
+@login_required
 def export(history_id, status_id):
+    history = UploadHistoryModel.find_by_id(history_id)
+    if history.user.id != current_user.id and current_user.has_role('Vendor'):
+        return render_template('errors/404.html'), 404
+
     # 1 - Validated
     # 2 - Validation-err
     # 3 - Unvalidated
