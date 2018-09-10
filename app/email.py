@@ -15,7 +15,7 @@ def send_async_email(app, msg):
 
 def send_email(subject, sender, recipients, text_body, html_body, sync=False, bcc=None):
     if current_app.config["ZINC_MODE"]:
-        msg = Message(subject, sender=sender, recipients=recipients, bcc=bcc)
+        msg = Message(subject, sender=sender, recipients=recipients)
         msg.body = text_body
         msg.html = html_body
         if sync:
