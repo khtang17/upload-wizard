@@ -1,3 +1,6 @@
+
+![Logo of the project](./app/static/assets/demo/demo6/media/img/logo/logo.png)
+
 # Upload-wizard
 Upload wizard web application
 
@@ -7,7 +10,7 @@ Upload wizard web application
 * PostgreSQL
 * SQLAlchemy
 
-# Installation on Linux 
+# Installing / Getting started on Linux 
 
 To clone repository 
 
