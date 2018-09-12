@@ -30,6 +30,7 @@ from app import db
 
 @application.route('/welcome')
 @login_required
+@roles_required('Vendor')
 @register_menu(application, '.main', 'Home', order=0)
 def welcome():
     user = UserModel.find_by_email(current_user.email)
@@ -140,6 +141,7 @@ def index():
 
 @application.route('/help')
 @login_required
+@roles_required('Vendor')
 @register_menu(application, '.fourth', 'Help', order=4)
 def help_page():
     return render_template('help.html', title='Help')
