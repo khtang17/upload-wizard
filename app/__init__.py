@@ -65,7 +65,7 @@ def create_app(config_class=Config):
     # Create admin
     admin = flask_admin.Admin(
         app,
-        'Upload Wizard v1.0: Admin Panel',
+        'Upload Wizard:',
         index_view=MyHomeView(),
         base_template='master.html',
         template_mode='bootstrap3',
