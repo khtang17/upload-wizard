@@ -38,7 +38,7 @@ def send_email(subject, sender, recipients, text_body, html_body, sync=False, bc
             response = client.send_email(
                 Destination={
                     'ToAddresses': recipients,
-                    'BccAddresses': bcc,
+                    # 'BccAddresses': bcc,
                 },
                 Message={
                     'Body': {
