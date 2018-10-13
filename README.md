@@ -1,3 +1,5 @@
+<img src="./app/static/assets/demo/demo6/media/img/logo/logo.png" width="100" height="100" >
+
 # Upload-wizard
 Upload wizard web application
 
