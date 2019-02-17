@@ -2,7 +2,13 @@ import os
 from dotenv import load_dotenv
 
 #basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv()
+
+from os.path import join, dirname
+from dotenv import load_dotenv
+
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
 
 
 class Config(object):
@@ -10,7 +16,7 @@ class Config(object):
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT")
     #SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
                               # 'sqlite:///' + os.path.join(basedir, 'app.db')
-    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI_AWS") or 'your_db_URI'
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI_GIMEL") or 'your_db_URI'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_POOL_SIZE = 20
     SQLALCHEMY_MAX_OVERFLOW = 5
@@ -36,7 +42,7 @@ class Config(object):
     MAIL_USE_SSL = True
     MAIL_USE_TLS = False
 
-    ZINC_MODE = False
+    ZINC_MODE = True
     FILE_VALIDATION_LIMIT = 500000
 
     # Flask-Mail SMTP account settings
