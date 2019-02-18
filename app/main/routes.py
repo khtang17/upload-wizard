@@ -358,55 +358,55 @@ def resend_confirmation_email():
     return redirect(url_for('user.login'))
 
 
-# @application.route('/athena', methods=['GET'])
-# def athena():
-#     # from pyathenajdbc import connect
-#     # conn_str = 'awsathena+jdbc://{}:{}@athena.{}.amazonaws.com:443/{}?s3_staging_dir={}'.format(
-#     #     current_app.config['S3_KEY'],
-#     #     current_app.config['S3_SECRET'],
-#     #     'us-west-2',
-#     #     'default',
-#     #     's3://aws-athena-query-results-upw/')
-#     # conn = connect(conn_str)
-#     # try:
-#     #     with conn.cursor() as cursor:
-#     #         cursor.execute("""
-#     #             SELECT * FROM one_row
-#     #             """)
-#     #         print(cursor.description)
-#     #         print(cursor.fetchall())
-#     # finally:
-#     #     conn.close()
-#     res = ""
-#     import contextlib
-#     from urllib.parse import quote_plus  # PY2: from urllib import quote_plus
-#     from sqlalchemy.engine import create_engine
-#     from sqlalchemy.sql.expression import select
-#     from sqlalchemy.sql.functions import func
-#     from sqlalchemy.sql.schema import Table, MetaData
-#
-#     conn_str = 'awsathena+jdbc://{}:{}@athena.{}.amazonaws.com:443/{}?s3_staging_dir={}'.format(
-#         current_app.config['S3_KEY'],
-#         current_app.config['S3_SECRET'],
-#         'us-west-2',
-#         'uploadwizard',
-#         's3://aws-athena-query-results-upw/')
-#     engine = create_engine(conn_str.format(
-#         access_key=quote_plus(current_app.config['S3_KEY']),
-#         secret_key=quote_plus(current_app.config['S3_SECRET']),
-#         region_name='us-west-2',
-#         schema_name='uploadwizard',
-#         s3_staging_dir=quote_plus('s3://aws-athena-query-results-upw/')))
-#     try:
-#         with contextlib.closing(engine.connect()) as conn:
-#             many_rows = Table('file', MetaData(bind=engine), autoload=True)
-#             rs = select([many_rows.c.manufacturerpartid]).execute()
-#             res = ""
-#             for row in rs:
-#                 res += str(row) +"\n<br/>"
-#     finally:
-#         engine.dispose()
-#     return res
+@application.route('/athena', methods=['GET'])
+def athena():
+    # from pyathenajdbc import connect
+    # conn_str = 'awsathena+jdbc://{}:{}@athena.{}.amazonaws.com:443/{}?s3_staging_dir={}'.format(
+    #     current_app.config['S3_KEY'],
+    #     current_app.config['S3_SECRET'],
+    #     'us-west-2',
+    #     'default',
+    #     's3://aws-athena-query-results-upw/')
+    # conn = connect(conn_str)
+    # try:
+    #     with conn.cursor() as cursor:
+    #         cursor.execute("""
+    #             SELECT * FROM one_row
+    #             """)
+    #         print(cursor.description)
+    #         print(cursor.fetchall())
+    # finally:
+    #     conn.close()
+    res = ""
+    import contextlib
+    from urllib.parse import quote_plus  # PY2: from urllib import quote_plus
+    from sqlalchemy.engine import create_engine
+    from sqlalchemy.sql.expression import select
+    from sqlalchemy.sql.functions import func
+    from sqlalchemy.sql.schema import Table, MetaData
+
+    conn_str = 'awsathena+jdbc://{}:{}@athena.{}.amazonaws.com:443/{}?s3_staging_dir={}'.format(
+        current_app.config['S3_KEY'],
+        current_app.config['S3_SECRET'],
+        'us-west-2',
+        'uploadwizard',
+        's3://aws-athena-query-results-upw/')
+    engine = create_engine(conn_str.format(
+        access_key=quote_plus(current_app.config['S3_KEY']),
+        secret_key=quote_plus(current_app.config['S3_SECRET']),
+        region_name='us-west-2',
+        schema_name='uploadwizard',
+        s3_staging_dir=quote_plus('s3://aws-athena-query-results-upw/')))
+    try:
+        with contextlib.closing(engine.connect()) as conn:
+            many_rows = Table('file', MetaData(bind=engine), autoload=True)
+            rs = select([many_rows.c.manufacturerpartid]).execute()
+            res = ""
+            for row in rs:
+                res += str(row) +"\n<br/>"
+    finally:
+        engine.dispose()
+    return res
 
 # @app.errorhandler(InvalidUsage)
 # def handle_invalid_usage(error):
