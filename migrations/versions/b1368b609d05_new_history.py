@@ -1,8 +1,8 @@
-"""initial commit
+"""new history
 
-Revision ID: b192907779ea
+Revision ID: b1368b609d05
 Revises: 
-Create Date: 2019-06-28 11:23:00.414003
+Create Date: 2019-06-28 15:00:29.409811
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'b192907779ea'
+revision = 'b1368b609d05'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -76,6 +76,11 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
+    op.create_table('status',
+    sa.Column('status_id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('status', sa.Text(), nullable=False),
+    sa.PrimaryKeyConstraint('status_id')
+    )
     op.create_table('field_allowed_value',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('allowed_values', sa.Text(), nullable=False),
@@ -119,16 +124,19 @@ def upgrade():
     sa.Column('date_uploaded', sa.DateTime(), nullable=True),
     sa.Column('file_name', sa.String(length=200), nullable=True),
     sa.Column('file_size', sa.String(length=200), nullable=True),
-    sa.Column('type', sa.String(length=50), nullable=True),
-    sa.Column('purchasability', sa.String(length=50), nullable=True),
+    sa.Column('catalog_type', sa.String(length=50), nullable=True),
+    sa.Column('upload_type', sa.String(length=50), nullable=True),
+    sa.Column('availability', sa.String(length=50), nullable=True),
+    sa.Column('last_updated', sa.DateTime(), nullable=True),
     sa.Column('natural_products', sa.Boolean(), nullable=False),
-    sa.Column('status', sa.Integer(), nullable=False),
+    sa.Column('status_id', sa.Integer(), nullable=True),
     sa.Column('data_array', sa.Text(), nullable=True),
+    sa.ForeignKeyConstraint(['status_id'], ['status.status_id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_history_date_uploaded'), 'history', ['date_uploaded'], unique=False)
-    op.create_index(op.f('ix_history_status'), 'history', ['status'], unique=False)
+    op.create_index(op.f('ix_history_last_updated'), 'history', ['last_updated'], unique=False)
     op.create_table('roles_users',
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('role_id', sa.Integer(), nullable=True),
@@ -155,7 +163,7 @@ def downgrade():
     op.drop_index(op.f('ix_job_log_date'), table_name='job_log')
     op.drop_table('job_log')
     op.drop_table('roles_users')
-    op.drop_index(op.f('ix_history_status'), table_name='history')
+    op.drop_index(op.f('ix_history_last_updated'), table_name='history')
     op.drop_index(op.f('ix_history_date_uploaded'), table_name='history')
     op.drop_table('history')
     op.drop_index(op.f('ix_user_username'), table_name='user')
@@ -166,6 +174,7 @@ def downgrade():
     op.drop_table('user')
     op.drop_table('field_decimal')
     op.drop_table('field_allowed_value')
+    op.drop_table('status')
     op.drop_table('role')
     op.drop_index(op.f('ix_file_format_title'), table_name='file_format')
     op.drop_index(op.f('ix_file_format_order'), table_name='file_format')

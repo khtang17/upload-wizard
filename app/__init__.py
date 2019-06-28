@@ -57,7 +57,7 @@ def create_app(config_class=config):
 
     from app.data.models.company import CompanyModel
     from app.data.models.user import RoleModel
-    # from app.data.models.status import StatusModel
+    from app.data.models.status import StatusModel
     from app.data.models.history import UploadHistoryModel
     from app.data.models.format import FileFormatModel
     from app.data.models.field_allowed_value import FieldAllowedValueModel

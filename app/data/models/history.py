@@ -54,10 +54,12 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     date_uploaded = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     file_name = db.Column(db.String(200))
     file_size = db.Column(db.String(200))
-    type = db.Column(db.String(50))
-    purchasability = db.Column(db.String(50))
+    catalog_type = db.Column(db.String(50))
+    upload_type = db.Column(db.String(50))
+    availability = db.Column(db.String(50))
+    last_updated = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     natural_products = db.Column(db.Boolean(), nullable=False, default=False)
-    status = db.Column(db.Integer, index=True, nullable=False, default=1)
+    status_id = db.Column(db.Integer, db.ForeignKey('status.status_id'))
     data_array = db.Column(db.Text, nullable=True)
     job_logs = db.relationship(JobLogModel,
                                order_by='asc(JobLogModel.date)',
@@ -76,10 +78,11 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
             'DateUploaded': self.date_uploaded.isoformat() + 'Z',
             'FileName': self.file_name,
             'FileSize': self.file_size,
-            'Type': self.type,
-            'Purchasability': self.purchasability,
+            'CatalogType': self.catalog_type,
+            'UploadType' : self.upload_type,
+            'Availability': self.availability,
             'NaturalProducts': self.natural_products,
-            'Status': self.status
+            'StatusId': self.status_id
             # 'Status': self.get_status_type()
         }
         return data
@@ -106,10 +109,11 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                 # 'date_uploaded': self.date_uploaded.isoformat() + 'Z',
                 'file_name': self.file_name,
                 'file_size': self.file_size,
-                'type': self.type,
-                'purchasability': self.purchasability,
+                'catalog_type': self.catalog_type,
+                'upload_type' : self.upload_type,
+                'availability': self.availability,
                 'natural_products': self.natural_products,
-                'status': self.status
+                'status_id': self.status_id
                 }
 
     def get_miliseconds(self):
