@@ -102,7 +102,7 @@ def company():
             company.job_notify_email = form.job_notify_email.data
             company.save_to_db()
         flash('Updated!', category='success')
-        return jsonify({"message": "Updated!"}, 200)
+        # return jsonify({"message": "Updated!"}, 200)
     elif request.method == 'GET':
         user = UserModel.find_by_email(current_user.email)
         if user.company:
