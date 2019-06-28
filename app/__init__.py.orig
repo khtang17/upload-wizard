@@ -3,7 +3,7 @@ __copyright__ = ""
 
 
 from flask import Flask
-from config import config
+from config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bootstrap import Bootstrap
@@ -36,10 +36,9 @@ bootstrap = Bootstrap()
 # bootstrap = Bootstrap(app)
 
 
-def create_app(config_class=config):
-    app = Flask(__name__)
+def create_app(config_class=Config):
+    application = app = Flask(__name__)
     Menu(app=app)
-    app.config.from_object(config['dev'])
     app.config.from_object(config_class)
 
     db.init_app(app)
@@ -57,14 +56,11 @@ def create_app(config_class=config):
 
     from app.data.models.company import CompanyModel
     from app.data.models.user import RoleModel
-    # from app.data.models.status import StatusModel
     from app.data.models.history import UploadHistoryModel
     from app.data.models.format import FileFormatModel
     from app.data.models.field_allowed_value import FieldAllowedValueModel
     from app.data.models.field_decimal import FieldDecimalModel
     from app.data.models.field import FieldModel
-    from app.data.models.job_log import JobLogModel
-    # from app.data.models.job_info import JobInfoModel
 
     # Create admin
     admin = flask_admin.Admin(
