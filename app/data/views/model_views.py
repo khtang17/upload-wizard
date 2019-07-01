@@ -108,7 +108,7 @@ class HistoryView(AdminModelView):
     column_list = ['date', 'user', 'file_name', 'catalog_type', 'upload_type', 'availability',
                    'natural_products', 'file_size', 'status_id', 'file_size']
     column_searchable_list = ('file_name', 'upload_type', 'availability')
-    column_editable_list = ('status_id',)
+    # column_editable_list = ('status_id')
     can_create = False
     page_size = 20
 

@@ -59,7 +59,7 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     availability = db.Column(db.String(50))
     last_updated = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     natural_products = db.Column(db.Boolean(), nullable=False, default=False)
-    status_id = db.Column(db.Integer, db.ForeignKey('status.status_id'))
+    status_id = db.Column(db.Integer, db.ForeignKey('status.status_id'), default=1)
     data_array = db.Column(db.Text, nullable=True)
     job_logs = db.relationship(JobLogModel,
                                order_by='asc(JobLogModel.date)',

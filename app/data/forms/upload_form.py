@@ -9,12 +9,15 @@ class UploadForm(FlaskForm):
         FileAllowed(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi', 'csv', 'tsv', 'xlsx'],
                     'Please upload only allowed files! (.txt, .)')
     ])
-    type = SelectField('Type:', render_kw={"class": "form-control m-input"},
+    catalog_type = SelectField('Catalog Type:', render_kw={"class": "form-control m-input"},
                        choices=[('bb', 'Building Block'), ('sc', 'Screening Compounds'), ('both', 'Mixed')]
     )
-    purchasability = SelectField('Purchasability:',
+    availability = SelectField('Availability:',
                                  render_kw={"class": "form-control m-input"},
                                  choices=[('stock', 'In Stock'), ('demand', 'Make on Demand')]
     )
+    upload_type = SelectField('Upload Type:', render_kw={"class": "form-control m-input"},
+                              choices=[('full', 'Full Catalog Update'), ('incremental', 'Incremental Catalog Update')]
+                              )
     natural_products = BooleanField(' Natural products')
     submit = SubmitField('submit', render_kw={"class": "btn btn-success"})

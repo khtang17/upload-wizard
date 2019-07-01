@@ -1,29 +1,70 @@
 {% extends "base.html" %}
+ {% block styles %}
+    <link href="{{ url_for('static', filename='styles/progress-bar.css')}}" rel="stylesheet" type="text/css" />
+ {% endblock styles %}
 
 {% block content %}
     <div class="m-portlet m-portlet--mobile ">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title">
-                    <h3 class="m-portlet__head-text">Job Result</h3>
+                    <h3 class="m-portlet__head-text">Job {{ history.id }} Result</h3>
                 </div>
             </div>
         </div>
         <div class="m-portlet__body">
-            <p><b>File Name: </b>{{ history.file_name }}</p>
-            <p><b>File Size: </b>{{ history.file_size }}</p>
-            <p><b>Upload Date: </b>{{ moment(history.date_uploaded).format('LLL') }}</p>
+            <p><b>File Name: </b> {{ history.file_name }}</p>
+            <p><b>File Size: </b> {{ history.file_size }}</p>
+            <p><b>Upload Date: </b> {{ moment(history.date_uploaded).format('LLL') }}</p>
             {% if config['ZINC_MODE'] %}
-                <p><b>Type: </b>{{ history.type }}</p>
-                <p><b>Purchasability: </b>{{ history.purchasability }}</p>
-                <p><b>Natural products: </b>{{ history.natural_products }}</p>
+                {% if history.catalog_type == 'bb' %}
+                    <p><b>Catalog Type: </b> Building Blocks</p>
+                {% elif history.catalog_type == 'sc' %}
+                     <p><b>Catalog Type: </b> Screening Compounds</p>
+                {% else %}
+                     <p><b>Catalog Type: </b> Mixed</p>
+                {% endif %}
+                {% if history.upload_type == 'full' %}
+                    <p><b>Upload Type: </b> Full Update</p>
+                {% elif history.upload_type == 'incremental' %}
+                    <p><b>Upload Type: </b> Incremental Update</p>
+                {% endif %}
+                {% if history.availability == 'stock' %}
+                    <p><b>Availability: </b> In Stock</p>
+                {% elif history.availability == 'demand' %}
+                    <p><b>Availability: </b> On Demand</p>
+                {% endif %}
+                <p><b>Natural products: </b> {{ history.natural_products }}</p>
+                <p><b>Last Updated: </b> {{ moment(history.last_updated).format('LLL') }}</p>
+
             {% else %}
                  <p><b>Raw file: </b>
                     <a href="{{ url_for('main.export', history_id=history.id, status_id=history.status) }}" >Download raw file as csv</a>,
                 </p>
             {% endif %}
+        <br>
+            <div id="progress-bar-container">
+              <div class="progress">
+                <div class="progress-track"></div>
+                <div id="step{{ history.status_id }}" class="progress-step">
+                  Step 1
+                </div>
+                <div id="step2" class="progress-step">
+                  Step Two
+                </div>
+                <div id="step3" class="progress-step">
+                  Step Three
+                </div>
+                <div id="step4" class="progress-step">
+                  Complete
+                </div>
 
+            </div>
+                <button onClick=next()>Next Step</button>
+            </div>
             <br/>
+        <br>
+
             <div id="mCSB_5_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
                 <div class="m-timeline-2">
                     <div class="m-timeline-2__items  m--padding-top-25 m--padding-bottom-30">
@@ -53,6 +94,7 @@
             </div>
             <div class="m-spinner m-spinner--info m-spinner--lg" style="margin-left: 56px;"></div>
             <br/>
+
             <br/>
 {#            <div class="panel panel-danger">#}
 {#                <div class="panel-heading">#}
@@ -71,6 +113,7 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="{{ url_for('static', filename='scripts/progress-bar.js')}}" type="text/javascript"></script>
     {{ super() }}
     <script>
         $(function () {

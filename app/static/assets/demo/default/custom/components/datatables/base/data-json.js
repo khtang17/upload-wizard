@@ -29,7 +29,7 @@ var DatatableJsonRemoteDemo= {
                 field:"FileSize", title:"File Size", width: 60
             }
             , {
-                field:"Type", title:"Type", width: 60 , template:function(t) {
+                field:"CatalogType", title:"Catalog Type", width: 60 , template:function(t) {
                     var e= {
                         'bb': {
                             title: "Building Block", state: "accent"
@@ -42,11 +42,26 @@ var DatatableJsonRemoteDemo= {
                         }
                     }
                     ;
-                    return'<span class="m--font-bold m--font-'+e[t.Type].state+'">'+e[t.Type].title+"</span>"
+                     return'<span class="m--font-bold m--font-'+e[t.CatalogType].state+'">'+e[t.CatalogType].title+"</span>"
                 }
-            }
-            , {
-                field:"Purchasability", title:"Purchasability", width: 50, template:function(t) {
+            },
+             {
+                field:"UploadType", title:"Upload Type", width: 60 , template:function(t) {
+                    var e= {
+                        'full': {
+                            title: "Full Update", state: "accent"
+                        }
+                        , 'incremental': {
+                            title: "Incremental Update", state: "info"
+                        }
+                    }
+                    ;
+                    return'<span class="m--font-bold m--font-'+e[t.UploadType].state+'">'+e[t.UploadType].title+"</span>"
+                }
+            },
+
+            {
+                field:"Availability", title:"Availability", width: 50, template:function(t) {
                     var e= {
                         'stock': {
                             title: "In Stock", class: " m--font-primary"
@@ -56,30 +71,58 @@ var DatatableJsonRemoteDemo= {
                         }
                     }
                     ;
-                    return'<span class="m--font-bold '+e[t.Purchasability].class+' m-badge--wide">'+e[t.Purchasability].title+"</span>"
+                    return'<span class="m--font-bold '+e[t.Availability].class+' m-badge--wide">'+e[t.Availability].title+"</span>"
                 }
             }
             , {
                 field:"NaturalProducts", title:"Natural Products", width: 50
             }
             , {
-                field:"Status", title:"Status", template:function(t) {
+                field:"StatusId", title:"Status ID", template:function(t) {
                     var e= {
                         1: {
-                            title: "Job Submitted", class: "m-badge--brand"
+                            title: "File Submitted", class: "m-badge--brand"
                         }
                         , 2: {
-                            title: "Warning", class: " m-badge--warning"
+                            title: "Validation Started", class: "m-badge--brand"
                         }
                         , 3: {
-                            title: "Error", class: " m-badge--danger"
+                            title: "Validation Failed", class: " m-badge--danger"
                         }
                         , 4: {
+                            title: "Validation Completed", class: " m-badge--brand"
+                        }
+                        , 5: {
+                            title: "Prepare for Loading", class: "m-badge--warn"
+                        }
+                        , 6: {
+                            title: "Fail to Prepare for Loading", class: "m-badge--danger"
+                        }
+                        , 7: {
+                            title: "Loading Started", class: "m-badge--brand"
+                        }
+                        , 8: {
+                            title: "Loading Failed", class: "m-badge--danger"
+                        }
+                        , 9: {
+                            title: "Depletion", class: "m-badge--brand"
+                        }
+                        , 10: {
                             title: "Job Finished", class: " m-badge--success"
                         }
+                        , 11: {
+                            title: "Awaiting System Admin Review", class: "m-badge--warn"
+                        }
+                        , 12: {
+                            title: "Job Cancelled by Admin", class: "m-badge--danger"
+                        }
+                        , 13: {
+                            title: "Job Cancelled by System", class: "m-badge--danger"
+                        }
+
                     }
                     ;
-                    return'<span class="m-badge '+e[t.Status].class+' m-badge--wide">'+e[t.Status].title+"</span>"
+                    return'<span class="m-badge '+e[t.StatusId].class+' m-badge--wide">'+e[t.StatusId].title+"</span>"
                 }
             }
             ]
@@ -87,13 +130,13 @@ var DatatableJsonRemoteDemo= {
         ),
         e=t.getDataSourceQuery(),
         $("#m_form_status").on("change", function() {
-            t.search($(this).val(), "Status")
+            t.search($(this).val(), "StatusId")
         }
-        ).val(void 0!==e.Status?e.Status:""),
+        ).val(void 0!==e.StatusId?e.StatusId:""),
         $("#m_form_type").on("change", function() {
             t.search($(this).val(), "Type")
         }
-        ).val(void 0!==e.Type?e.Type:""),
+        ).val(void 0!==e.CatalogType?e.CatalogType:""),
         $("#m_form_status, #m_form_type").selectpicker()
     }
 }

@@ -137,11 +137,12 @@ def validate(file, form):
         file_length = file.tell()
         file_size = size(file_length, system=alternative)
         history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
-        history.type = form.type.data
-        history.purchasability = form.purchasability.data
+        history.catalog_type = form.catalog_type.data
+        history.upload_type = form.upload_type.data
+        history.availability = form.availability.data
         history.natural_products = form.natural_products.data
         history.save_to_db()
-        result = save_file(file, history.file_name, False, history.id)
+        result = save_file(file, history, history.file_name, False, history.id)
         file_info = "File Uploaded! File Size:{}. ".format(file_size)
         if result is None:
             return {"message": file_info}, 200
@@ -156,6 +157,14 @@ def validate(file, form):
     return {"message": "File Uploaded! File Size:{}".format(file_size)}, 200
 
 
+def write_json_file(history, folder):
+    job_info = history.json()
+    job_info.update({'short_name': current_user.short_name})
+    file_path = os.path.join(folder, 'JOB_INFO.json')
+    with open(file_path, 'w') as fh:
+        json.dump(job_info, fh, indent=4)
+        fh.close()
+
 def check_img_type(file):
     if file.mimetype.startswith('image/jpeg') or file.mimetype.startswith('image/png'):
         return True
@@ -163,7 +172,7 @@ def check_img_type(file):
         return False
 
 
-def save_file(file, name, is_logo, id=""):
+def save_file(file, object, name, is_logo, id=""):
     try:
         if is_logo:
             folder = current_app.config['LOGO_UPLOAD_FOLDER']
@@ -182,7 +191,10 @@ def save_file(file, name, is_logo, id=""):
         # print(name)
         # print(secure_filename(name))
         # print(os.path.join(file_dir, secure_filename(name)))
+        print("Saving file to directory")
         file.save(os.path.join(file_dir, secure_filename(name)))
+        print("Saving json file")
+        write_json_file(object, file_dir)
     except:
         print(sys.exc_info())
         return {"message": "1: " + str(sys.exc_info()[0])}, 500
@@ -206,7 +218,7 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
         if len(current_user.company.idnumber) > 0:
             script_dir = current_app.config['UPLOAD_FOLDER'] + "script/"
             os.chdir(current_app.config['UPLOAD_FOLDER']+user_folder)
-            out = subprocess.Popen(["qsub " + script_dir
+            out = subprocess.Popen(["q " + script_dir
                                     + 'script.sh {} {} {} {} {} {}'
                                    .format(user_folder,
                                            current_user.company.idnumber.replace(" ", ","),
