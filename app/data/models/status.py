@@ -10,3 +10,5 @@ class StatusModel(db.Model):
     def __init__(self, status_id, status):
         self.status_id = status_id
         self.status = status
+
+

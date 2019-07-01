@@ -35,6 +35,7 @@
                     <p><b>Availability: </b> On Demand</p>
                 {% endif %}
                 <p><b>Natural products: </b> {{ history.natural_products }}</p>
+                <p><b>Status: </b> {{ status }}</p>
                 <p><b>Last Updated: </b> {{ moment(history.last_updated).format('LLL') }}</p>
 
             {% else %}

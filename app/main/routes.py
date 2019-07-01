@@ -8,6 +8,7 @@ from app.data.models.user import UserModel
 from app.data.models.company import CompanyModel
 from app.data.models.history import UploadHistoryModel
 from app.data.models.job_log import JobLogModel
+from app.data.models.status import StatusModel
 from flask_user.forms import RegisterForm, ResendConfirmEmailForm, ForgotPasswordForm, ResetPasswordForm
 
 from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_file_to_s3, s3
@@ -177,6 +178,7 @@ def last_result():
 def result():
     id = request.args.get('id', type=int)
     history = UploadHistoryModel.find_by_id(id)
+    status = StatusModel.query.filter_by(status_id=history.status_id).first()
     if history.user.id != current_user.id and current_user.has_role('Vendor'):
         return render_template('errors/404.html'), 404
     # stdout = ""
@@ -198,7 +200,7 @@ def result():
     #         stderr = stderr.replace('\n', "<br/>")
     #         file2.close()
 
-    return render_template('result.html', title='Job Result', history=history)
+    return render_template('result.html', title='Job Result', history=history, status=status.status)
     # return render_template('result.html', title='Job Result', history=history, stdout=stdout, stderr=stderr)
 
 
