@@ -39,7 +39,7 @@ bootstrap = Bootstrap()
 def create_app(config_class=config):
     app = Flask(__name__)
     Menu(app=app)
-    app.config.from_object(config['dev'])
+    app.config.from_object(config['prod'])
     app.config.from_object(config_class)
 
     db.init_app(app)

@@ -26,8 +26,8 @@ curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" 
 
 echo "ID NUMBER: $idNumber"
 
-#cd "/nfs/ex5/vendoruploads/"
-cd "/nfs/home/khtang/work/Projects/upload-wizard/vendoruploads"
+cd "/nfs/ex5/vendoruploads/"
+#cd "/nfs/home/khtang/work/Projects/upload-wizard/vendoruploads"
 cd "$userDir"
 
 filesInCurrentDir=`ls`
@@ -49,6 +49,8 @@ for file in $filesInCurrentDir; do
             esac
         else
             echo "'$file' is not a valid file"
+	    /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
+	    echo (`pwd`)
             curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"'$file' is not a valid file", "status_type":2}' -H "Authorization: Bearer $token" $apiUrl
         fi
 done
@@ -74,6 +76,7 @@ done
 echo "============================================================================================================================"
 echo "Validated Files:"
 curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Validation Started", "status_type":1}' -H "Authorization: Bearer $token" $apiUrl
+/nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 2
 
 newFilesInCurrentDir=`ls`
 
@@ -135,12 +138,14 @@ for file in *; do
                 duplicate=$(printf '%s\n' "${array[@]}"|awk '!($0 in seen){t=seen[$0];next} 1')
                 if [ ${#duplicate} -gt 0 ]; then
                         echo "RED: File title columns are not unique! Please check file."
+			/nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
                         curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"File title columns are not unique! Please check file.", "status_type":3}' -H "Authorization: Bearer $token" $apiUrl
                         break
                 fi
                 if [ ${#mandatoryCols[@]} -gt ${#array[@]}  ]; then
                         echo "============================================================================================================================"
                         echo "RED: There must be at least "${#mandatoryCols[@]}" column(s). Please check file."
+			/nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
                         curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"There must be at least '${#mandatoryCols[@]}' column(s). Please check file.", "status_type":3}' -H "Authorization: Bearer $token" $apiUrl
                         break
                 else
@@ -151,6 +156,7 @@ for file in *; do
                         diff="$(echo -e "${diff}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
                         if [ ${#diff} -gt 0 ]; then
                             echo "RED: Please add mandatory file title column(s): $diff"
+			    /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
                             curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Please add mandatory file title column(s): '$diff'", "status_type":2}' -H "Authorization: Bearer $token" $apiUrl
                             break
                         fi
@@ -162,12 +168,14 @@ for file in *; do
                         diff="$(echo -e "${diff}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
                         if [ ${#diff} -gt 0 ]; then
                             echo "Warning: Optional column(s) not found: $diff"
+			    /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
                             curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Optional column(s) not found: '$diff'", "status_type":2}' -H "Authorization: Bearer $token" $apiUrl
                         fi
                 fi
             fi
         done < "$file"
         curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"'$file' has been validated", "status_type":1}' -H "Authorization: Bearer $token" $apiUrl
+	/nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 4
         echo "============================================================================================================================"
         echo "$file"": --- END ---"
         echo "============================================================================================================================"
@@ -179,19 +187,23 @@ catch || {
     case $ex_code in
         $AnException)
             curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Exception was thrown", "status_type":3}' -H "Authorization: Bearer $token" $apiUrl
-            echo "AnException was thrown"
+            /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
+	    echo "AnException was thrown"
         ;;
         $AnotherException)
             curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"AnotherException was thrown", "status_type":3}' -H "Authorization: Bearer $token" $apiUrl
-            echo "AnotherException was thrown"
+            /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
+	    echo "AnotherException was thrown"
         ;;
         *)
             curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"An unexpected exception was thrown", "status_type":3}' -H "Authorization: Bearer $token" $apiUrl
-            echo "An unexpected exception was thrown"
+            /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
+	    echo "An unexpected exception was thrown"
             throw $ex_code # you can rethrow the "exception" causing the script to exit if not caught
         ;;
     esac
         curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Finished with exception", "status_type":4}' -H "Authorization: Bearer $token" $apiUrl
+	/nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
 }
 
 curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Finished", "status_type":4}' -H "Authorization: Bearer $token" $apiUrl
