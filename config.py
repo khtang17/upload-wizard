@@ -68,7 +68,7 @@ class DevConfig(Config):
     LOGO_UPLOAD_FOLDER = 'app/static/vendorlogos/'
     LOGO_UPLOAD_FOLDER_URL = 'static/vendorlogos/'
 
-    SCRIPT_DIR = os.path.join(os.getcwd(), 'app/script/')
+    SCRIPT_DIR = os.path.join(os.getcwd(), 'app/scripts/')
 
 class ProdConfig(Config):
     DEBUG = True

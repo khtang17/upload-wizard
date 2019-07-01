@@ -216,9 +216,9 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
         # print(str_mandatory_columns)
         # print(str_optional_columns)
         if len(current_user.company.idnumber) > 0:
-            script_dir = current_app.config['UPLOAD_FOLDER'] + "script/"
+            script_dir = current_app.config['SCRIPT_DIR']
             os.chdir(current_app.config['UPLOAD_FOLDER']+user_folder)
-            out = subprocess.Popen(["q " + script_dir
+            out = subprocess.Popen(["qsub " + script_dir
                                     + 'script.sh {} {} {} {} {} {}'
                                    .format(user_folder,
                                            current_user.company.idnumber.replace(" ", ","),
