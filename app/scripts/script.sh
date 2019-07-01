@@ -26,7 +26,8 @@ curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" 
 
 echo "ID NUMBER: $idNumber"
 
-cd "/nfs/ex5/vendoruploads/"
+#cd "/nfs/ex5/vendoruploads/"
+cd "/nfs/home/khtang/work/Projects/upload-wizard/vendoruploads"
 cd "$userDir"
 
 filesInCurrentDir=`ls`

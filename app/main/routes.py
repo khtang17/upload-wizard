@@ -170,7 +170,8 @@ def history():
 @roles_required('Vendor')
 def last_result():
     history = UploadHistoryModel.get_last_by_user_id(current_user.id)
-    return render_template('result.html', title='Job Result', history=history)
+    status = StatusModel.query.filter_by(status_id=history.status_id).first()
+    return render_template('result.html', title='Job Result', history=history, status=status.status)
 
 
 @application.route('/result', methods=['GET', 'POST'])
