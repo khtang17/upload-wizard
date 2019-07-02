@@ -156,10 +156,29 @@ def validate(file, form):
 
     return {"message": "File Uploaded! File Size:{}".format(file_size)}, 200
 
+def get_shortname(catalog_type, company_shortname, availabilty):
+    upload_catalog_name =""
+    if not company_shortname:
+        print("Short_name is not detected.")
+    else:
+        if catalog_type == 'mixed':
+            print("Catalog is Mixed")
+            upload_catalog_name = company_shortname
+        else:
+            print("Catalog is " + catalog_type)
+            upload_catalog_name = company_shortname + catalog_type
+        print("Company shortname :" + company_shortname)
+        upload_catalog_name = company_shortname + catalog_type
+        print("Catalog short name: " + upload_catalog_name)
+    return upload_catalog_name
 
 def write_json_file(history, folder):
     job_info = history.json()
-    job_info.update({'short_name': current_user.short_name})
+    upload_catalog_shortname = get_shortname(catalog_type=history.catalog_type,
+                                             company_shortname=current_user.short_name,
+                                             availabilty=history.availability)
+    print(upload_catalog_shortname)
+    job_info.update({'short_name': upload_catalog_shortname})
     file_path = os.path.join(folder, 'JOB_INFO.json')
     with open(file_path, 'w') as fh:
         json.dump(job_info, fh, indent=4)
