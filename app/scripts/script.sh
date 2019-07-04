@@ -21,6 +21,7 @@ historyID=$6
 apiUrl="http://10.20.0.31:5020/api/job_logs"
 
 curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Job Started", "status_type":1}' -H "Authorization: Bearer $token" $apiUrl 2>&1
+/nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 2
 
 echo "ID NUMBER: $idNumber"
 
@@ -48,8 +49,9 @@ for file in $filesInCurrentDir; do
             esac
         else
             echo "'$file' is not a valid file"
-	    /nfs/home/khtang/work/Projects/upload-wizard/app/scripts/script.sh 2
+	    #/nfs/home/khtang/work/Projects/upload-wizard/app/scripts/script.sh 2
 	    curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"'$file' is not a valid file", "status_type":2}' -H "Authorization: Bearer $token" $apiUrl
+        /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
         fi
 done
 
@@ -145,6 +147,7 @@ for file in *; do
 			echo "============================================================================================================================"
 		    	echo "RED: There must be at least "${#mandatoryCols[@]}" column(s). Please check file."
 		    	curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"There must be at least '${#mandatoryCols[@]}' column(s). Please check file.", "status_type":3}' -H "Authorization: Bearer $token" $apiUrl 2>&1
+			    /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
 			break
 		else
 			diff=" ${mandatoryCols[*]} "
@@ -155,6 +158,7 @@ for file in *; do
 			if [ ${#diff} -gt 0 ]; then
 				echo "RED: Please add mandatory file title column(s): $diff"
 				curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Please add mandatory file title column(s): '$diff'", "status_type":2}' -H "Authorization: Bearer $token" $apiUrl 2>&1
+				/nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
 				break
 			fi
 
@@ -166,6 +170,7 @@ for file in *; do
 			if [ ${#diff} -gt 0 ]; then
                                 echo "Warning: Optional column(s) not found: $diff"
 				curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Optional column(s) not found: '$diff'", "status_type":2}' -H "Authorization: Bearer $token" $apiUrl 2>&1
+                /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
                         fi
 
 			diff=" ${array[*]} "
@@ -195,10 +200,12 @@ done
     case $ex_code in
         $AnException)
             curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Exception was thrown", "status_type":3}' -H "Authorization: Bearer $token" $apiUrl 2>&1
+	        /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
 	    echo "AnException was thrown"
         ;;
         $AnotherException)
             curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"AnotherException was thrown", "status_type":3}' -H "Authorization: Bearer $token" $apiUrl 2>&1
+            /nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 3
             echo "AnotherException was thrown"
         ;;
         *)
@@ -226,3 +233,6 @@ else
 	fi
 fi
 curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id":'$historyID', "status":"Finished", "status_type":4}' -H "Authorization: Bearer $token" $apiUrl 2>&1
+echo $PWD
+/nfs/home/khtang/code/upload_wizard_codes/update_zincload_status.pl 4
+

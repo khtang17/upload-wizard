@@ -179,6 +179,13 @@ def last_result():
 def result():
     id = request.args.get('id', type=int)
     history = UploadHistoryModel.find_by_id(id)
+    all_statuses = StatusModel.query.all()
+    statuses_dict = {}
+    for status in all_statuses:
+        item = {status.status_id : status.status}
+        statuses_dict.update(item)
+
+
     status = StatusModel.query.filter_by(status_id=history.status_id).first()
     if history.user.id != current_user.id and current_user.has_role('Vendor'):
         return render_template('errors/404.html'), 404
@@ -201,7 +208,7 @@ def result():
     #         stderr = stderr.replace('\n', "<br/>")
     #         file2.close()
 
-    return render_template('result.html', title='Job Result', history=history, status=status.status)
+    return render_template('result.html', title='Job Result', history=history, status=status.status, statuses_dict=statuses_dict)
     # return render_template('result.html', title='Job Result', history=history, stdout=stdout, stderr=stderr)
 
 

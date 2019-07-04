@@ -156,29 +156,11 @@ def validate(file, form):
 
     return {"message": "File Uploaded! File Size:{}".format(file_size)}, 200
 
-def get_shortname(catalog_type, company_shortname, availabilty):
-    upload_catalog_name =""
-    if not company_shortname:
-        print("Short_name is not detected.")
-    else:
-        if catalog_type == 'mixed':
-            print("Catalog is Mixed")
-            upload_catalog_name = company_shortname
-        else:
-            print("Catalog is " + catalog_type)
-            upload_catalog_name = company_shortname + catalog_type
-        print("Company shortname :" + company_shortname)
-        upload_catalog_name = company_shortname + catalog_type
-        print("Catalog short name: " + upload_catalog_name)
-    return upload_catalog_name
+
 
 def write_json_file(history, folder):
     job_info = history.json()
-    upload_catalog_shortname = get_shortname(catalog_type=history.catalog_type,
-                                             company_shortname=current_user.short_name,
-                                             availabilty=history.availability)
-    print(upload_catalog_shortname)
-    job_info.update({'short_name': upload_catalog_shortname})
+    job_info.update({'company_basename': current_user.short_name})
     file_path = os.path.join(folder, 'JOB_INFO.json')
     with open(file_path, 'w') as fh:
         json.dump(job_info, fh, indent=4)
@@ -222,7 +204,9 @@ def save_file(file, object, name, is_logo, id=""):
         return name
     else:
         str_mandatory_columns = FileFormatModel.find_all_mandatory_column_str()
+        print("Mandatory : " + str_mandatory_columns)
         str_optional_columns = FileFormatModel.find_all_optional_column_str()
+        print("Optional : " + str_optional_columns)
         return run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, id)
 
     return None

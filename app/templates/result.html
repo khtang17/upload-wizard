@@ -47,20 +47,27 @@
             <div id="progress-bar-container">
               <div class="progress">
                 <div class="progress-track"></div>
-                <div id="step{{ history.status_id }}" class="progress-step">
-                  Step 1
-                </div>
-                <div id="step2" class="progress-step">
-                  Step Two
-                </div>
-                <div id="step3" class="progress-step">
-                  Step Three
-                </div>
-                <div id="step4" class="progress-step">
-                  Complete
-                </div>
+            {% for status_id, status_msg in statuses_dict.items() %}
+                {% set count = 1 %}
+                {% if status_id in (1, 4, 9, 11) %}
+                    <div id="step {{ status_id }}" class="progress-step">
+                        <b>{{ status_msg }}</b>
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+{#                <div id="step2" class="progress-step">#}
+{#                  Step Two#}
+{#                </div>#}
+{#                <div id="step3" class="progress-step">#}
+{#                  Step Three#}
+{#                </div>#}
+{#                <div id="step4" class="progress-step">#}
+{#                  Complete#}
+{#                </div>#}
 
             </div>
+
                 <button onClick=next()>Next Step</button>
             </div>
             <br/>
