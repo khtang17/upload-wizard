@@ -56,6 +56,7 @@ class Config(object):
     S3_KEY = os.getenv("S3_KEY") or 'S3_KEY'
     S3_SECRET = os.getenv("S3_SECRET") or 'S3_SECRET'
     S3_LOCATION = os.getenv("S3_LOCATION") or 'S3_LOCATION'
+    SCRIPT_DIR = os.getenv("SCRIPT_DIR")
 
 class DevConfig(Config):
     DEBUG = True
@@ -68,7 +69,7 @@ class DevConfig(Config):
     LOGO_UPLOAD_FOLDER = 'app/static/vendorlogos/'
     LOGO_UPLOAD_FOLDER_URL = 'static/vendorlogos/'
 
-    SCRIPT_DIR = os.path.join(os.getcwd(), 'app/scripts/')
+
 
 class ProdConfig(Config):
     DEBUG = True
@@ -84,7 +85,7 @@ class ProdConfig(Config):
     LOGO_UPLOAD_FOLDER_URL = 'http://files.docking.org/vendorlogos/'
 
     # SCRIPT_DIR = os.getenv("SCRIPT_DIR")
-    SCRIPT_DIR = '/nfs/home/khtang/work/Projects/upload-wizard/app/scripts/'
+    # SCRIPT_DIR = '/nfs/home/khtang/work/Projects/upload-wizard/app/scripts/'
 
 config = {
     "dev" : DevConfig,

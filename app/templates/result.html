@@ -35,8 +35,8 @@
                     <p><b>Availability: </b> On Demand</p>
                 {% endif %}
                 <p><b>Natural products: </b> {{ history.natural_products }}</p>
-                <p><b>Status: </b> {{ status }}</p>
-                <p><b>Last Updated: </b> {{ moment(history.last_updated).format('LLL') }}</p>
+                <p><b>Status: </b><span id ="status"> {{ status }}</span></p>
+                <p ><b>Last Updated: </b><span id="last_updated"> {{ moment(history.last_updated).format('LLL') }}</span></p>
 
             {% else %}
                  <p><b>Raw file: </b>
@@ -44,18 +44,17 @@
                 </p>
             {% endif %}
         <br>
-            <div id="progress-bar-container">
-              <div class="progress">
-                <div class="progress-track"></div>
-            {% for status_id, status_msg in statuses_dict.items() %}
-                {% set count = 1 %}
-                {% if status_id in (1, 4, 9, 11) %}
-                    <div id="step {{ status_id }}" class="progress-step">
-                        <b>{{ status_msg }}</b>
-                    </div>
-                {% endif %}
-
-            {% endfor %}
+{#            <div id="progress-bar-container">#}
+{#              <div class="progress">#}
+{#                <div class="progress-track"></div>#}
+{#            {% for status_id, status_msg in statuses_dict.items() %}#}
+{#                {% if status_id in (1, 4, 9, 11) %}#}
+{#                    <div id="step{{ loop.index }}" class="progress-step">#}
+{#                        <b>{{ status_msg }}</b>#}
+{#                    </div>#}
+{#                {% endif %}#}
+{##}
+{#            {% endfor %}#}
 {#                <div id="step2" class="progress-step">#}
 {#                  Step Two#}
 {#                </div>#}
@@ -65,11 +64,12 @@
 {#                <div id="step4" class="progress-step">#}
 {#                  Complete#}
 {#                </div>#}
+{##}
+{#            </div>#}
+{##}
+{#                <button onClick=next()>Next Step</button>#}
+{#            </div>#}
 
-            </div>
-
-                <button onClick=next()>Next Step</button>
-            </div>
             <br/>
         <br>
 
@@ -123,7 +123,20 @@
 {% block scripts %}
     <script src="{{ url_for('static', filename='scripts/progress-bar.js')}}" type="text/javascript"></script>
     {{ super() }}
+
     <script>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    (function update_status(){
+        $.getJSON(
+            $SCRIPT_ROOT+"/api/_get_current_status?history_id={{ history.id }}", // Your AJAX route here
+            function(data) {
+                // Update the value in your table here
+                $("#status").text(data.status)
+                $("#last_updated").text(data.last_updated)
+            }
+        );
+        setTimeout(arguments.callee, 50000);
+    })();
         $(function () {
             {% if history.job_logs.count() > 0 %}
                 $('.last_log_id').text({{ history.job_logs[-1].id }});

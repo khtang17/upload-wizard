@@ -16,6 +16,7 @@ from flask_mail import Mail
 import flask_excel as excel
 
 from flask_menu import Menu
+from flask_socketio import SocketIO
 # # from flask_restful import Api
 
 db = SQLAlchemy()
@@ -41,6 +42,7 @@ def create_app(config_class=config):
     Menu(app=app)
     app.config.from_object(config['prod'])
     app.config.from_object(config_class)
+    socketio = SocketIO(app)
 
     db.init_app(app)
     migrate.init_app(app, db)

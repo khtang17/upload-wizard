@@ -4,8 +4,11 @@
 
 from __future__ import print_function
 import sys, os, json
+import argparse
 import subprocess
 
+
+example = "python depletion.py JOB_INFO.json"
 def get_job_info_from_json(file):
     file_path = os.path.abspath(file)
     with open(file_path, 'r') as fh:
@@ -26,6 +29,8 @@ def main():
         print("Short name is " + str(short_name))
         print("")
         print("Run depletion...")
+        cmd = "zinc-manage -e admin admin catalogs deplete -C 10000 {} list2".format(short_name)
+        print(cmd)
         # out = subprocess.Popen("zinc-manage -e admin admin catalogs deplete -C 10000 {} list2".format(short_name), shell=True, close_fds=True)
     print(short_name, catalog_type, upload_type)
 if __name__=="__main__":
