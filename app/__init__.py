@@ -11,12 +11,11 @@ from flask_user import UserManager, SQLAlchemyAdapter
 from flask_moment import Moment
 import flask_admin
 from app.data.views.model_views import AdminModelView, UserView, RoleView, \
-    CompanyView, HistoryView, FieldView, MyHomeView
+    CompanyView, HistoryView, FieldView, MyHomeView, CatalogResult
 from flask_mail import Mail
 import flask_excel as excel
 
 from flask_menu import Menu
-from flask_socketio import SocketIO
 # # from flask_restful import Api
 
 db = SQLAlchemy()
@@ -40,9 +39,8 @@ bootstrap = Bootstrap()
 def create_app(config_class=config):
     app = Flask(__name__)
     Menu(app=app)
-    app.config.from_object(config['prod'])
+    app.config.from_object(config['dev'])
     app.config.from_object(config_class)
-    socketio = SocketIO(app)
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -66,6 +64,7 @@ def create_app(config_class=config):
     from app.data.models.field_decimal import FieldDecimalModel
     from app.data.models.field import FieldModel
     from app.data.models.job_log import JobLogModel
+    from app.data.models.catalog_info import CatalogResultInfo
     # from app.data.models.job_info import JobInfoModel
 
     # Create admin
@@ -81,6 +80,7 @@ def create_app(config_class=config):
     admin.add_view(HistoryView(UploadHistoryModel, db.session, "History"))
     admin.add_view(CompanyView(CompanyModel, db.session, "Companies"))
     admin.add_view(UserView(UserModel, db.session, "Users"))
+    admin.add_view(CatalogResult(CatalogResultInfo, db.session, "Catalog Results"))
 
     if app.config['ZINC_MODE']:
         admin.add_view(AdminModelView(FileFormatModel, db.session, "Column name"))

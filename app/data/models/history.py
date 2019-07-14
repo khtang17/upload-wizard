@@ -1,7 +1,7 @@
 from datetime import datetime
 from app import db
 from app.data.models.job_log import JobLogModel
-# from app.data.models.catalog_info import CatalogResultInfo
+from app.data.models.catalog_info import CatalogResultInfo
 from flask import url_for, jsonify
 
 
@@ -66,9 +66,9 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                                order_by='asc(JobLogModel.date)',
                                backref='history',
                                lazy='dynamic')
-    # result_info = db.relationship(CatalogResultInfo,
-    #                           backref='catalog_result',
-    #                           lazy='dynamic')
+    result_info = db.relationship(CatalogResultInfo,
+                              backref='catalog_result',
+                              lazy='dynamic')
 
 
     @classmethod

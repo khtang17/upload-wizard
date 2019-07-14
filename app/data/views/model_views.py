@@ -56,6 +56,9 @@ class UserView(AdminModelView):
     column_editable_list = ('active', 'email', 'company')
     page_size = 20
 
+class CatalogResult(AdminModelView):
+    column_list = ['history_id', 'size','filtered', 'errors']
+    page_size = 20
 
 class RoleView(AdminModelView):
     column_list = ['name', 'description']
