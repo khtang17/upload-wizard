@@ -25,8 +25,11 @@ class CatalogResultInfo(db.Model):
     def to_dict(self):
         data = {
             'history_id': self.history_id,
-            'size': self.original_size,
+            'size': self.size,
             'filtered': self.filtered,
             'errors': self.errors
         }
         return data
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
