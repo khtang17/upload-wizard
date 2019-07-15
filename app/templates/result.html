@@ -71,6 +71,12 @@
 {#            </div>#}
 
             <br/>
+	<h5>Live update</h5>
+		<div class="progress">
+  			<div id="dynamic" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+    	<span id="current-progress"></span>
+  			</div>
+		</div>
         <br>
 
             <div id="mCSB_5_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
@@ -123,6 +129,20 @@
 {% block scripts %}
     <script src="{{ url_for('static', filename='scripts/progress-bar.js')}}" type="text/javascript"></script>
     {{ super() }}
+    <script>
+	$(function() {
+  	var current_progress = 0;
+  	var interval = setInterval(function() {
+     		 current_progress += 10;
+      		$("#dynamic")
+      		.css("width", current_progress + "%")
+      		.attr("aria-valuenow", current_progress)
+      		.text(current_progress + "% Complete");
+      	if (current_progress >= 100)
+          	clearInterval(interval);
+ 	 }, 1000);
+	});
+   </script>
 
     <script>
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
