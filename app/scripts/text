@@ -1,0 +1,2 @@
+curl -S -i -k -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"history_id" : 804, "size" :90732, "filtered": 1295, "errors": 20}' -H "Authorization: Bearer NykGTdVjpEYrnYhC7VCkyPTOYHnoVh4r" gimel.compbio.ucsf.edu:5020/api/_write_job_results
+

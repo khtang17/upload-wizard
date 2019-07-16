@@ -179,6 +179,11 @@ def save_file(file, object, name, is_logo, id=""):
             folder = current_app.config['LOGO_UPLOAD_FOLDER']
             name = name.replace(" ", "_") + os.path.splitext(file.filename)[1]
         else:
+            if name.endswith(".txt"):
+                print("Txt format catalog")
+                name = name.replace("txt", "smi")
+            if name.endswith(".smi"):
+                print("Smi format catalog")
             user_folder = str(current_user.id) + "_"
             if current_user.short_name:
                 user_folder += current_user.short_name

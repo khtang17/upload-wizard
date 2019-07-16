@@ -65,7 +65,6 @@ def create_app(config_class=config):
     from app.data.models.field import FieldModel
     from app.data.models.job_log import JobLogModel
     from app.data.models.catalog_info import CatalogResultInfo
-    # from app.data.models.job_info import JobInfoModel
 
     # Create admin
     admin = flask_admin.Admin(
@@ -104,6 +103,7 @@ def create_app(config_class=config):
 
     from app.main import application as main_bp
     app.register_blueprint(main_bp)
+
 
     return app
 

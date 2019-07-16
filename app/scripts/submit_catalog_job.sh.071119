@@ -1,0 +1,79 @@
+#!/usr/bin/env -f
+#$ -clear
+#$ -S /bin/sh
+#$ -cwd
+#$ -o stdout
+#$ -e stderr
+#$ -P DB-4
+# upload_wizard submit catalog update job
+
+cmd="sh submit_catalog_job.sh <job_folder> <short_name>"
+
+if [ "$#" -ne 2 ]; then
+	echo "Incorrect arguments supplied!!"
+	echo "Usage: $cmd"
+	exit 1
+fi
+
+cd $1
+company_basename=$2
+
+#short_name=`python /nfs/home/khtang/work/Projects/upload-wizard/app/helpers/shortname.py JOB_INFO.json`
+short_name=$2
+echo "$short_name"
+
+jobID=`cat jobID | cut -d \. -f1 | sed 's/[^0-9]*//g'`
+echo "Checking validation step with jobID : $jobID"
+running=`qstat | grep $jobID | wc -l`
+if ($running -ne 0); then
+	echo "Validation is running.Checking back later."
+	exit 1
+fi
+
+#echo "Checking basename of this directory -> $short_name"
+
+smi_file=(`find ./ -maxdepth 1 -name "*.smi"`)
+echo "Checking the file name: $smi_file"
+
+if [ ${#smi_file[@]} -eq 1  ]; then
+	if [ -s $smi_file ]; then
+		#echo "$smi_file has molecules"	
+		#setup directory for loading
+		echo "Setting up directory for loading"
+		 ~khtang/code/upload_wizard_codes/update_zincload_status.pl 5
+		mkdir $short_name
+		ism_file="$short_name.ism"
+		echo "Moving $smi_file to new directory and renaming to $ism_file"
+		mv $smi_file $short_name/$ism_file
+		if [ ! -f $short_name/$ism_file ]; then
+			echo "$ism_file does not found!"
+			rm -r $short_name/
+			exit 1
+		else
+			cd $short_name	
+			echo "Sourcing environment variables..."
+			source /nfs/soft/mitools/env.sh
+			source /nfs/soft/www/apps/zinc15/envs/edge/env.sh
+			ZINC_CONFIG_ENV="admin"
+			ZINC_CONFIG_SETUP_SKIP="blueprints"
+
+			# newcmd - parallel loading
+
+			echo "Submitting job to the cluster ..."
+			#/nfs/soft/tools/utils/qsub-slice/qsub-mr \
+			#-s /nfs/home/xyz/bin/loadenv.sh -tc 3 -P ZINC-2D-Loading \
+			#-l 500 $ism_file zincload-catalog.sh \
+			#--name $( basename $ism_file) --skip-depletion
+			~khtang/code/upload_wizard_codes/update_zincload_status.pl 7 ../
+
+		fi
+	else
+        	echo "$smi_file is empty"
+		 ~khtang/code/upload_wizard_codes/update_zincload_status.pl 6
+		exit 1
+	fi
+else
+	echo "None or more than 1 smiles file exists"
+	 ~khtang/code/upload_wizard_codes/update_zincload_status.pl 3
+	exit 1
+fi

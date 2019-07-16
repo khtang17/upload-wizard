@@ -10,6 +10,8 @@ from flask import request, jsonify
 from app.api.auth import token_auth
 from app.api.errors import bad_request
 from flask import g
+from datetime import datetime
+from dateutil import tz
 
 
 @application.route('/update_job_status', methods=['PUT'])
@@ -33,8 +35,10 @@ def update_job_status():
 def get_current_status():
     history_id = request.args.get('history_id', type=int)
     current = UploadHistoryModel.query.filter_by(id=history_id).first()
+    last_updated = current.last_updated
     status = StatusModel.query.filter_by(status_id=current.status_id).first()
-    return jsonify({'status' : status.status})
+    return jsonify({'status' : status.status,
+                    'last_updated': last_updated})
 #
 @application.route('/_write_job_results', methods=['POST'])
 @token_auth.login_required

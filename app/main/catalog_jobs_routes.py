@@ -13,6 +13,7 @@ from flask_user.forms import RegisterForm, ResendConfirmEmailForm, ForgotPasswor
 
 # from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_file_to_s3, s3
 from app.helpers.validation import validate, excel_validation, s3
+from app.helpers.catalog_result import gather_info
 from app.email import notify_new_user_to_admin, send_password_reset_email, email_confirmation
 from app.main import application
 
@@ -48,9 +49,10 @@ def history():
 @roles_required('Vendor')
 def last_result():
     history = UploadHistoryModel.get_last_by_user_id(current_user.id)
+    last_updated = history.last_updated
     status = StatusModel.query.filter_by(status_id=history.status_id).first()
     statuses_dict = StatusModel.to_dict()
-    return render_template('result.html', title='Job Result', history=history, status=status.status, statuses_dict=statuses_dict)
+    return render_template('result.html', title='Job Result', history=history, status=status.status, last_updated=last_updated, statuses_dict=statuses_dict)
 
 @application.route('/get_status_update', methods =['GET', 'POST'])
 @login_required
@@ -67,6 +69,7 @@ def get_status_update():
 def result():
     id = request.args.get('id', type=int)
     history = UploadHistoryModel.find_by_id(id)
+    last_updated = history.last_updated
     statuses_dict = StatusModel.to_dict()
     status = StatusModel.query.filter_by(status_id=history.status_id).first()
     if history.user.id != current_user.id and current_user.has_role('Vendor'):
@@ -90,8 +93,16 @@ def result():
     #         stderr = stderr.replace('\n', "<br/>")
     #         file2.close()
 
-    return render_template('result.html', title='Job Result', history=history, status=status.status, statuses_dict=statuses_dict)
+    return render_template('result.html', title='Job Result', history=history, status=status.status, last_updated=last_updated, statuses_dict=statuses_dict)
     # return render_template('result.html', title='Job Result', history=history, stdout=stdout, stderr=stderr)
+
+
+@application.route('/write_resutls', methods=['POST'])
+@login_required
+def write_results():
+    history_id = request.args.get('history_id', type=int)
+    return_msg = gather_info(history_id)
+    return return_msg
 
 
 @application.route('/job_logs', methods=['GET'])

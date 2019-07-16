@@ -17,7 +17,8 @@ def parse_job_info():
         return job_info
     except IOException as e:
         print(e)
-def get_catalog_shortname(job_info):
+def get_catalog_shortname():
+    job_info = parse_job_info()
     company_basename = job_info['company_basename']
     catalog_type = job_info['catalog_type'] # SC, BB, or both
     availability = job_info['availability'] # stock or demand
@@ -71,8 +72,7 @@ def main():
     job_folder = os.path.abspath(sys.argv[1])
     os.chdir(job_folder)
     print(os.getcwd())
-    job_info = parse_job_info()
-    catalog_shortname = get_catalog_shortname(job_info)
+    catalog_shortname = get_catalog_shortname()
     print(catalog_shortname)
     if is_qsub_running():
         print("qsub is still running")
@@ -91,8 +91,9 @@ def main():
                 ism_file = catalog_shortname+".ism"
                 shutil.move(smile_file, "{}/{}".format(catalog_shortname, ism_file))
                 os.chdir(catalog_shortname)
-                print(os.getcwd())
-                os.system("source /mnt/nfs/ex9/work/khtang/cmd")
+                source_cmd = "source /mnt/nfs/ex9/work/khtang/cmd"
+                source = subprocess.Popen(source_cmd, shell=True)
+                source.communicate()
                 submit_cmd = "sh /mnt/nfs/ex9/work/khtang/batch {}".format(ism_file)
                 print(submit_cmd)
                 submit_job = subprocess.Popen(submit_cmd, shell=True)
