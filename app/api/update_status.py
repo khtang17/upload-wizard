@@ -10,15 +10,14 @@ from flask import request, jsonify
 from app.api.auth import token_auth
 from app.api.errors import bad_request
 from flask import g
-from datetime import datetime
-from dateutil import tz
+from app.helpers.catalog_result import get_results
+
 
 
 @application.route('/update_job_status', methods=['PUT'])
 @token_auth.login_required
 def update_job_status():
     data = request.get_json() or {}
-
     if 'history_id' not in data or 'status_id' not in data:
         return bad_request('must include id and status_id fields')
     history = UploadHistoryModel.query.filter_by(id=data['history_id'], user_id=g.current_user.id).first()
@@ -36,9 +35,18 @@ def get_current_status():
     history_id = request.args.get('history_id', type=int)
     current = UploadHistoryModel.query.filter_by(id=history_id).first()
     last_updated = current.last_updated
+    date = last_updated.strftime("%B %d, %Y %I:%M %p")
     status = StatusModel.query.filter_by(status_id=current.status_id).first()
     return jsonify({'status' : status.status,
-                    'last_updated': last_updated})
+                    'last_updated': date})
+
+@application.route('/_get_catalog_results', methods=['GET'])
+@login_required
+def get_catalog_results():
+    history_id = request.args.get('history_id', type=int)
+    data = get_results(history_id)
+    return data
+
 #
 @application.route('/_write_job_results', methods=['POST'])
 @token_auth.login_required
@@ -56,12 +64,4 @@ def write_job_result():
     response.status_code = 201
     return response
 
-#@application.route('/_write_job_results', methods=['POST'])
-#@login_required
-#def write_job_results():
-#    catalog_size = request.args.get('size', type=int)
-#    filtered = request.args.get('filtered', type=int)
-#    errors = request.args.get('errors', type=int)
-#    return jsonify({'catalog_size' : catalog_size,
-#                    'filtered' : filtered,
-#                    'errors' : errors})
+

@@ -34,7 +34,7 @@ def welcome():
 def index():
     if current_user.is_authenticated:
         if current_user.has_role('Admin'):
-            return redirect(url_for('admin.index'))
+            return redirect(url_for('admin_views.load2d_report'))
         else:
             return redirect(url_for('main.welcome'))
     else:

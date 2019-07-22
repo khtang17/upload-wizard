@@ -2,7 +2,6 @@ Dear {{ history.user.username }},
 
 Your job has been finished.
 
-
 {% for log in history.job_logs %}
     <div class="m-timeline-2__item">
         <span class="m-timeline-2__item-time">{{ moment(log.date).format("hh:mm") }}</span>

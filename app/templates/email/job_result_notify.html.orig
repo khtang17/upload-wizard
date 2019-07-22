@@ -1,8 +1,10 @@
-Dear {{ history.user.username }},
-
+<p>Dear {{ history.user.username }},</p>
+<p>
 Your job has been finished.
-
-
+</p>
+<p>
+<p>Status Log:</p>
+<p> ------------------------------ </p>
 {% for log in history.job_logs %}
     <div class="m-timeline-2__item">
         <span class="m-timeline-2__item-time">{{ moment(log.date).format("hh:mm") }}</span>
@@ -18,10 +20,14 @@ Your job has been finished.
             {% endif %}
         </div>
         <div class="m-timeline-2__item-text  m--padding-top-5">
-            {{ log.status }}
+            - {{ log.status }}
         </div>
     </div>
 {% endfor %}
+<p> ------------------------------ </p>
+</p>
+<p>
 
-Sincerely,
-Irwin and Shoichet Lab
+</p>
+<p>Sincerely,</p>
+<p>Irwin and Shoichet Lab</p>

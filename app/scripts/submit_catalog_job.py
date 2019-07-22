@@ -28,7 +28,7 @@ def get_catalog_shortname():
         print("This is the natural product catalog")
         short_name = company_basename + "np"
     else:
-        if catalog_type == 'both':
+        if catalog_type == 'both' or catalog_type == 'sc':
             short_name = company_basename
         else:
             short_name = company_basename + catalog_type

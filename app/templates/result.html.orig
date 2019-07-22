@@ -36,7 +36,7 @@
                 {% endif %}
                 <p><b>Natural products: </b> {{ history.natural_products }}</p>
                 <p><b>Status: </b><span id ="status"> {{ status }}</span></p>
-                <p ><b>Last Updated: </b><span id="last_updated"> {{ moment(last_updated).format('LLL') }}</span></p>
+                <p ><b>Last Updated: </b><span id="last_updated"> {{ moment(history.last_updated).format('LLL') }}</span></p>
 
             {% else %}
                  <p><b>Raw file: </b>
@@ -44,35 +44,40 @@
                 </p>
             {% endif %}
         <br>
+{#            <div id="progress-bar-container">#}
+{#              <div class="progress">#}
+{#                <div class="progress-track"></div>#}
+{#            {% for status_id, status_msg in statuses_dict.items() %}#}
+{#                {% if status_id in (1, 4, 9, 11) %}#}
+{#                    <div id="step{{ loop.index }}" class="progress-step">#}
+{#                        <b>{{ status_msg }}</b>#}
+{#                    </div>#}
+{#                {% endif %}#}
+{##}
+{#            {% endfor %}#}
+{#                <div id="step2" class="progress-step">#}
+{#                  Step Two#}
+{#                </div>#}
+{#                <div id="step3" class="progress-step">#}
+{#                  Step Three#}
+{#                </div>#}
+{#                <div id="step4" class="progress-step">#}
+{#                  Complete#}
+{#                </div>#}
+{##}
+{#            </div>#}
+{##}
+{#                <button onClick=next()>Next Step</button>#}
+{#            </div>#}
 
-        {% if status_id >= 4 %}
+            <br/>
 	<h5>Live update</h5>
 		<div class="progress">
-  			<div id="dynamic" class="progress-bar progress-bar-striped bg-info active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+  			<div id="dynamic" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
     	<span id="current-progress"></span>
   			</div>
 		</div>
-             {% if status_id >= 9 %}
-                 <button type="button" class="btn btn-primary text-center" id="get_result" data-toggle="collapse" href="#result" role="button" aria-expanded="false" aria-controls="#result" onclick="function get_catalog_results()">View Catalog Results</button>
-                 <div class="collapse" id ='result'>
-                 <table style="width: 700px" id ="result-table" class="table text-center" >
-                 <tr>
-                     <th>Smiles Processed</th>
-                     <th>Filtered</th>
-                     <th>Errors</th>
-                 </tr>
-                 <tr>
-                     <td id="size">{{ size if size else "NA" }}</td>
-                     <td id="filtered">{{ filtered if filtered else "NA" }}</td>
-                     <td id = "errors">{{ errors if errors else "NA" }}</td>
-                 </tr>
-                 </table>
-                 </div>
-        {% endif %}
         <br>
-        {% else %}
-        <br>
-
 
             <div id="mCSB_5_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
                 <div class="m-timeline-2">
@@ -103,7 +108,7 @@
             </div>
             <div class="m-spinner m-spinner--info m-spinner--lg" style="margin-left: 56px;"></div>
             <br/>
-        {% endif %}
+
             <br/>
 {#            <div class="panel panel-danger">#}
 {#                <div class="panel-heading">#}
@@ -124,91 +129,35 @@
 {% block scripts %}
     <script src="{{ url_for('static', filename='scripts/progress-bar.js')}}" type="text/javascript"></script>
     {{ super() }}
+    <script>
+	$(function check_status() {
+  	var current_progress = 0;
+  	var interval = setInterval(function() {
+     		 current_progress += 10;
+      		$("#dynamic")
+      		.css("width", current_progress + "%")
+      		.attr("aria-valuenow", current_progress)
+      		.text(current_progress + "% Complete");
+      	if (current_progress >= 100)
+          	clearInterval(interval);
+ 	 }, 1000);
+	});
+   </script>
 
     <script>
-     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     (function update_status(){
-        var current_progress = 0;
-        var interval = setInterval(function() {
-            $.getJSON(
+        $.getJSON(
             $SCRIPT_ROOT+"/api/_get_current_status?history_id={{ history.id }}", // Your AJAX route here
             function(data) {
                 // Update the value in your table here
-                $("#status").text(data.status);
-                $("#last_updated").text(data.last_updated);
-                if ($("#status").text() == "File Submitted")
-                    current_progress = 11;
-                if ($("#status").text() == "Validation Started")
-                    current_progress = 22;
-                if ($("#status").text() == "Validation Completed")
-                    current_progress = 33;
-                if ($("#status").text() == "Validation Completed")
-                    current_progress = 44;
-                if ($("#status").text() == "Prepare for Loading")
-                    current_progress = 55;
-                if ($("#status").text() == "Loading Started")
-                    current_progress = 66;
-                 if ($("#status").text() == "Loading Completed")
-                    current_progress = 77;
-                if ($("#status").text() == "Depletion")
-                    current_progress = 88;
-                if ($("#status").text() == "Finished")
-                    current_progress = 100;
-                if ($("#status").text() == "Awaiting System Admin")
-                    current_progress = 95;
-                 {#current_progress += 12.5;#}
-      		    $("#dynamic")
-      		    .css("width", current_progress + "%")
-      		    .attr("aria-valuenow", current_progress)
-      		    .text($("#status").text());
-      	    if (current_progress >= 100)
-          	    clearInterval(interval);
-                }
+                $("#status").text(data.status)
+                $("#last_updated").text(data.last_updated)
+            }
         );
-        }, 3000);
-        })();
-        {#$.getJSON(#}
-        {#    $SCRIPT_ROOT+"/api/_get_current_status?history_id={{ history.id }}", // Your AJAX route here#}
-        {#    function(data) {#}
-        {#        // Update the value in your table here#}
-        {#        $("#status").text(data.status);#}
-        {#        $("#last_updated").text(data.last_updated);#}
-        {#    }#}
-        {#);#}
-        {#setTimeout(arguments.callee, 50000);#}
-	{#$(function() {#}
-  	{#var current_progress = 0;#}
-  	{#var interval = setInterval(function() {#}
-    {# 		 current_progress += 10;#}
-    {#  		$("#dynamic")#}
-    {#  		.css("width", current_progress + "%")#}
-    {#  		.attr("aria-valuenow", current_progress)#}
-    {#  		.text(current_progress + "% Complete");#}
-    {#  	if (current_progress >= 100)#}
-    {#      	clearInterval(interval);#}
- 	{# }, 1000);#}
-
-
-   </script>
-    <script>
-
-        $(function get_catalog_results () {
-            $.getJSON(
-                $SCRIPT_ROOT+"/api/_get_catalog_results?history_id={{ history.id }}",
-                function(data){
-                    $("#size").text(data.size);
-                    $("#filtered").text(data.filtered);
-                    $("#errors").text(data.errors);
-                }
-
-            );
-
-        });
-    </script>
-  <script>
-      {% if status_id < 5 %}
-        $(function get_logs () {
+        setTimeout(arguments.callee, 50000);
+    })();
+        $(function () {
             {% if history.job_logs.count() > 0 %}
                 $('.last_log_id').text({{ history.job_logs[-1].id }});
                 $('.last_log_status').text({{ history.job_logs[-1].status_type }});
@@ -216,7 +165,6 @@
                     $('.m-spinner').hide();
                 {% endif %}
             {% endif %}
-
             var interval = setInterval(function () {
                 $.ajax('{{ url_for('main.job_logs') }}?history_id=' + {{ history.id }}+'&id=' + $('.last_log_id').text()).done(
                     function (job_logs) {
@@ -230,7 +178,6 @@
                                 msg = 'danger';
                             else
                                 msg = 'brand';
-
                             $('.m-timeline-2__items').append(
                                 '<div class="m-timeline-2__item">' +
                                 '<span class="m-timeline-2__item-time">' + moment(job_logs[i].date).format("hh:mm") + '</span>' +
@@ -240,7 +187,6 @@
                                 '<div class="m-timeline-2__item-text  m--padding-top-5">' + job_logs[i].status + '</div>' +
                                 '</div>'
                             ).fadeIn('slow');
-
                         }
                         if ($('.last_log_status').text() == 4) {
                             clearInterval(interval);
@@ -257,6 +203,5 @@
                 );
             }, 5000);
         });
-      {% endif %}
     </script>
 {% endblock %}

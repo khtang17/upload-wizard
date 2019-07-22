@@ -104,6 +104,8 @@ def create_app(config_class=config):
     from app.main import application as main_bp
     app.register_blueprint(main_bp)
 
+    from app.admin import application as admin_blueprints
+    app.register_blueprint(admin_blueprints)
 
     return app
 

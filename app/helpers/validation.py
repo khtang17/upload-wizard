@@ -212,6 +212,7 @@ def save_file(file, object, name, is_logo, id=""):
         print("Mandatory : " + str_mandatory_columns)
         str_optional_columns = FileFormatModel.find_all_optional_column_str()
         print("Optional : " + str_optional_columns)
+
         return run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, id)
 
     return None

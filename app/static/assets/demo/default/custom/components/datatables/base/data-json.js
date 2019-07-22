@@ -105,18 +105,21 @@ var DatatableJsonRemoteDemo= {
                             title: "Loading Failed", class: "m-badge--danger"
                         }
                         , 9: {
-                            title: "Depletion", class: "m-badge--brand"
+                            title: "Loading Completed", class: "m-badge--brand"
                         }
                         , 10: {
-                            title: "Job Finished", class: " m-badge--success"
+                            title: "Depletion", class: "m-badge--brand"
                         }
                         , 11: {
-                            title: "Awaiting System Admin Review", class: "m-badge--warn"
+                            title: "Finished", class: " m-badge--success"
                         }
                         , 12: {
-                            title: "Job Cancelled by Admin", class: "m-badge--danger"
+                            title: "Awaiting System Admin Review", class: "m-badge--warn"
                         }
                         , 13: {
+                            title: "Job Cancelled by Admin", class: "m-badge--danger"
+                        }
+                        , 14: {
                             title: "Job Cancelled by System", class: "m-badge--danger"
                         }
 
