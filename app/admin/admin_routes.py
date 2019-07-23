@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, current_app, app, request, Response
 from flask_user import current_user, roles_required, user_confirmed_email, login_required
-
+from app.constants import *
 from app.data.models.format import FileFormatModel
 from app.data.forms.upload_form import UploadForm
 from app.data.forms.company_form import CompanyForm
@@ -20,15 +20,17 @@ from datetime import datetime, timezone
 
 from flask import Flask, request, jsonify, send_file, make_response
 # import flask_excel as excel
+import pdb
 
 
-@application.route('/load2d_report')
+@application.route('/load2d_report', methods=['GET', 'POST'])
 @login_required
 @roles_required('Admin')
 def load2d_report():
     page = request.args.get("page", 1, type=int)
     histories = UploadHistoryModel.query.order_by(UploadHistoryModel.status_id.desc()).paginate(
         page, current_app.config['LISTS_PER_PAGE'], False)
+    print(histories.items)
     # histories = current_user.upload_histories.paginate(
     #     page, current_app.config['LISTS_PER_PAGE'], False)
     next_url = url_for('admin_views.load2d_report', page=histories.next_num) \
@@ -36,9 +38,18 @@ def load2d_report():
     prev_url = url_for('admin_views.load2d_report', page=histories.prev_num) \
         if histories.has_prev else None
     pagestart = (page - 1) * current_app.config['LISTS_PER_PAGE']
+
     return render_template('history.html', title='Report Page', histories=histories.items,
                            next_url=next_url,
                            prev_url=prev_url,
-                           pagestart=pagestart)
+                           pagestart=pagestart, JOB_STATUS=JOB_STATUS, CATALOG_TYPE=CATALOG_TYPE)
+
+@application.route('/admin_cronjob', methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def cronjob():
+    pass
+
+
 
 

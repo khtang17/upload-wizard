@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect, url_for, current_app, app, request, Response
 from flask_user import current_user, roles_required, user_confirmed_email, login_required
+from app.constants import *
 
 from app.data.models.format import FileFormatModel
 from app.data.forms.upload_form import UploadForm
@@ -40,7 +41,7 @@ def history():
     return render_template('history.html', title='Home Page', histories=histories.items,
                            next_url=next_url,
                            prev_url=prev_url,
-                           pagestart=pagestart)
+                       pagestart=pagestart, JOB_STATUS=JOB_STATUS, CATALOG_TYPE=CATALOG_TYPE)
 
 
 @application.route('/last_result', methods=['GET', 'POST'])

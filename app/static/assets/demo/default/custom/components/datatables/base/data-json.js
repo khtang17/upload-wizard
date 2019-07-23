@@ -137,7 +137,7 @@ var DatatableJsonRemoteDemo= {
         }
         ).val(void 0!==e.StatusId?e.StatusId:""),
         $("#m_form_type").on("change", function() {
-            t.search($(this).val(), "Type")
+            t.search($(this).val(), "CatalogType")
         }
         ).val(void 0!==e.CatalogType?e.CatalogType:""),
         $("#m_form_status, #m_form_type").selectpicker()

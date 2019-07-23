@@ -68,15 +68,11 @@
 																<option value="">
 																	All
 																</option>
-																<option value="1">
-																	File Submitted
+                                                                {% for index, status in JOB_STATUS.items() %}
+																<option value="{{ index }}">
+																	{{ status }}
 																</option>
-																<option value="2">
-																	Job Finished
-																</option>
-																<option value="3">
-																	Running
-																</option>
+                                                                {% endfor %}
 															</select>
 														</div>
 													</div>
@@ -94,15 +90,11 @@
 																<option value="">
 																	All
 																</option>
-																<option value="bb">
-																	Building Block
+                                                                {% for key, name in CATALOG_TYPE.items() %}
+																<option value="{{ key }}">
+																	{{ name }}
 																</option>
-																<option value="sc">
-																	Screening Compounds
-																</option>
-																<option value="both">
-																	Both
-																</option>
+                                                                {% endfor %}
 															</select>
 														</div>
 													</div>
