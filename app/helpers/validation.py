@@ -20,7 +20,7 @@ from flask import request, jsonify, Response
 
 from datetime import datetime
 import time
-import json
+import json, csv
 from botocore.client import Config
 import boto3
 import flask_excel as excel
@@ -28,7 +28,7 @@ from collections import OrderedDict
 
 
 
-ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi'])
+ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi', 'csv'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
 
 config = Config(connect_timeout=5, retries={'max_attempts': 0})
@@ -180,12 +180,31 @@ def check_img_type(file):
         return False
 
 
+def extract_molcules_info_from_csv(csv_file, job_folder):
+    catalog_file = job_folder +'/'+csv_file
+    with open(catalog_file) as catalog:
+        catalog_reader = csv.DictReader(catalog, delimiter=',')
+        catalog_reader = list(catalog_reader)
+        catalog.close()
+    smi_file = job_folder+"/"+ csv_file.split('.')[0] + ".smi"
+    with open(smi_file, 'w') as file_handler:
+        for row in catalog_reader:
+            product_id = row['product_id']
+            smiles_code = row['smiles']
+            line = smiles_code + '\t' + product_id + '\n'
+            file_handler.write(line)
+        file_handler.close()	
+
+
 def save_file(file, object, name, is_logo, id=""):
     try:
         if is_logo:
             folder = current_app.config['LOGO_UPLOAD_FOLDER']
             name = name.replace(" ", "_") + os.path.splitext(file.filename)[1]
         else:
+            #if name.endswith(".csv"):
+            #    print("csv format catalog")
+            #    extract_molcules_info_from_csv(name)
             if name.endswith(".txt"):
                 print("Txt format catalog")
                 name = name.replace("txt", "smi")
@@ -206,6 +225,9 @@ def save_file(file, object, name, is_logo, id=""):
         # print(os.path.join(file_dir, secure_filename(name)))
         print("Saving file to directory")
         file.save(os.path.join(file_dir, secure_filename(name)))
+        if name.endswith(".csv"):
+                print("csv format catalog")
+                extract_molcules_info_from_csv(name, file_dir)
         print("Saving json file")
         write_json_file(object, file_dir)
     except:
@@ -247,6 +269,7 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
         # print(str_optional_columns)
         if len(current_user.company.idnumber) > 0:
             script_dir = current_app.config['SCRIPT_DIR']
+            print(script_dir)
             os.chdir(current_app.config['UPLOAD_FOLDER']+user_folder)
             out = subprocess.Popen(["qsub " + script_dir
                                     + 'script.sh {} {} {} {} {} {}'

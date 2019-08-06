@@ -147,8 +147,12 @@
                                         <td>{{ moment(job.date_uploaded).format('LLL')  }}</td>
                                         <td>{{ job.file_name }}</td>
                                         <td>{{ job.catalog_type }}</td>
+					{% if job.user.company  %}
                                         <td>{{ job.user.company.name }}</td>
-                                        <td>{{ JOB_STATUS[job.status_id] }}</td>
+					{% else %}
+					<td>None</td>
+                                        {% endif  %}
+					<td>{{ JOB_STATUS[job.status_id] }}</td>
                                     </tr>
 
                                 {% endfor %}

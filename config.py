@@ -84,7 +84,7 @@ class ProdConfig(Config):
 
     LOGO_UPLOAD_FOLDER_URL = 'http://files.docking.org/vendorlogos/'
 
-    # SCRIPT_DIR = os.getenv("SCRIPT_DIR")
+    SCRIPT_DIR = os.getenv("SCRIPT_DIR")
     # SCRIPT_DIR = '/nfs/home/khtang/work/Projects/upload-wizard/app/scripts/'
 
 config = {
