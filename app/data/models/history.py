@@ -2,6 +2,7 @@ from datetime import datetime
 from app import db
 from app.data.models.job_log import JobLogModel
 from app.data.models.catalog_info import CatalogResultInfo
+from app.data.models.status import StatusModel
 from flask import url_for, jsonify
 
 
@@ -59,7 +60,7 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     upload_type = db.Column(db.String(50))
     availability = db.Column(db.String(50))
     last_updated = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    natural_products = db.Column(db.Boolean(), nullable=False, default=False)
+    # natural_products = db.Column(db.Boolean(), nullable=False, default=False)
     status_id = db.Column(db.Integer, db.ForeignKey('status.status_id'), default=1)
     data_array = db.Column(db.Text, nullable=True)
     job_logs = db.relationship(JobLogModel,
@@ -83,9 +84,9 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
             'FileName': self.file_name,
             'FileSize': self.file_size,
             'CatalogType': self.catalog_type,
-            'UploadType' : self.upload_type,
+            'UploadType': self.upload_type,
             'Availability': self.availability,
-            'NaturalProducts': self.natural_products,
+            # 'NaturalProducts': self.natural_products,
             'StatusId': self.status_id,
             'LatestUpdated': self.last_updated.isoformat() + 'Z'
             # 'Status': self.get_status_type()
@@ -121,7 +122,7 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                 'catalog_type': self.catalog_type,
                 'upload_type' : self.upload_type,
                 'availability': self.availability,
-                'natural_products': self.natural_products,
+                # 'natural_products': self.natural_products,
                 'status_id': self.status_id
                 }
 
@@ -146,6 +147,22 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     def find_by_user_id(cls, user_id):
         return cls.query.filter_by(user_id=user_id).order_by(cls.date_uploaded).all()
 
+    @classmethod
+    def check_email_notify(seft):
+        try:
+            from app.email import notify_job_result_to_user
+            if seft.status_id == 11:
+                if seft.user.company.job_notify_email:
+                    notify_job_result_to_user(seft)
+        except:
+            pass
+
     def __repr__(self):
         return '<UploadHistory {}>'.format(self.file_name)
+
+    # def get_status(self):
+    #     status_msg = StatusModel.query.join()
+
+    def __str__(self):
+        return self.file_name
 

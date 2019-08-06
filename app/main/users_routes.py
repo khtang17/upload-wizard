@@ -46,7 +46,7 @@ def reset_password_request():
 @application.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
-        return redirect(url_for('main.welcome'))
+        return redirect(url_for('user.login'))
     user = UserModel.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('user.login'))

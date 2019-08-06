@@ -38,11 +38,14 @@
 	<body  style="background-image: url(./static/assets/app/media/img/bg/bg-5.jpg)"
            class="m-page--boxed m--skin- m-page--loading-enabled m-page--loading m-content--skin-light2 m-header--fixed m-header--fixed-mobile m-aside-left--enabled m-aside-left--skin-light m-aside-left--fixed m-aside-left--offcanvas m-aside-left--minimize m-brand--minimize m-footer--push m-aside--offcanvas-default"  >
 		<!--[html-partial:include:{"file":"partials\/_loader-base.html"}]/-->
+
         {% include "partials/_loader-base.html" %}
         <!--[html-partial:include:{"file":"_layout.html"}]/-->
             <!-- begin:: Page -->
+
             <div class="m-grid m-grid--hor m-grid--root m-page">
                 <!--[html-partial:include:{"file":"partials\/_header-base.html"}]/-->
+
                 {% include "partials/_header-base.html" %}
 
                 <!-- begin::Body -->
@@ -70,6 +73,7 @@
                               {% endif %}
                             {% endwith %}
                             {% block content %}{% endblock %}
+
                         </div>
                     </div>
                 </div>
@@ -77,12 +81,14 @@
             <!--[html-partial:include:{"file":"partials\/_footer-default.html"}]/-->
                 {% include "partials/_footer-default.html" %}
             </div>
+
             <!-- end:: Page -->
             <!--[html-partial:include:{"file":"partials\/_layout-quick-sidebar.html"}]/-->
 {#            {% include "partials/_layout-quick-sidebar.html" %}#}
             <!--[html-partial:include:{"file":"partials\/_layout-scroll-top.html"}]/-->
             {% include "partials/_layout-scroll-top.html" %}
             <!--[html-partial:include:{"file":"partials\/_layout-tooltips.html"}]/-->
+
     	<!--begin::Base Scripts -->
 		<script src="{{ url_for('static', filename='assets/vendors/base/vendors.bundle.js')}}" type="text/javascript"></script>
 		<script src="{{ url_for('static', filename='assets/demo/demo6/base/scripts.bundle.js')}}" type="text/javascript"></script>

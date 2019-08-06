@@ -85,9 +85,14 @@ while (my @row = $sth2->fetchrow_array()) {
 			my $running = length(`qstat | grep $jobID`);
 			if ($running == 0){
 				print "Loading is completed\n";
-				system("$SCRIPT_DIR/update_zincload_status.pl 9 $dir"); #marks loading is completed
 				print "Gathering information from outputs\n";
 				system("sh $SCRIPT_DIR/gather_and_sort.sh $sub_dir"); #get filtered errors and sort list
+				if ($status_id == 8 && $job_id > 807) {
+					print "Loading failed";
+					exit;
+				} elsif ($status_id == 9 && $job_id > 807) {
+					system("$SCRIPT_DIR/update_zincload_status.pl 10 $dir");
+				}
 			} else {
 				 print "Job $job_id is still running. Check back later.\n";
 			}
@@ -96,7 +101,7 @@ while (my @row = $sth2->fetchrow_array()) {
 	} elsif ($status_id == 9 && $job_id > 807) {
 		#check for depletion
 		print("Check if depletion is needed.");
-		system("$SCRIPT_DIR/cmd");
+		#system("source $SCRIPT_DIR/cmd");
 		system("$SCRIPT_DIR/depletion.py $dir"); #check and run depletion 
 
 	}

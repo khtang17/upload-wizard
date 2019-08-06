@@ -61,7 +61,7 @@ var DatatableJsonRemoteDemo= {
             },
 
             {
-                field:"Availability", title:"Availability", width: 50, template:function(t) {
+                field:"Availability", title:"Availability", width: 80, template:function(t) {
                     var e= {
                         'stock': {
                             title: "In Stock", class: " m--font-primary"
@@ -73,9 +73,6 @@ var DatatableJsonRemoteDemo= {
                     ;
                     return'<span class="m--font-bold '+e[t.Availability].class+' m-badge--wide">'+e[t.Availability].title+"</span>"
                 }
-            }
-            , {
-                field:"NaturalProducts", title:"Natural Products", width: 50
             }
             , {
                 field:"StatusId", title:"Status ID", template:function(t) {

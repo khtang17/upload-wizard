@@ -1,9 +1,11 @@
 from flask import render_template, flash, redirect, url_for, current_app, app, request, Response
 from flask_user import current_user, roles_required, user_confirmed_email, login_required
-
+from app.constants import JOB_STATUS, CATALOG_TYPE
 
 from app.data.models.user import UserModel
+from app.data.models.history import UploadHistoryModel
 from app.main import application
+
 
 from flask_menu import Menu, register_menu
 from datetime import datetime
@@ -17,6 +19,10 @@ from app import db
 # @user_confirmed_email.connect_via(application)
 # def _after_confirmed_hook(sender, user, **extra):
 #     notify_new_user_to_admin(user)
+@application.route('/')
+@application.route('/home')
+def home():
+    return render_template('home.html', title='Home Page')
 
 
 @application.route('/welcome')
@@ -24,17 +30,22 @@ from app import db
 @register_menu(application, '.main', 'Home', order=0)
 def welcome():
     user = UserModel.find_by_email(current_user.email)
-    return render_template('welcome.html', user=user, title='Welcome')
+    latest_history = UploadHistoryModel.get_last_by_user_id(user_id=user.id)
+    if latest_history:
+        catalog_type = CATALOG_TYPE.get(latest_history.catalog_type)
+        status = JOB_STATUS.get(latest_history.status_id)
+        return render_template('welcome.html', user=user, title='Welcome', latest_history=latest_history, catalog_type=catalog_type, status=status)
+    else:
+        return render_template('welcome.html', user=user, title='Welcome')
 
 
 
-
-@application.route('/', methods=['GET', 'POST'])
+# @application.route('/', methods=['GET', 'POST'])
 @application.route('/index', methods=['GET', 'POST'])
 def index():
     if current_user.is_authenticated:
         if current_user.has_role('Admin'):
-            return redirect(url_for('admin_views.load2d_report'))
+            return redirect(url_for('admin_views.upload_report'))
         else:
             return redirect(url_for('main.welcome'))
     else:

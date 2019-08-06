@@ -34,7 +34,6 @@
                 {% elif history.availability == 'demand' %}
                     <p><b>Availability: </b> On Demand</p>
                 {% endif %}
-                <p><b>Natural products: </b> {{ history.natural_products }}</p>
                 <p><b>Status: </b><span id ="status"> {{ status }}</span></p>
                 <p ><b>Last Updated: </b><span id="last_updated"> {{ moment(last_updated).format('LLL') }}</span></p>
 

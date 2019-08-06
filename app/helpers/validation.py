@@ -1,10 +1,12 @@
-import os
+import os, shutil
 from flask import current_app
 from hurry.filesize import size, alternative
 from app.data.models.format import FileFormatModel
 from werkzeug.utils import secure_filename
 from flask_login import current_user
 from app.data.models.history import UploadHistoryModel
+from app.data.models.company import CompanyModel
+from app.data.models.user import UserModel
 from app.data.models.job_log import JobLogModel
 from app.data.models.field import FieldModel
 from app.data.models.field_allowed_value import FieldAllowedValueModel
@@ -140,11 +142,12 @@ def validate(file, form):
         history.catalog_type = form.catalog_type.data
         history.upload_type = form.upload_type.data
         history.availability = form.availability.data
-        history.natural_products = form.natural_products.data
+        # history.natural_products = form.natural_products.data
         history.save_to_db()
         result = save_file(file, history, history.file_name, False, history.id)
         file_info = "File Uploaded! File Size:{}. ".format(file_size)
         if result is None:
+            history.delete_from_db()
             return {"message": file_info}, 200
         elif result[1] == 200:
             return {"message": file_info + result[0]["message"]}, 200
@@ -161,6 +164,10 @@ def validate(file, form):
 def write_json_file(history, folder):
     job_info = history.json()
     job_info.update({'company_basename': current_user.short_name})
+    price_tag = history.user.company.price
+    print(price_tag)
+    if price_tag:
+        job_info.update({'price_tag': price_tag})
     file_path = os.path.join(folder, 'JOB_INFO.json')
     with open(file_path, 'w') as fh:
         json.dump(job_info, fh, indent=4)
@@ -213,12 +220,26 @@ def save_file(file, object, name, is_logo, id=""):
         str_optional_columns = FileFormatModel.find_all_optional_column_str()
         print("Optional : " + str_optional_columns)
 
-        return run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, id)
+        return run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, id, object)
 
     return None
 
 
-def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, history_id):
+def remove_job_folder(id=""):
+    try:
+        user_folder = str(current_user.id) + "_"
+        if current_user.short_name:
+            user_folder += current_user.short_name
+        else:
+            user_folder += "vendor"
+        user_folder += "/" + str(id) + "/"
+        folder = current_app.config['UPLOAD_FOLDER'] + user_folder
+        job_dir = os.path.realpath(os.path.dirname(folder))
+        shutil.rmtree(job_dir)
+    except:
+        print(sys.exc_info())
+
+def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, history_id, history):
     try:
         # print(current_user.get_token())
         # print(current_user.company.idnumber)
@@ -237,12 +258,20 @@ def run_bash_script(user_folder, str_mandatory_columns, str_optional_columns, hi
                                            history_id) + " > jobID"], shell=True, close_fds=True)
             # print(out.communicate())
             return {"message": "Your job has been submitted!"}, 200
+        history.delete_from_db()
+        remove_job_folder(history_id)
         return {"message": " Please enter your IDNUMBER in the company profile section. "
                            "We need your company IDNUMBER to validate .sdf file. "}, 400
+
     except AttributeError:
+        history.delete_from_db()
+        remove_job_folder(history_id)
         return {"message": " Please enter your IDNUMBER in the company profile section. "
                            "We need your company IDNUMBER to validate .sdf file. "}, 400
+
     except:
+        history.delete_from_db()
+        remove_job_folder(history_id)
         print(sys.exc_info())
         return {"message": "1: " + str(sys.exc_info()[0])}, 500
 

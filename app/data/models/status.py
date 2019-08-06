@@ -22,4 +22,9 @@ class StatusModel(db.Model):
         for status in all_statuses:
             item = {status.status_id : status.status}
             statuses_dict.update(item)
-        return  statuses_dict
+        return statuses_dict
+
+    @classmethod
+    def get_status_by_id(cls, status_id):
+        status = cls.query.filter_by(status_id=status_id).first()
+        return status

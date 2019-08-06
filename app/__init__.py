@@ -14,6 +14,7 @@ from app.data.views.model_views import AdminModelView, UserView, RoleView, \
     CompanyView, HistoryView, FieldView, MyHomeView, CatalogResult
 from flask_mail import Mail
 import flask_excel as excel
+from flask_debugtoolbar import DebugToolbarExtension
 
 from flask_menu import Menu
 # # from flask_restful import Api
@@ -41,7 +42,8 @@ def create_app(config_class=config):
     Menu(app=app)
     app.config.from_object(config['prod'])
     app.config.from_object(config_class)
-
+    # toolbar = DebugToolbarExtension(app)
+    # toolbar.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
     from app.data.models.user import UserModel
@@ -104,8 +106,8 @@ def create_app(config_class=config):
     from app.main import application as main_bp
     app.register_blueprint(main_bp)
 
-    from app.admin import application as admin_blueprints
-    app.register_blueprint(admin_blueprints)
+    from app.admin import admin_blueprint
+    app.register_blueprint(admin_blueprint)
 
     return app
 

@@ -17,24 +17,23 @@ def get_catalog_shortname(job_info):
     catalog_type = job_info['catalog_type'] # SC, BB, or both
     availability = job_info['availability'] # stock or demand
     upload_type = job_info['upload_type']
-    is_np = job_info['natural_products'] # true or false
+    #is_np = job_info['natural_products'] # true or false
     short_name = ""
-    if is_np:
-        print("This is the natural product catalog")
-        short_name = company_basename + "np"
+    #if is_np:
+    #    print("This is the natural product catalog")
+    #    short_name = company_basename + "np"
+    if catalog_type == 'both' or catalog_type == 'sc':
+        short_name = company_basename
     else:
-        if catalog_type == 'both':
-            short_name = company_basename
-        else:
-            short_name = company_basename + catalog_type
-            if availability == 'demand':
-                short_name = short_name + '-v'
+        short_name = company_basename + catalog_type
+        if availability == 'demand':
+            short_name = short_name + '-v'
         if upload_type == 'incremental':
-                short_name = None
+            short_name = None
     return short_name
 
-def get_job_info_from_json(folder):
-    file_path = os.path.join(folder, "JOB_INFO.json")
+def get_job_info_from_json():
+    file_path = os.path.join("JOB_INFO.json")
     with open(file_path, 'r') as fh:
         job_info = json.load(fh)
     short_name = get_catalog_shortname(job_info)
@@ -45,21 +44,26 @@ def get_job_info_from_json(folder):
 
 def main():
     job_dir = sys.argv[1]
-    short_name, catalog_type, upload_type = get_job_info_from_json(job_dir)
-
+    os.chdir(job_dir)
+    print(job_dir)
+    short_name, catalog_type, upload_type = get_job_info_from_json()
     if short_name is None:
         print("This is a incremental upload")
         sys.exit(1)
     else:
         print("This is a full upload")
         print("Short name is " + str(short_name))
+        print(os.getcwd())
         os.chdir(short_name)
         print("Run depletion...")
-        cmd = "zinc-manage -e admin admin catalogs deplete -C 10000 {} list2".format(str(short_name))
-        print(cmd)
-        out = subprocess.Popen("zinc-manage -e admin admin catalogs deplete -C 10000 {} list2".format(short_name), shell=True, close_fds=True)
-        out.communicate()[0]
-        cmd = UPDATE_CMD + " " + "10"
+        depletion_cmd = "csh /nfs/home/khtang/code/upload_wizard_codes/run_deplete.csh {0}".format(short_name)
+        #depletion_cmd = "zinc-manage -e admin admin catalogs deplete -C 10000 {0} list2".format(str(short_name))
+        print(depletion_cmd)
+        out = subprocess.Popen(depletion_cmd, shell=True)
+        #out = subprocess.Popen("zinc-manage -e admin admin catalogs deplete -C 10000 {0} list2".format(short_name), shell=True)
+        #out.communicate()[0]
+        #os.system(depletion_cmd)
+        cmd = UPDATE_CMD + " " + "11"
         os.system(cmd)
 if __name__=="__main__":
     main()

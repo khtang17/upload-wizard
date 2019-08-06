@@ -5,7 +5,8 @@
 <div id="m_aside_left" class="m-grid__item	m-aside-left  m-aside-left--skin-light ">
 	<!-- BEGIN: Aside Menu -->
 	<div 		id="m_ver_menu" 		class="m-aside-menu  m-aside-menu--skin-light m-aside-menu--submenu-skin-light " 		data-menu-vertical="true"		 m-menu-scrollable="1" m-menu-dropdown-timeout="500"  		>
-		<ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
+
+        <ul class="m-menu__nav  m-menu__nav--dropdown-submenu-arrow ">
 {#			<li class="m-menu__item  m-menu__item--submenu" aria-haspopup="true"  m-menu-submenu-toggle="hover">#}
 {#				<a  href="javascript:;" class="m-menu__link m-menu__toggle">#}
 {#					<i class="m-menu__link-icon flaticon-statistics"></i>#}
@@ -64,6 +65,7 @@
 {#				</h4>#}
 {#				<i class="m-menu__section-icon flaticon-more-v3"></i>#}
 {#			</li>#}
+
 			<li class="m-menu__item  m-menu__item--submenu m-menu__item--bottom-1" aria-haspopup="true"  m-menu-submenu-toggle="hover">
 				<a  href="javascript:;" class="m-menu__link m-menu__toggle">
 					<i class="m-menu__link-icon flaticon-info"></i>
@@ -82,6 +84,7 @@
 								</span>
 							</span>
 						</li>
+
 						<li class="m-menu__item " aria-haspopup="true"  m-menu-link-redirect="1">
 							<a  href="{{ url_for('main.help_page') }}" class="m-menu__link ">
 								<i class="m-menu__link-bullet m-menu__link-bullet--dot">
@@ -92,10 +95,23 @@
 								</span>
 							</a>
 						</li>
+                        <li class="m-menu__item " aria-haspopup="true"  m-menu-link-redirect="1">
+							<a  href="mailto:chemistry4biolog_at_gmail_dot_com" class="m-menu__link ">
+								<i class="m-menu__link-bullet m-menu__link-bullet--dot">
+									<span></span>
+								</i>
+								<span class="m-menu__link-text">
+									Contact us
+								</span>
+							</a>
+						</li>
+
 					</ul>
 				</div>
 			</li>
+
 		</ul>
+
 	</div>
 	<!-- END: Aside Menu -->
 </div>

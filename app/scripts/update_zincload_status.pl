@@ -33,11 +33,16 @@ $dbh->{PrintError} = 0;
 my $newstatus = $ARGV[0];
 
 my $cmd2 = "update history set status_id = ? where id = ?";
-# last_updated=unix_timestamp()
+my $cmd3 = "update history set last_updated = now() where id = ?";
+#my $last_updated=unix_timestamp();
+my $last_updated = time;
 my $sth2 = $dbh->prepare($cmd2);
 my $row2 = $sth2->execute($newstatus, $job_id);
+my $sth3 = $dbh->prepare($cmd3);
+my $row3 = $sth3->execute($job_id); 
 
 print "updating job $job_id with status_id $newstatus\n";
 
 $sth2->finish();
+$sth3->finish();
 $dbh->disconnect();
