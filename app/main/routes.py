@@ -53,7 +53,6 @@ def index():
 
 
 @application.route('/help')
-@login_required
 @register_menu(application, '.fourth', 'Help', order=4)
 def help_page():
     return render_template('help.html', title='Help')
