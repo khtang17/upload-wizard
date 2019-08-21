@@ -11,7 +11,7 @@ from flask_user import UserManager, SQLAlchemyAdapter
 from flask_moment import Moment
 import flask_admin
 from app.data.views.model_views import AdminModelView, UserView, RoleView, \
-    CompanyView, HistoryView, FieldView, MyHomeView, CatalogResult
+    CompanyView, HistoryView, FieldView, MyHomeView, CatalogResult, CatalogStatusView
 from flask_mail import Mail
 import flask_excel as excel
 from flask_debugtoolbar import DebugToolbarExtension
@@ -37,6 +37,7 @@ bootstrap = Bootstrap()
 # bootstrap = Bootstrap(app)
 
 
+
 def create_app(config_class=config):
     app = Flask(__name__)
     Menu(app=app)
@@ -50,6 +51,7 @@ def create_app(config_class=config):
 
     db_adapter = SQLAlchemyAdapter(db, UserModel)
     user_manager = UserManager(db_adapter, app)
+
     user_manager.resend_confirm_email_view_function
     # api.init_app(app)
     mail.init_app(app)
@@ -82,7 +84,7 @@ def create_app(config_class=config):
     admin.add_view(CompanyView(CompanyModel, db.session, "Companies"))
     admin.add_view(UserView(UserModel, db.session, "Users"))
     admin.add_view(CatalogResult(CatalogResultInfo, db.session, "Catalog Results"))
-
+    admin.add_view(CatalogStatusView(StatusModel, db.session, "Statuses"))
     if app.config['ZINC_MODE']:
         admin.add_view(AdminModelView(FileFormatModel, db.session, "Column name"))
     else:
@@ -108,6 +110,7 @@ def create_app(config_class=config):
 
     from app.admin import admin_blueprint
     app.register_blueprint(admin_blueprint)
+
 
     return app
 

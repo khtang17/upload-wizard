@@ -4,6 +4,7 @@ New vendor company user registered on system. Please see detailed information as
 
 Username: {{ user.username }}
 Email: {{ user.email }}
+User Note: {{ user_note }}
 
 If you do not want to give "Vendor" access simply ignore this message.
 

@@ -93,7 +93,7 @@ def email_confirmation(user):
                                          user=user, token=token))
 
 
-def notify_new_user_to_admin(user):
+def notify_new_user_to_admin(user, user_note):
     admins = UserModel.get_admins()
     admin_emails = []
     for admin in admins:
@@ -101,8 +101,8 @@ def notify_new_user_to_admin(user):
     send_email('New user registration!',
                sender=current_app.config['MAIL_DEFAULT_SENDER'],
                recipients=admin_emails,
-               text_body=render_template('email/email_confirmation_notify.txt', user=user),
-               html_body=render_template('email/email_confirmation_notify.html', user=user))
+               text_body=render_template('email/email_confirmation_notify.txt', user=user, user_note=user_note),
+               html_body=render_template('email/email_confirmation_notify.html', user=user, user_note=user_note))
 
 
 def notify_new_role_to_user(user):
@@ -114,7 +114,7 @@ def notify_new_role_to_user(user):
 
 
 def notify_job_result_to_user(history):
-    send_email('Your job has been finished!',
+    send_email('We have receiced your catalog update!',
                sender=current_app.config['MAIL_DEFAULT_SENDER'],
                recipients=[history.user.email],
                text_body=render_template('email/job_result_notify.txt', history=history),

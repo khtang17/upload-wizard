@@ -1,12 +1,56 @@
+// $(document).ready(function() {
+//     $('#admin_json_data').DataTable({
+//         "ordering": true,
+//          "order": [[ 2, "desc" ]],
+//
+//
+// } );
+
 $(document).ready(function() {
-    $('#admin_json_data').DataTable({
-        "ordering": true,
-    });
+    $('#admin_json_data').DataTable( {
+         "ordering": true,
+         "order": [[ 2, "desc" ]],
+        initComplete: function () {
+            this.api().columns([1]).every( function () {
+                var column = this;
+
+                var select = $('<select><option value=""> All </option></select>')
+                    .appendTo( $('#date-filter') )
+                    .on( 'change', function () {
+                        var val = $.fn.dataTable.util.escapeRegex(
+
+                            $(this).val()
+                        );
+
+                        column
+                            .search( val ? '^'+val+'$' : '', true, false )
+                            .draw();
+
+                    } );
+
+                    // var formatted = column.data().sort().each( function (key, value){
+                    //     return $('<div/>').html(key).text();
+                    //         // console.log(new_key +  " | " + value);
+                    //         });
+                    var prev = '';
+                    column.data().unique().sort().reverse().each( function ( d, j) {
+                        var val = $('<div/>').html(d).text();
+                        if (prev == '' || prev != val){
+                            prev = val;
+                            select.append( $('<option value="'+val+'">'+val+'</option>') );
+                        }
+
+                } );
+            } );
+        },
+    } );
 } );
- $('#m_form_status').on('change',function(){
-        var selectedValue = $(this).val();
-        oTable.fnFilter("^"+selectedValue+"$", 0, true); //Exact value, column, reg
-    });
+
+ //
+ // $('#m_form_status').on('change',function(){
+ //        var selectedValue = $(this).val();
+ //        oTable.fnFilter("^"+selectedValue+"$", 0, true); //Exact value, column, reg
+ //    });
 
 
 // var DatatableJsonRemoteDemo= {

@@ -11,7 +11,7 @@ from app.api.auth import token_auth
 from app.api.errors import bad_request
 from flask import g
 from app.helpers.catalog_result import get_results
-
+from app.main.catalog_jobs_routes import utc_to_local
 
 
 @application.route('/update_job_status', methods=['PUT'])
@@ -34,8 +34,8 @@ def update_job_status():
 def get_current_status():
     history_id = request.args.get('history_id', type=int)
     current = UploadHistoryModel.query.filter_by(id=history_id).first()
-    last_updated = current.last_updated
-    date = last_updated.strftime("%B %d, %Y %I:%M %p")
+    date = utc_to_local(current.last_updated)
+
     status = StatusModel.query.filter_by(status_id=current.status_id).first()
     return jsonify({'status' : status.status,
                     'last_updated': date})

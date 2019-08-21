@@ -7,9 +7,14 @@ class StatusModel(db.Model):
     status_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     status = db.Column(db.Text, nullable=False)
 
-    def __init__(self, status_id, status):
-        self.status_id = status_id
-        self.status = status
+    # def __init__(self, status):
+    #     self.status = status
+    def __repr__(self):
+        return '<Job Status {}>'.format(self.status)
+    def __str__(self):
+        return self.status
+
+
     @classmethod
     def to_dict(cls):
         # all_statuses =self.query.all()

@@ -17,11 +17,12 @@ from app.admin import admin_blueprint
 from datetime import datetime
 from flask_menu import Menu, register_menu
 from datetime import datetime, timezone
+from datetime import date
 
 from flask import Flask, request, jsonify, send_file, make_response, Blueprint
 # import flask_excel as excel
 import pdb
-
+from .admin_help import get_job_status_count
 
 
 
@@ -30,32 +31,14 @@ import pdb
 @login_required
 @roles_required('Admin')
 def upload_report():
-    # page = request.args.get("page", 1, type=int)
-    # histories = UploadHistoryModel.query.order_by(UploadHistoryModel.status_id.desc()).paginate(
-    #     page, current_app.config['LISTS_PER_PAGE'], False)
-    # # histories = current_user.upload_histories.paginate(
-    # #     page, current_app.config['LISTS_PER_PAGE'], False)
-    # next_url = url_for('admin_views.upload_report', page=histories.next_num) \
-    #     if histories.has_next else None
-    # prev_url = url_for('admin_views.upload_report', page=histories.prev_num) \
-    #     if histories.has_prev else None
-    # pagestart = (page - 1) * current_app.config['LISTS_PER_PAGE']
-    #
-    # return render_template('admin/report.html', title='Report Page', histories=histories.items,
-    #                        next_url=next_url,
-    #                        prev_url=prev_url,
-    #                        pagestart=pagestart, JOB_STATUS=JOB_STATUS, CATALOG_TYPE=CATALOG_TYPE)
 
+    this_month = date.today().strftime("%B - %Y")
     page = request.args.get('page', 1, type=int)
     histories = UploadHistoryModel.query.order_by(UploadHistoryModel.status_id.desc()).paginate(
         page, current_app.config['LISTS_PER_PAGE'], False)
-    # next_url = url_for('admin_views.upload_report', page = histories.next_num) \
-    #         if histories.has_next else None
-    # prev_url = url_for('admin_views.upload_report', page=histories.prev_num) \
-    #         if histories.has_prev else None
-    # page_start = (page -1) * current_app.config['LISTS_PER_PAGE']
+    failed_history_count = get_job_status_count()
     return render_template('admin/report.html', title='Report Page', histories=histories.items,
-                            JOB_STATUS=JOB_STATUS, CATALOG_TYPE=CATALOG_TYPE)
+                            JOB_STATUS=JOB_STATUS, CATALOG_TYPE=CATALOG_TYPE, this_month=this_month)
 
 # @application.route('/admin_cronjob', methods=['GET', 'POST'])
 # @login_required

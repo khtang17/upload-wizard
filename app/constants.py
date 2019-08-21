@@ -24,3 +24,4 @@ CATALOG_TYPE = {
         'np' : 'Natural Products',
         'both' : 'Mixed'
 }
+

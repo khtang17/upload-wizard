@@ -35,7 +35,8 @@
                     <p><b>Availability: </b> On Demand</p>
                 {% endif %}
                 <p><b>Status: </b><span id ="status"> {{ status }}</span></p>
-                <p ><b>Last Updated: </b><span id="last_updated"> {{ moment(last_updated).format('LLL') }}</span></p>
+{#                <p ><b>Last Updated: </b><span id="last_updated"> {{ moment(last_updated).format('LLL') }}</span></p>#}
+                 <p ><b>Last Updated: </b><span id="last_updated"> {{ last_updated }}</span></p>
 
             {% else %}
                  <p><b>Raw file: </b>
@@ -71,7 +72,7 @@
         <br>
         {% else %}
         <br>
-
+            {% if history.job_logs %}
 
             <div id="mCSB_5_container" class="mCSB_container" style="position:relative; top:0; left:0;" dir="ltr">
                 <div class="m-timeline-2">
@@ -102,6 +103,7 @@
             </div>
             <div class="m-spinner m-spinner--info m-spinner--lg" style="margin-left: 56px;"></div>
             <br/>
+                {% endif %}
         {% endif %}
             <br/>
 {#            <div class="panel panel-danger">#}

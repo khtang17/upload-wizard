@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import and_
 
 
+
 class JobLogModel(db.Model):
     __tablename__ = 'job_log'
     id = db.Column(db.Integer(), primary_key=True)
@@ -42,8 +43,8 @@ class JobLogModel(db.Model):
         try:
             from app.email import notify_job_result_to_user
             from app.data.models.history import UploadHistoryModel
-            if self.status_type == 4:
-                history = UploadHistoryModel.find_by_id(self.history_id)
+            history = UploadHistoryModel.find_by_id(self.history_id)
+            if self.status_type == 4 and history.status_id == 4:
                 if history.user.company.job_notify_email:
                     notify_job_result_to_user(history)
         except:

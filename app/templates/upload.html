@@ -30,7 +30,19 @@
             {% if config['ZINC_MODE'] %}
             <div class="row">
                 <div class="col-md-4">
-                    {{ wtf.quick_form(form) }}
+                    <form action="" method="post" class="m-form__group">
+    {#                    {{ wtf.quick_form(form) }}#}
+                        {{ form.hidden_tag() }}
+                        <p>{{ form.file.label }}<br>
+                            {{ form.file }}</p>
+                        <p>{{ form.catalog_type.label }}<br>
+                            {{ form.catalog_type }}</p>
+                        <p id="availability_form">{{ form.availability.label }}<br>
+                            {{ form.availability }}</p>
+                        <p>{{ form.upload_type.label }}<br>
+                            {{ form.upload_type }}</p>
+                        <p>{{ form.submit() }}</p>
+                    </form>
                 </div>
             </div>
             <br/>
@@ -84,6 +96,17 @@
 {% block scripts %}
 {{ super() }}
     <script>
+        $(document).ready(function() {
+           $("#catalog_type").change(function(){
+               var catalog_type = $('#catalog_type').val();
+               if(catalog_type == 'bio' || catalog_type == 'np'){
+                 $('#availability_form').hide();
+               } else{
+                     $('#availability_form').show();
+                   }
+
+           }) ;
+        });
         $(document).ready(function () {
            $(function() {
 

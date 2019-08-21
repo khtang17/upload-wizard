@@ -62,6 +62,9 @@ var SnippetLogin = function() {
                         retype_password: {
                             required: !0,
                             equalTo : ".password1"
+                        },
+                        user_note: {
+                            required: !0
                         }
                     }
                 }), r.valid() && (t.addClass("m-loader m-loader--right m-loader--light").attr("disabled", !0), r.submit())

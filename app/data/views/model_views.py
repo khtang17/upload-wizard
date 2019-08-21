@@ -98,7 +98,7 @@ def _file_name_link(view, context, model, name):
 class CompanyView(AdminModelView):
     column_list = ['logo', 'name', 'telephone_number', 'toll_free_number',
                    'sales_email', 'idnumber', 'cmpdname',	'cas', 'price']
-    form_excluded_columns = ('users', 'logo')
+    form_excluded_columns = ( 'logo')
     page_size = 20
 
     column_formatters = {
@@ -108,10 +108,12 @@ class CompanyView(AdminModelView):
 
 class HistoryView(AdminModelView):
     column_default_sort = ('date_uploaded', True)
-    column_list = ['date', 'user', 'file_name', 'catalog_type', 'upload_type', 'availability',
-                   'file_size', 'file_size', ]
+    column_list = ['date_uploaded', 'file_name', 'catalog_type', 'upload_type', 'availability',
+                   'file_size', 'status_id']
+    form_columns = ['date_uploaded','file_name', 'catalog_type', 'upload_type', 'availability',
+                   'file_size', 'status_id']
     column_searchable_list = ('file_name', 'upload_type', 'availability')
-    # column_editable_list = ['catalog_type', 'status_id']
+    column_editable_list = ['status_id']
     can_create = False
     page_size = 20
 
@@ -124,7 +126,29 @@ class HistoryView(AdminModelView):
     #         'readonly': True
     #     },
     # }
-    can_edit = False
+    can_edit = True
+
+# class HistoryView(AdminModelView):
+#     column_default_sort = ('date_uploaded', True)
+#     column_list = ['date', 'user', 'file_name', 'catalog_type', 'file_size']
+#     column_searchable_list = ('file_name', 'catalog_type')
+#     column_editable_list = ('status_id',)
+#     can_create = False
+#     page_size = 20
+#
+#     column_formatters = {
+#         'date': _date_format,
+#         'file_name': _file_name_link
+#     }
+
+
+class CatalogStatusView(AdminModelView):
+    column_default_sort = ('status_id')
+    column_list = ['status_id', 'status']
+    can_create = True
+    column_editable_list = ['status']
+    can_delete = False
+    can_edit = True
 
 
 class FieldView(AdminModelView):

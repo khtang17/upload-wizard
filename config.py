@@ -56,7 +56,9 @@ class Config(object):
     S3_KEY = os.getenv("S3_KEY") or 'S3_KEY'
     S3_SECRET = os.getenv("S3_SECRET") or 'S3_SECRET'
     S3_LOCATION = os.getenv("S3_LOCATION") or 'S3_LOCATION'
+
     SCRIPT_DIR = os.getenv("SCRIPT_DIR")
+    STATIC_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app/static')
 
 class DevConfig(Config):
     DEBUG = True

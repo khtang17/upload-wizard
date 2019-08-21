@@ -70,7 +70,6 @@
             {%trans%}Sign Up{%endtrans%}
         </h3>
         <div class="m-login__desc">
-            Enter your details to create your account:
         </div>
     </div>
     <form action="{{ url_for('main.register') }}" method="POST" novalidate formnovalidate
@@ -114,6 +113,9 @@
         </div>
         <div class="form-group m-form__group  ">
             <input class="form-control m-input" id="retype_password" name="retype_password" placeholder="Retype Password" tabindex="240" type="password" value="">
+        </div>
+        <div class="form-group m-form__group  ">
+            <textarea class="form-control m-input" id="user_note" name="user_note" placeholder="Tell us briefly about you and your company" tabindex="250" type="text" value=""></textarea>
         </div>
 
         <div class="m-login__form-action">

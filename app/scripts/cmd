@@ -1,8 +1,0 @@
-#source /nfs/soft/jchem/current/env.csh
-source /nfs/soft/mitools/env.csh
-source /nfs/soft/www/apps/zinc15/envs/edge/env.csh
-setenv ZINC_CONFIG_ENV admin
-setenv ZINC_CONFIG_SETUP_SKIP blueprints 
-#setenv ZINC_CONFIG_ENV admin-private
-#tmp...
-#setenv ZINC_TAUTOMERIZE 'zincload-tautomerize --rules=/nfs/scratch/A/xyz/load2d/taut.txt'

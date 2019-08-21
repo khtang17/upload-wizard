@@ -5,34 +5,72 @@
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title">
-                    <h3 class="m-portlet__head-text">Help</h3>
+                    <h2 class="m-portlet__head-text">HELP</h2>
                 </div>
             </div>
         </div>
         <div class="m-portlet__body">
-            <ol>
-                <li>New users should register.</li>
-                <li>A confirmation email is sent to confirm ownership of the email</li>
-                <li>User logs in, confirming email.</li>
-                <li>Administrator must activate (approve) the account</li>
-                <li>User can now edit company information (one time)</li>
-                <li>User can begin with first upload.</li>
-            </ol>
-            <p>The following formats are supported</p>
-            <ul>
-                <li> One item per line formats. Each of these formats should have a header line defining the columns
-                    (see below) and use a standard field separator as described below.
-                    <ul>
-                        <li>.smi - white space separated fields (with only smiles and product codes)
-                        <li>.txt - white space separated fields (with only smiles and product codes)
-                        <li>.csv - comma separated values 
-                        <li>.tsv - tab separated values
-                    </ul>
-                </li>
-                <li>Special molecule formats : SDF </li>
-            </ul>
-            <p>Additionally, any of these files may be compressed using:  zip, gzip
-                or tar.gz  (tgz).The fields are defined by the user in the "Company Profile" definition</p>
+            <ol type="I">
+                <h5><li class="m-portlet__head-text">Getting Started</li></h5>
+                    <ol>
+                        <li class="lead"><u>User Registration</u></li>
+                            <p>New user must register in order to submit your catalog onto ZINC. Please tell us briefly about you and your company in 140 words or less.</p>
+                            <p>After you submitted your infomation, you will receive an email asking to confirm your email. </p>
+                            <p>Once you do that, our admin will review your information and get back to you shortly via email (please be patient)</p>
+                        <li class="lead"><u>Filling Company Profile and Catalog Info</u></li>
+                            <i>When you login for the first time, you are required to filling the form in Company Profile tab on the topbar</i><br>
+                            There are 2 parts in the form
+                            <ul>
+                                <p><li>Company Information</li></p>
+                                <li>Catalog Information</li>
+                                    <p>The fields are defined here are important to ensure the catalog get process correctly</p>
+                                    <p> Images here pls</p>
+                            </ul>
+                    </ol>
+                    <h5><li class="m-portlet__head-text">Catalog Submission Requirements</li></h5>
+                        <ul>
+                            <li>Maximum size: 1GB. If you catalog is bigger than 1GB, please email us at chemistry4biology_at_gmail_dot_com</li>
+                            <li>Supporting Formats:</li>
+                                 <ul>
+                                     <li><a href= '{{ url_for('main.example', file_type = 'smi') }}' target='_blank'>.smi or .txt files</a> - white space separated fields (with only smiles and product codes)
+                                     This is good for big catalog with no pricing</li>
+                                     <li><a href='{{ url_for('main.example', file_type = 'csv') }}' target='_blank'>.csv</a> - comma separated values
+                                     {% for format in file_format %}
+                                         <p>{{ format.title }}</p>
+                                         {% endfor %}
+                                     </li>
+                                     <li><a href= '{{ url_for('main.example', file_type = 'tsv') }}' target='_blank'>.tsv</a> - tab separated values (Same as .csv file)</li>
+                                    <li>Excel-format files (.xlsx, .xls) are currently not supported. You could convert them into tsv or csv format with Excel</li>
+                                </ul>
+                        </ul>
+
+
+                    </ol>
+{##}
+{#                <h5><li class="m-portlet__head-text">Filling in Company</li></h5>#}
+{#            <ol>#}
+{#                <li>New users should register.</li>#}
+{#                <li>A confirmation email is sent to confirm ownership of the email</li>#}
+{#                <li>User logs in, confirming email.</li>#}
+{#                <li>Administrator must activate (approve) the account</li>#}
+{#                <li>User can now edit company information (one time)</li>#}
+{#                <li>User can begin with first upload.</li>#}
+{#            </ol>#}
+{#            <p>The following formats are supported</p>#}
+{#            <ul>#}
+{#                <li> One item per line formats. Each of these formats should have a header line defining the columns#}
+{#                    (see below) and use a standard field separator as described below.#}
+{#                    <ul>#}
+{#                        <li><a href= '/static/catalog_examples/smiles_catalog_example.txt' target='_blank'>.smi</a> - white space separated fields (with only smiles and product codes)#}
+{#                        <li><a href= '/static/catalog_examples/smiles_catalog_example.txt' target='_blank'>.txt</a> - white space separated fields (with only smiles and product codes)#}
+{#                        <li><a href= '/static/catalog_examples/csv_catalog_example.csv' target='_blank'>.csv</a> - comma separated values #}
+{#                        <li><a href= '/static/catalog_examples/tsv_catalog_example.tsv' target='_blank'>.tsv</a> - tab separated values#}
+{#                    </ul>#}
+{#                </li>#}
+{#                <li>Special molecule formats : <a href= '/static/catalog_examples/sdf_catalog_example.sdf' target='_blank'>SDF</a> </li>#}
+{#            </ul>#}
+{#            <p>Additionally, any of these files may be compressed using:  zip, gzip#}
+{#                or tar.gz  (tgz).The fields are defined by the user in the "Company Profile" definition</p>#}
         </div>
     </div>
 {% endblock %}

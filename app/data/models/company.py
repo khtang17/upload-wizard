@@ -24,6 +24,7 @@ class CompanyModel(db.Model):
     users = db.relationship(UserModel, backref='company', lazy='dynamic')
     idnumber = db.Column(db.String(100))
     cmpdname = db.Column(db.String(100))
+    smiles = db.Column(db.String(100))
     cas = db.Column(db.String(100))
     price = db.Column(db.String(20))
     job_notify_email = db.Column(db.Boolean(), nullable=True, default=False)
@@ -31,7 +32,7 @@ class CompanyModel(db.Model):
     def __init__(self, name, description, address, telephone_number,
                  toll_free_number, fax_number, website, sales_email,
                  personal_contact_name, personal_contact_email,
-                 idnumber, cmpdname, cas, price, job_notify_email):
+                 idnumber, smiles, cmpdname, cas, price, job_notify_email):
         self.name = name
         self.description = description
         self.address = address
@@ -43,6 +44,7 @@ class CompanyModel(db.Model):
         self.personal_contact_name = personal_contact_name
         self.personal_contact_email = personal_contact_email
         self.idnumber = idnumber
+        self.smiles = smiles
         self.cmpdname = cmpdname
         self.cas = cas
         self.price = price

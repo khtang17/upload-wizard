@@ -1,13 +1,26 @@
 {% extends 'admin/master.html' %}
+
 {% block body %}
     <h3>Welcome to the Upload Wizard Tool.</h3>
     <p>You have have logged in as an administrator. Please be careful. You can</p>
     <ul>
-    <li> review recent account applications </li>
-    <li> monitor recent uploads </li>
-    <li> curate vendors </li>
-    <li> curate other parameters </li>
+    <li> Review recent account applications </li>
+    <li> Monitor recent uploads </li>
+    <li> Curate vendors </li>
+    <li> Curate other parameters </li>
     </ul>
+
+    <h4>Approving user procedure:</h4>
+    After user confirm their email, admin will:
+    <ol>
+    <li>Assign catalog shortname based from the user information provided from the notification email.
+        <p style="color:red;">*** Please note that this is not the same as catalog shortname on ZINC. This is will be the shortname of the company without any suffixes like sc, bb, -v, etc ( these will be added later in the upload process )</p>
+    </li>
+
+    <li>Admin confirm the user.</li>
+    </ol>
+
+
     <p>During the development please direct questions to Chinzo D via
         <a href="https://github.com/ChinzoD/upload-wizard/issues" target="_blank">
         https://github.com/ChinzoD/upload-wizard/issues</a>

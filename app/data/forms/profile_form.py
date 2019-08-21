@@ -2,6 +2,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.data.models.user import UserModel
+from flask_user.forms import RegisterForm
+
+# class CustomRegisterForm(RegisterForm):
+#     user_note = TextAreaField(render_kw={"placeholder": "Tell us about you and company"}, validators=[DataRequired()])
 
 
 class ProfileForm(FlaskForm):

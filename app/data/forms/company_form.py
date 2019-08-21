@@ -8,7 +8,7 @@ class CompanyForm(FlaskForm):
     id = HiddenField('Company ID')
     file = FileField('Company Logo:', render_kw={"class": "form-control btn btn-outline-info"},
                      validators=[
-                         FileAllowed(['png', 'jpeg', 'jpg'], 'Please upload only allowed files! (.txt, .jpeg, .jpg)')
+                         FileAllowed(['png', 'jpeg', 'jpg'], 'Please upload only allowed files! (.png, .jpeg, .jpg)')
                      ])
     logo = HiddenField('Logo')
     name = StringField('Company Name: *', render_kw={"class": "form-control m-input",
@@ -39,14 +39,17 @@ class CompanyForm(FlaskForm):
                                          render_kw={"class": "form-control m-input",
                                                     "placeholder": "Enter personal contact email"})
     # , validators=[DataRequired(), Email()])
-    idnumber = StringField('ID Number:', render_kw={"class": "form-control m-input",
-                                                    "placeholder": "Enter id number"})
+    smiles = StringField('Smiles Field:', render_kw={"class": "form-control m-input",
+                                                        "placeholder": "Enter Smiles Field"})
+    #                            )
+    idnumber = StringField('ID Field: *', render_kw={"class": "form-control m-input",
+                                                    "placeholder": "Enter ID Field"}, validators=[DataRequired()])
     cmpdname = StringField('Compound Name:', render_kw={"class": "form-control m-input",
                                                         "placeholder": "Enter compound name"})
     cas = StringField('CAS:', render_kw={"class": "form-control m-input",
                                          "placeholder": "Enter cas number"})
-    price = StringField('Price:', render_kw={"class": "form-control m-input",
-                                             "placeholder": "Enter price"})
+    price = StringField('Price Field:', render_kw={"class": "form-control m-input",
+                                             "placeholder": "Enter Price Field"})
     job_notify_email = BooleanField('Job Notify by an Email:')
     submit = SubmitField('Save', render_kw={"class": "btn btn-success"})
 

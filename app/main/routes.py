@@ -5,10 +5,12 @@ from app.constants import JOB_STATUS, CATALOG_TYPE
 from app.data.models.user import UserModel
 from app.data.models.history import UploadHistoryModel
 from app.main import application
-
+from app.data.models.format import FileFormatModel
+from app.helpers.upload_tools import print_on_browser
 
 from flask_menu import Menu, register_menu
 from datetime import datetime
+
 
 from flask import Flask, request, jsonify, send_file, make_response
 # import flask_excel as excel
@@ -22,7 +24,10 @@ from app import db
 @application.route('/')
 @application.route('/home')
 def home():
-    return render_template('home.html', title='Home Page')
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    else:
+        return render_template('home.html', title='Home Page')
 
 
 @application.route('/welcome')
@@ -30,13 +35,16 @@ def home():
 @register_menu(application, '.main', 'Home', order=0)
 def welcome():
     user = UserModel.find_by_email(current_user.email)
-    latest_history = UploadHistoryModel.get_last_by_user_id(user_id=user.id)
-    if latest_history:
-        catalog_type = CATALOG_TYPE.get(latest_history.catalog_type)
-        status = JOB_STATUS.get(latest_history.status_id)
-        return render_template('welcome.html', user=user, title='Welcome', latest_history=latest_history, catalog_type=catalog_type, status=status)
+    if current_user.has_role("Admin"):
+        return redirect(url_for('admin_views.upload_report'))
     else:
-        return render_template('welcome.html', user=user, title='Welcome')
+        latest_history = UploadHistoryModel.get_last_by_user_id(user_id=user.id)
+        if latest_history:
+            catalog_type = CATALOG_TYPE.get(latest_history.catalog_type)
+            status = JOB_STATUS.get(latest_history.status_id)
+            return render_template('welcome.html', user=user, title='Welcome', latest_history=latest_history, catalog_type=catalog_type, status=status)
+        else:
+            return render_template('welcome.html', user=user, title='Welcome')
 
 
 
@@ -55,9 +63,17 @@ def index():
 @application.route('/help')
 @register_menu(application, '.fourth', 'Help', order=4)
 def help_page():
-    return render_template('help.html', title='Help')
+    file_format = FileFormatModel.find_all()
+    return render_template('help.html', file_format=file_format, title='Help')
 
+@application.route('/help/example/<file_type>')
+def example(file_type):
+    return print_on_browser(file_type)
+    # return render_template('help.html', file_format=file_format, title='Help')
 
+#@application.route('/help/example/<file_type>')
+#def catalog_example(file_type):
+#    path 
 
 
 
@@ -78,7 +94,7 @@ def athena():
     #             """)
     #         print(cursor.description)
     #         print(cursor.fetchall())
-    # finally:
+	    # finally:
     #     conn.close()
     res = ""
     import contextlib

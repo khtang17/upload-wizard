@@ -25,10 +25,11 @@ from botocore.client import Config
 import boto3
 import flask_excel as excel
 from collections import OrderedDict
+from pdb import set_trace
 
 
 
-ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi', 'csv'])
+ALLOWED_EXTENSIONS = set(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi', 'csv', 'tsv'])
 ALLOWED_EXTENSIONS2 = set(['tsv', 'xls', 'xlsx', 'xlsm', 'csv'])
 
 config = Config(connect_timeout=5, retries={'max_attempts': 0})
@@ -140,8 +141,11 @@ def validate(file, form):
         file_size = size(file_length, system=alternative)
         history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
         history.catalog_type = form.catalog_type.data
+        if form.catalog_type.data == 'bio' or form.catalog_type.data == 'np':
+            history.availability = 'stock'
+        else:
+            history.availability = form.availability.data
         history.upload_type = form.upload_type.data
-        history.availability = form.availability.data
         # history.natural_products = form.natural_products.data
         history.save_to_db()
         result = save_file(file, history, history.file_name, False, history.id)
@@ -163,7 +167,7 @@ def validate(file, form):
 
 def write_json_file(history, folder):
     job_info = history.json()
-    job_info.update({'company_basename': current_user.short_name})
+    # job_info.update({'company_basename': current_user.short_name})
     price_tag = history.user.company.price
     print(price_tag)
     if price_tag:
@@ -180,20 +184,42 @@ def check_img_type(file):
         return False
 
 
-def extract_molcules_info_from_csv(csv_file, job_folder):
-    catalog_file = job_folder +'/'+csv_file
-    with open(catalog_file) as catalog:
-        catalog_reader = csv.DictReader(catalog, delimiter=',')
-        catalog_reader = list(catalog_reader)
-        catalog.close()
-    smi_file = job_folder+"/"+ csv_file.split('.')[0] + ".smi"
-    with open(smi_file, 'w') as file_handler:
-        for row in catalog_reader:
-            product_id = row['product_id']
-            smiles_code = row['smiles']
-            line = smiles_code + '\t' + product_id + '\n'
-            file_handler.write(line)
-        file_handler.close()	
+def process_delimited_file(delimited_file, job_folder, history):
+
+    try:
+        catalog_file = job_folder +'/'+delimited_file
+        if delimited_file.endswith('csv'):
+            catalog_delimiter = ','
+        elif delimited_file.endswith('tsv'):
+            catalog_delimiter = '\t'
+        with open(catalog_file, encoding = "ISO-8859-1") as catalog:
+            catalog_reader = csv.DictReader(catalog, delimiter=catalog_delimiter)
+            catalog_reader = list(catalog_reader)
+
+            catalog.close()
+        smi_file = job_folder+"/"+ delimited_file.split('.')[0] + ".smi"
+        product_col_name = current_user.company.idnumber
+        smiles_col_name = current_user.company.smiles
+        with open(smi_file, 'w') as file_handler:
+            for row in catalog_reader:
+                product_id = row[product_col_name]
+                smiles_code = row[smiles_col_name]
+                line = smiles_code + '\t' + product_id + '\n'
+                file_handler.write(line)
+            file_handler.close()
+    except IOError:
+        history.delete_from_db()
+        remove_job_folder(history.id)
+        return {"message": "1: " + str(sys.exc_info()[0])}, 500
+
+    update_status_cmd = current_app.config['SCRIPT_DIR'] + "/update_zincload_status.pl" + " 4" + " " + job_folder
+    os.system(update_status_cmd)
+    return {"message": "Your job has been successfully validated!"}, 200
+
+
+
+
+
 
 
 def save_file(file, object, name, is_logo, id=""):
@@ -225,13 +251,15 @@ def save_file(file, object, name, is_logo, id=""):
         # print(os.path.join(file_dir, secure_filename(name)))
         print("Saving file to directory")
         file.save(os.path.join(file_dir, secure_filename(name)))
-        if name.endswith(".csv"):
-                print("csv format catalog")
-                extract_molcules_info_from_csv(name, file_dir)
+        if name.endswith(".csv") or name.endswith(".tsv"):
+                print("delimited format catalog")
+                process_delimited_file(name, file_dir, object)
+                print("Saving json file")
+                write_json_file(object, file_dir)
+                return {"message": "Your job has been submitted!"}, 200
         print("Saving json file")
         write_json_file(object, file_dir)
     except:
-        print(sys.exc_info())
         return {"message": "1: " + str(sys.exc_info()[0])}, 500
 
     if is_logo:

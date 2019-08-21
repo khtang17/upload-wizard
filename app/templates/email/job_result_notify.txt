@@ -1,6 +1,6 @@
 Dear {{ history.user.username }},
 
-Your job has been finished.
+We have received your catalog. It is submitted and validated successfully. We will send out an email when it is updated on ZINC.
 
 
 {% for log in history.job_logs %}

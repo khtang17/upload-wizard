@@ -3,7 +3,7 @@ import os, sys
 import shlex
 import subprocess
 from flask_user import current_user
-from app.scripts.submit_catalog_job import get_catalog_shortname
+from app.helpers.upload_tools import get_catalog_shortname
 #
 
 # def gather_info():

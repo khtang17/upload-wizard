@@ -17,9 +17,9 @@
             <div class="m-portlet__body">
                  {% if current_user.has_role('Vendor') %}
 		<h3>Aim of this website</h3>
-		<p>This website is to help you the vendor to update your catalog in the <a href="http://zinc15.docking.org" target="_blank">ZINC database</a>
+                     <p>This website is to help you the vendor to update your catalog in the <a href="http://zinc15.docking.org" target="_blank"><b>ZINC database</b></a>
 We have tried to make this website easy to use. If you have trouble, or if you have suggestions on how to improve it,
-or if you have questions about it, please write to John Irwin at chemistry4biology_at_gmail.com</p>
+                         or if you have questions about it, please write to <b>John Irwin</b> at <u>chemistry4biology_at_gmail_dot_com</u></p>
                  <table>
                     <tr valign="top">
                         <td>
@@ -29,26 +29,31 @@ or if you have questions about it, please write to John Irwin at chemistry4biolo
                         </td>
                     </tr>
                 </table>
-                     {% if latest_history %}
-                     <div class="m-portlet__body">
-                          <div class="card-header text-center">
-                              <h4>Last Catalog Update</h4>
-                          </div>
-                          <div class="card-body">
-                            <p class="card-title">File name : {{ latest_history.file_name }}</p>
+                     {% if user.company %}
+                         {% if latest_history %}
+                         <div class="m-portlet__body">
+                              <div class="card-header text-center">
+                                  <h4>Last Catalog Update</h4>
+                              </div>
+                              <div class="card-body">
+                                <p class="card-title">File name : {{ latest_history.file_name }}</p>
 
-                              <p class="card-title">Catalog Type : {{ catalog_type }}</p>
-                              <p class="card-title">Status :  {{ status }}</p>
-{#                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>#}
-                              <a href="{{ url_for('main.upload') }}" class="btn btn-info text center">Upload new Catalog</a>
-                          </div>
-                          <div class="card-footer text-muted">
-                            Last updated on : {{ moment(latest_history.last_updated).format('LLL') }}
-                          </div>
-                        </div>
-                         {% else %}
-                            <p>Please Fill in Company information before uploading catalog</p>
-                         {% endif %}
+                                  <p class="card-title">Catalog Type : {{ catalog_type }}</p>
+                                  <p class="card-title">Status :  {{ status }}</p>
+    {#                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>#}
+                                  <a href="{{ url_for('main.upload') }}" class="btn btn-info text center">Submit new Catalog Update</a>
+                              </div>
+                              <div class="card-footer text-muted">
+                                Last updated on : {{ moment(latest_history.last_updated).format('LLL') }}
+                              </div>
+                            </div>
+                             {% else %}
+                                  <a href="{{ url_for('main.upload') }}" class="btn btn-info text center">Click here to submit catalog to ZINC</a>
+
+                             {% endif %}
+                      {% else %}
+                         <p class="lead">Please fill Company Profile on the top bar.</p>
+                      {% endif %}
 
                 {% else %}
                 <p>For security, please wait for the administrator to review your account application.

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import SubmitField, SelectField, BooleanField, FileField
-from flask_wtf.file import FileField, FileRequired, FileAllowed
+from flask_wtf.file import FileField, FileRequired, FileAllowed, DataRequired
 
 
 class UploadForm(FlaskForm):
@@ -9,16 +9,16 @@ class UploadForm(FlaskForm):
         FileAllowed(['bz2', '7z', 'tar', 'gz', 'zip', 'sdf', 'txt', 'smi', 'csv', 'tsv', 'xlsx'],
                     'Please upload only allowed files! (.txt, .)')
     ])
-    catalog_type = SelectField('Catalog Type:', render_kw={"class": "form-control m-input"},
-                       choices=[('bb', 'Building Blocks'), ('sc', 'Screening Compounds'), ('both', 'Mixed'),
-                                ('np', 'Natural Products'), ('bio', 'Bioactives')]
+    catalog_type = SelectField('Catalog Type:', render_kw={"class": "form-control m-input"}, validators=[DataRequired()],
+                       choices=[('', '--- Select one ---'), ('bb', 'Building Blocks'), ('sc', 'Screening Compounds'), ('both', 'Mixed'),
+                                ('np', 'Natural Products'), ('bio', 'Bioactives'), ]
     )
     availability = SelectField('Availability:',
-                                 render_kw={"class": "form-control m-input"},
-                                 choices=[('stock', 'In Stock'), ('demand', 'Make on Demand')]
+                                 render_kw={"class": "form-control m-input"}, validators=[DataRequired()],
+                                 choices=[('', '--- Select one ---'), ('stock', 'In Stock'), ('demand', 'Make on Demand')]
     )
-    upload_type = SelectField('Upload Type:', render_kw={"class": "form-control m-input"},
-                              choices=[('full', 'Full Catalog Update'), ('incremental', 'Incremental Catalog Update')]
+    upload_type = SelectField('Upload Type:', render_kw={"class": "form-control m-input"}, validators=[DataRequired()],
+                              choices=[('', '--- Select one ---'), ('full', 'Full Catalog Update'), ('incremental', 'Incremental Catalog Update')]
                               )
     # natural_products = BooleanField(' Natural products')
-    submit = SubmitField('submit', render_kw={"class": "btn btn-success"})
+    submit = SubmitField('Submit', render_kw={"class": "btn btn-primary"})

@@ -1,9 +1,11 @@
 from datetime import datetime
 from app import db
+from flask_user import current_user
 from app.data.models.job_log import JobLogModel
 from app.data.models.catalog_info import CatalogResultInfo
 from app.data.models.status import StatusModel
 from flask import url_for, jsonify
+from sqlalchemy import extract
 
 
 class PaginatedAPIMixin(object):
@@ -63,6 +65,7 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     # natural_products = db.Column(db.Boolean(), nullable=False, default=False)
     status_id = db.Column(db.Integer, db.ForeignKey('status.status_id'), default=1)
     data_array = db.Column(db.Text, nullable=True)
+    completion_emailed = db.Column(db.Boolean(), nullable=True, default=False)
     job_logs = db.relationship(JobLogModel,
                                order_by='asc(JobLogModel.date)',
                                backref='history',
@@ -93,6 +96,13 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
         }
         return data
 
+    @classmethod
+    def get_this_month_upload(cls, this_month):
+        # this_month = datetime.today().month
+        this_month_histories = cls.query.filter(extract('month'), cls.date_uploaded == this_month).all()
+        return this_month_histories
+
+
     def from_dict(self, data):
         for field in ['id', 'user_id', 'date_uploaded']:
             if field in data:
@@ -116,6 +126,7 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     def json(self):
         return {'id': self.id,
                 'user_id': self.user_id,
+                'company_basename' : current_user.short_name,
                 # 'date_uploaded': self.date_uploaded.isoformat() + 'Z',
                 'file_name': self.file_name,
                 'file_size': self.file_size,
@@ -123,7 +134,6 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                 'upload_type' : self.upload_type,
                 'availability': self.availability,
                 # 'natural_products': self.natural_products,
-                'status_id': self.status_id
                 }
 
     def get_miliseconds(self):

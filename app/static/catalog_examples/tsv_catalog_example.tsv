@@ -1,0 +1,21 @@
+supplier_code	Price1_USD	Price5_USD	Price2_USD	Price4_USD	Price3_USD	Smiles	MDLN	Chemical_Name	CAS_RN	Link	Purity	Quantity4	Quantity5	Quantity1	Quantity2	Quantity3
+ID-a002	173	 	277	 	 	OC1COC1	MFCD09056790	oxetan-3-ol	7748-36-9	http://example.com/oxetan-3-ol.html	95			100G	250G	
+ID-a003	102		398		1193	COC1(OC)COC1		3,3-Dimethoxyoxetane	922500-97-8	http://example.com/3-3-dimethoxyoxetane.html	95			1G	5G	25G
+ID-a004	149	 	248	 	 	Cc(cc1)ccc1S(OC1COC1)(=O)=O	MFCD08544401	oxetan-3-yl 4-methylbenzene-1-sulfonate	26272-83-3	http://example.com/oxetan-3-yl-4-methylbenzene-1-sulfonate.html	95			100G	250G	
+ID-a005	235		704		2030	C=CCOC1COC1		3-(Allyloxy)oxetane	6777-00-0	http://example.com/3-allyloxy-oxetane.html	95			5G	25G	100G
+ID-a006	184		255	2295	765	O=[N+]([O-])CC1COC1		3-(Nitromethyl)oxetane	1313739-08-0	http://example.com/3-nitromethyl-oxetane.html	95	5G		0.1G	0.25G	1G
+ID-a007	226	 	376	1267	753	CC(C)(C)[S@](N=C1COC1)=O	MFCD14702522	2-methyl-N-(oxetan-3-ylidene)propane-2-sulfinamide	1158098-73-7	http://example.com/2-methyl-n-oxetan-3-ylidene-propane-2-sulfinamide.html	95	50G		5G	10G	25G
+ID-a008	149	2474	446	1484	743	O=C(C=C1COC1)OCc1ccccc1	MFCD20444447	benzyl 2-(oxetan-3-ylidene)acetate	1242160-03-7	http://example.com/benzyl-2-oxetan-3-ylidene-acetate.html	95	25G	50G	1G	5G	10G
+ID-a009	149	 	248	743	446	CCOC(C=C1COC1)=O	MFCD12755197	ethyl 2-(oxetan-3-ylidene)acetate	922500-91-2	http://example.com/ethyl-2-oxetan-3-ylidene-acetate.html	95	50G		5G	10G	25G
+ID-a010	214		357	3029	1010	O=CC=C1COC1		2-(Oxetan-3-ylidene)acetaldehyde	922500-93-4	http://example.com/2-oxetan-3-ylidene-acetaldehyde.html	95	5G		0.1G	0.25G	1G
+ID-a011	176	2667	520	1697	935	N#CC=C1COC1	MFCD14586415	2-(oxetan-3-ylidene)acetonitrile	1123787-67-6	http://example.com/2-oxetan-3-ylidene-acetonitrile.html	95	25G	50G	1G	5G	10G
+ID-a012	122		357	 	740	CC(=O)C=C1COC1		1-(Oxetan-3-ylidene)propan-2-one	1221819-47-1	http://example.com/1-oxetan-3-ylidene-propan-2-one.html	95			0.25G	1G	5G
+ID-a013	110	 	248	1237	743	O=S(C=C1COC1)(c1ccccc1)=O	MFCD16652327	3-[(benzenesulfonyl)methylidene]oxetane	1221819-46-0	http://example.com/3-benzenesulfonyl-methylidene-oxetane.html	95	10G		0.25G	1G	5G
+ID-a014	194		398	3029	1010	CCOP(=O)(C=C1COC1)OCC		Diethyl (oxetan-3-ylidenemethyl)phosphonate	1221819-45-9	http://example.com/diethyl-oxetan-3-ylidenemethyl-phosphonate.html	95	5G		0.1G	0.25G	1G
+ID-a015	130	 	376	 	624	COC(C(NC(OCc1ccccc1)=O)=C1COC1)=O	MFCD14586429	methyl 2-{[(benzyloxy)carbonyl]amino}-2-(oxetan-3-ylidene)acetate	394653-39-5	http://example.com/methyl-2-benzyloxy-carbonyl-amino-2-oxetan-3-ylidene-acetate.html	95			1G	5G	10G
+ID-a016	102		255	2550	765	O=[N+]([O-])C=C1COC1		3-(nitromethylidene)oxetane	922500-95-6	http://example.com/3-nitromethylidene-oxetane.html	95	25G		0.25G	1G	5G
+ID-a017	153	3264	255	1805	602	O=C(O)C1COC1		Oxetane-3-carboxylic acid	114012-41-8	http://example.com/oxetane-3-carboxylic-acid.html	95	5G	10G	0.1G	0.25G	1G
+ID-a018	112	3998	173	1193	398	O=C(O)CC1COC1	MFCD19442256	2-(oxetan-3-yl)acetic acid	1310381-54-4	http://example.com/2-oxetan-3-yl-acetic-acid.html	95	5G	25G	0.1G	0.25G	1G
+ID-a019	124	 	248	817	446	NC1COC1	MFCD08544363	oxetan-3-amine	21635-88-1	http://example.com/oxetan-3-amine.html	95	100G		10G	25G	50G
+ID-a020	184	 	541	2525	1683	NCC1COC1	MFCD12547197	oxetan-3-ylmethanamine	1587470	http://example.com/oxetan-3-ylmethanamine.html	95	50G		1G	5G	25G
+ID-a021	297	 	495	1237	743	CNC1COC1	MFCD08544349	N-methyloxetan-3-amine	952182-03-5	http://example.com/n-methyloxetan-3-amine.html	95	50G		5G	10G	25G

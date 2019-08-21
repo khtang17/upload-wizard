@@ -9,8 +9,8 @@ from app.data.models.company import CompanyModel
 from app.data.models.history import UploadHistoryModel
 from app.data.models.job_log import JobLogModel
 from app.data.models.status import StatusModel
-from flask_user.forms import RegisterForm, ResendConfirmEmailForm, ForgotPasswordForm, ResetPasswordForm
-
+from flask_user.forms import RegisterForm,  ResendConfirmEmailForm, ForgotPasswordForm, ResetPasswordForm
+from app.data.forms.users_form import CustomRegistrationForm
 # from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_file_to_s3, s3
 from app.helpers import *
 from app.email import notify_new_user_to_admin, send_password_reset_email, email_confirmation
@@ -65,12 +65,13 @@ def register():
         return redirect(url_for('main.welcome'))
     register_form = RegisterForm()
     if register_form.validate_on_submit():
+        if request.form['user_note']:
+            user_note = request.form['user_note']
         user = UserModel(username=register_form.username.data, email=register_form.email.data)
         user.set_password(register_form.password.data)
         user.save_to_db()
-
         email_confirmation(user)
-
+        notify_new_user_to_admin(user, user_note)
         flash('Congratulations, you are now a registered user! '
               'A confirmation email has been sent via email.', category='success')
     return render_template('flask_user/login_or_register.html', register_form=register_form, form=register_form, login_form=register_form)
@@ -88,8 +89,7 @@ def confirm(token):
     else:
         user.confirmed_at = datetime.now()
         user.save_to_db()
-        notify_new_user_to_admin(user)
-        flash('You have confirmed your account. Thanks!', 'success')
+        flash('You have confirmed your account. Thanks! Admin will send out email to you once complete reviewing your application', category='success')
     return redirect(url_for('main.welcome'))
 
 
@@ -129,6 +129,7 @@ def company():
                                    personal_contact_name=form.personal_contact_name.data,
                                    personal_contact_email=form.personal_contact_email.data,
                                    idnumber=form.idnumber.data,
+                                   smiles=form.smiles.data,
                                    cmpdname=form.cmpdname.data,
                                    cas=form.cas.data,
                                    price=form.price.data,
@@ -166,6 +167,7 @@ def company():
             company.personal_contact_name = form.personal_contact_name.data
             company.personal_contact_email = form.personal_contact_email.data
             company.idnumber = form.idnumber.data
+            company.smiles = form.smiles.data
             company.cmpdname = form.cmpdname.data
             company.cas = form.cas.data
             company.price = form.price.data
@@ -189,6 +191,7 @@ def company():
             form.personal_contact_name.data = user.company.personal_contact_name
             form.personal_contact_email.data = user.company.personal_contact_email
             form.idnumber.data = user.company.idnumber
+            form.smiles.data = user.company.smiles
             form.cmpdname.data = user.company.cmpdname
             form.cas.data = user.company.cas
             form.price.data = user.company.price

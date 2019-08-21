@@ -193,6 +193,29 @@
                     </div>
                 </div>
                 {% if config['ZINC_MODE'] %}
+                    <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <span class="m-portlet__head-icon m--hide">
+                        <i class="la la-gear"></i>
+                    </span>
+                    <h3 class="m-portlet__head-text">
+                        Catalog Info:
+                    </h3>
+                </div>
+            </div>
+
+        </div>
+{#                    <div class="form-group m-form__group row">#}
+{#                    <p class="lead">Tell us what format the catalog is in: </p>#}
+{#                    <select class="form-control" required>#}
+{#                        <option>  </option>#}
+{#                        <option>SDF</option>#}
+{#                        <option>.smi or .txt</option>#}
+{#                        <option>.csv or tsv</option>#}
+{#                         <option disabled>Excel format files(xls, xlxs)</option>#}
+{#                    </select>#}
+                    </div>
                 <div class="form-group m-form__group row">
                     <div class="col-lg-6">
                         <label>
@@ -200,16 +223,18 @@
                         </label>
                         {{ form.idnumber }}
                         <span class="m-form__help">
-                            Please enter ID NUMBER
+                            Please enter the product code header or data field from your catalog.<br>
+                            i.e. : Supplier_code, ID, Order_code
                         </span>
                     </div>
-                    <div class="col-lg-6">
+
+                 <div class="col-lg-6">
                         <label>
-                            {{ form.cmpdname.label }}
+                            {{ form.smiles.label }}
                         </label>
-                        {{ form.cmpdname }}
+                        {{ form.smiles(disabled=False) }}
                         <span class="m-form__help">
-                            Please enter Compound Name
+                            Please enter the field name for Smile column (applicable for all except SDF formatted catalog)
                         </span>
                     </div>
                 </div>
@@ -227,12 +252,25 @@
                         <label>
                             {{ form.price.label }}
                         </label>
-                        {{ form.price }}
+                        {{ form.price(disabled=False) }}
                         <span class="m-form__help">
-                            Please enter price
+                            Please enter the lowest price for the lowest amount you offer in your catalog.<br>
+                            i.e : Price_1MG, Price_1
                         </span>
                     </div>
+
                 </div>
+                     <div class="form-group m-form__group row">
+                       <div class="col-lg-6">
+                        <label>
+                            {{ form.cmpdname.label }}
+                        </label>
+                        {{ form.cmpdname }}
+                        <span class="m-form__help">
+                            Please enter Compound Name
+                        </span>
+                    </div>
+                     </div>
                 {% endif %}
             </div>
             <div class="m-portlet__foot m-portlet__no-border m-portlet__foot--fit">
@@ -254,4 +292,18 @@
     <script src="{{ url_for('static', filename='scripts/upload.js')}}" type="text/javascript"></script>
     <script src="{{ url_for('static', filename='assets/demo/default/custom/components/forms/widgets/autosize.js')}}" type="text/javascript"></script>
     <script src="{{ url_for('static', filename='assets/demo/default/custom/components/forms/validation/form-controls.js')}}" type="text/javascript"></script>
+    <script>
+{#        {{ super() }}#}
+    $(document).ready(function() {
+           $("#catalog_type").change(function(){
+               var catalog_type = $('#catalog_type').val();
+               if(catalog_type == 'bio' || catalog_type == 'np'){
+                 $('#availability_form').hide();
+               } else{
+                     $('#availability_form').show();
+                   }
+
+           }) ;
+        });
+    </script>
 {% endblock %}
