@@ -18,7 +18,7 @@ import numbers
 from app import db, create_app
 from flask import request, jsonify, Response
 
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 import json, csv
 from botocore.client import Config
@@ -26,6 +26,8 @@ import boto3
 import flask_excel as excel
 from collections import OrderedDict
 from pdb import set_trace
+from app.helpers.upload_tools import get_user_job_count
+# from app.main.catalog_jobs_routes import utc_to_local
 
 
 
@@ -104,6 +106,17 @@ def allowed_file2(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS2
 
 
+def is_duplicate_upload(form):
+    now = time.time()
+    past_uploads = UploadHistoryModel.get_all_user_id(current_user.id)
+    upload_file = form.file.data
+    for upload in past_uploads:
+        if upload_file.filename == upload.file_name:
+            return upload
+        else:
+            return None
+
+
 def validate(file, form):
     if file and allowed_file(file.filename):
         pass
@@ -136,27 +149,31 @@ def validate(file, form):
         return {"message": "Invalid file format!"}, 400
 
     try:
-        file.seek(0, os.SEEK_END)
-        file_length = file.tell()
-        file_size = size(file_length, system=alternative)
-        history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
-        history.catalog_type = form.catalog_type.data
-        if form.catalog_type.data == 'bio' or form.catalog_type.data == 'np':
-            history.availability = 'stock'
+        duplicate_upload = is_duplicate_upload(form)
+        if duplicate_upload is None:
+            file.seek(0, os.SEEK_END)
+            file_length = file.tell()
+            file_size = size(file_length, system=alternative)
+            history = UploadHistoryModel(current_user.id, secure_filename(file.filename), file_size)
+            history.catalog_type = form.catalog_type.data
+            if form.catalog_type.data == 'bio' or form.catalog_type.data == 'np':
+                history.availability = 'stock'
+            else:
+                history.availability = form.availability.data
+            history.upload_type = form.upload_type.data
+            history.save_to_db()
+            result = save_file(file, history, history.file_name, False, history.id)
+            file_info = "File Uploaded! File Size:{}. ".format(file_size)
+            if result is None:
+                history.delete_from_db()
+                return {"message": file_info}, 200
+            elif result[1] == 200:
+                return {"message": file_info + result[0]["message"]}, 200
+            else:
+                return result
         else:
-            history.availability = form.availability.data
-        history.upload_type = form.upload_type.data
-        # history.natural_products = form.natural_products.data
-        history.save_to_db()
-        result = save_file(file, history, history.file_name, False, history.id)
-        file_info = "File Uploaded! File Size:{}. ".format(file_size)
-        if result is None:
-            history.delete_from_db()
-            return {"message": file_info}, 200
-        elif result[1] == 200:
-            return {"message": file_info + result[0]["message"]}, 200
-        else:
-            return result
+            return {"message": "File {} had been uploaded before on {}".format(duplicate_upload.file_name, duplicate_upload.date_uploaded.replace(tzinfo= timezone.utc).astimezone(tz=None).strftime("%B %d %Y at %I:%M %p"))}, 500
+
     except:
         print(sys.exc_info())
         return {"message": "An error occured inserting the file."}, 500

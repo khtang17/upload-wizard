@@ -7,11 +7,31 @@
     {% if current_user.is_authenticated %}
         {% if current_user.has_role('Admin') %}
             <li class="m-menu__item" m-menu-link-redirect="1" aria-haspopup="true">
+                <a  href="{{ url_for('admin_views.upload_report') }}" class="m-menu__link">
+                        <span class="m-menu__item-here"></span>
+                        <span class="fa fa-list"></span>  &nbsp;
+                        <span class="m-menu__link-text">
+                                 Admin Report
+                        </span>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
+            </li>
+            <li class="m-menu__item" m-menu-link-redirect="1" aria-haspopup="true">
                 <a  href="/admin/" class="m-menu__link">
                         <span class="m-menu__item-here"></span>
                         <span class="fa fa-database"></span>  &nbsp;
                         <span class="m-menu__link-text">
                                  Access Database
+                        </span>
+                        <i class="m-menu__ver-arrow la la-angle-right"></i>
+                    </a>
+            </li>
+             <li class="m-menu__item" m-menu-link-redirect="1" aria-haspopup="true">
+                <a  href="{{ url_for('main.upload') }}" class="m-menu__link">
+                        <span class="m-menu__item-here"></span>
+                        <span class="fa fa-upload"></span>  &nbsp;
+                        <span class="m-menu__link-text">
+                                 Upload Catalog (Do Not Use)
                         </span>
                         <i class="m-menu__ver-arrow la la-angle-right"></i>
                     </a>

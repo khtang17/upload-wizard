@@ -79,6 +79,10 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
     def get_last_by_user_id(cls, user_id):
         return cls.query.filter_by(user_id=user_id).order_by(cls.id.desc()).first()
 
+    @classmethod
+    def get_all_user_id(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).order_by(cls.id.desc()).all()
+
     def to_dict(self):
         data = {
             'ID': self.id,
@@ -97,9 +101,9 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
         return data
 
     @classmethod
-    def get_this_month_upload(cls, this_month):
-        # this_month = datetime.today().month
-        this_month_histories = cls.query.filter(extract('month'), cls.date_uploaded == this_month).all()
+    def get_this_month_upload(cls):
+        this_month = datetime.today().month
+        this_month_histories = cls.query.filter(extract('month', cls.date_uploaded) == this_month).all()
         return this_month_histories
 
 
@@ -110,7 +114,8 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
 
     def __init__(self, user_id, file_name, file_size):
         self.user_id = user_id
-        self.file_name = "{}_{}".format(self.get_miliseconds(), file_name.replace(" ", "_"))
+        # self.file_name = "{}_{}".format(self.get_miliseconds(), file_name.replace(" ", "_"))
+        self.file_name = file_name
         self.file_size = file_size
 
     def get_status_type(self):
@@ -168,11 +173,11 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
             pass
 
     def __repr__(self):
-        return '<UploadHistory {}>'.format(self.file_name)
+        return '<UploadHistory id: {} filename : {}>'.format(self.id, self.file_name)
 
     # def get_status(self):
     #     status_msg = StatusModel.query.join()
 
     def __str__(self):
-        return self.file_name
+        return str(self.id)
 

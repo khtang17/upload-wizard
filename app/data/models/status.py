@@ -14,10 +14,14 @@ class StatusModel(db.Model):
     def __str__(self):
         return self.status
 
+    def object_as_dict(self):
+        return {c.key: getattr(obj, c.key)
+            for c in inspect(obj).mapper.column_attrs}
 
     @classmethod
     def to_dict(cls):
-        # all_statuses =self.query.all()
+        # all_statuses =cls.query.all()
+        #
         # statuses_dict = {}
         # for status in all_statuses:
         #     item = {status.status_id: status.status}
@@ -27,7 +31,7 @@ class StatusModel(db.Model):
         for status in all_statuses:
             item = {status.status_id : status.status}
             statuses_dict.update(item)
-        return statuses_dict
+        return dict(statuses_dict)
 
     @classmethod
     def get_status_by_id(cls, status_id):

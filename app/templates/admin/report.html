@@ -57,49 +57,49 @@
                              <!-- Widgets -->
                             <div class="row clearfix">
                                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                                    <div class="card text-white card-body bg-info">
+                                    <div class="card card-body" style="background: lightyellow;">
                                         <div class="row">
-                                            <div class="col-sm-3"><i class="fa fa-plus fa-5x"></i></div>
+                                            <div class="col-sm-3"><i class="fa fa-exclamation fa-5x "></i></div>
 
                                             <div class="col-sm-6 ">
-                                                <div class="text card-title">SUBMITTED</div>
-                                                <div>12</div>
+                                                <div class="text card-title">ATTENTION</div>
+                                                <div>{{ status_count['Attention'] if status_count['Attention'] else 0 }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                                    <div class="card text-white card-body bg-success">
-                                        <div class="row">
+                                    <div class="card card-body " style="background: lightcyan;">
+                                        <div class="row" >
                                             <div class="col-sm-3"><i class="fa fa-check fa-5x"></i></div>
 
                                             <div class="col-sm-6">
                                                 <div class="text card-title">COMPLETED</div>
-                                                <div>12</div>
+                                                <div>{{ status_count['Finished'] if status_count['Finished'] else 0 }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                                    <div class="card text-white card-body bg-primary">
+                                    <div class="card card-body">
                                         <div class="row">
                                             <div class="col-sm-3"><i class="fa fa-hourglass-half fa-5x"></i></div>
 
                                             <div class="col-sm-6">
                                                 <div class="text card-title">RUNNING</div>
-                                                <div>12</div>
+                                                <div>{{ status_count['Running'] if status_count['Running'] else 0 }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                  <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                                    <div class="card text-white card-body bg-danger">
+                                    <div class="card card-body" style="background: lightpink">
                                         <div class="row">
                                             <div class="col-sm-3"><i class="fa fa-times fa-5x"></i></div>
 
                                             <div class="col-sm-6">
                                                 <div class="text card-title">FAILED</div>
-                                                <div>{{ failed_history_count }}</div>
+                                                <div>{{ status_count['Failed'] if status_count['Failed'] else 0 }}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -204,18 +204,20 @@
                                     <tr style="background: lightcyan">
                                         {% elif job.status_id in (3, 6, 8) %}
                                         <tr style="background: lightpink">
+                                         {% elif job.status_id == 15 %}
+                                        <tr style="background: lightyellow">
                                         {% else %}
                                     {% endif %}
                                         <td>{{ job.id }}</td>
                                         <td>{{ moment(job.date_uploaded).format('LL')  }}</td>
                                         <td>{{ job.file_name }}</td>
                                         <td>{{ job.catalog_type }}</td>
-					{% if job.user.company  %}
-                                        <td>{{ job.user.company.name }}</td>
-					{% else %}
-					<td>None</td>
+                                        {% if job.user.company  %}
+                                            <td>{{ job.user.company.name }}</td>
+                                        {% else %}
+                                            <td>None</td>
                                         {% endif  %}
-					<td>{{ JOB_STATUS[job.status_id] }}</td>
+                                        <td>{{ JOB_STATUS[job.status_id] }}</td>
                                     </tr>
 
                                 {% endfor %}

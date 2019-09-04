@@ -22,6 +22,7 @@ from datetime import timezone
 
 from flask import Flask, request, jsonify, send_file, make_response
 # import flask_excel as excel
+from app.helpers.upload_tools import get_user_job_count
 
 def utc_to_local(utc_dt):
     local_time = utc_dt.replace(tzinfo= timezone.utc).astimezone(tz=None).strftime("%B %d %Y %I:%M %p")
@@ -124,7 +125,7 @@ def job_logs():
 
 @application.route('/upload', methods=['GET', 'POST'])
 @login_required
-@roles_required('Vendor')
+# @roles_required('Vendor')
 @register_menu(application, '.second', 'File Upload', order=2)
 def upload():
     if current_app.config['ZINC_MODE']:

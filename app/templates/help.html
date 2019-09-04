@@ -32,6 +32,7 @@
                             <li>Maximum size: 1GB. If you catalog is bigger than 1GB, please email us at chemistry4biology_at_gmail_dot_com</li>
                             <li>Supporting Formats:</li>
                                  <ul>
+                                     <li><a href= '{{ url_for('main.example', file_type = 'sdf') }}' target='_blank'>SDF files</a> - Scientific Data Format files</li>
                                      <li><a href= '{{ url_for('main.example', file_type = 'smi') }}' target='_blank'>.smi or .txt files</a> - white space separated fields (with only smiles and product codes)
                                      This is good for big catalog with no pricing</li>
                                      <li><a href='{{ url_for('main.example', file_type = 'csv') }}' target='_blank'>.csv</a> - comma separated values

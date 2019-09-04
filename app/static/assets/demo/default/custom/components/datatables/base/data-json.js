@@ -32,17 +32,23 @@ var DatatableJsonRemoteDemo= {
                 field:"CatalogType", title:"Catalog Type", width: 60 , template:function(t) {
                     var e= {
                         'bb': {
-                            title: "Building Block", state: "accent"
+                            title: "Building Block", state: "accent", icon : "leaf"
                         }
                         , 'sc': {
-                            title: "Screening Compounds", state: "info"
+                            title: "Screening Compounds", state: "info", icon : "times"
                         }
                         , 'both': {
-                            title: "Mixed", state: "focus"
+                            title: "Mixed", state: "focus", icon : "times"
+                        }
+                        , 'np': {
+                            title: "Natural Product", state: "focus", icon : "leaf"
+                        }
+                        , 'bio': {
+                            title: "Bioactives", state: "focus", icon : "times"
                         }
                     }
                     ;
-                     return'<span class="m--font-bold m--font-'+e[t.CatalogType].state+'">'+e[t.CatalogType].title+"</span>"
+                     return'<span class="m--font-bold m--font-'+e[t.CatalogType].state+'"><i class="fa fa-'+ e[t.CatalogType.icon]+' fa-5x"></i>'+e[t.CatalogType].title+"</span>"
                 }
             },
              {
@@ -99,10 +105,10 @@ var DatatableJsonRemoteDemo= {
                             title: "Loading Started", class: "m-badge--brand"
                         }
                         , 8: {
-                            title: "Loading Failed", class: "m-badge--danger"
+                            title: "Loading Completed", class: "m-badge--brand"
                         }
                         , 9: {
-                            title: "Loading Completed", class: "m-badge--brand"
+                            title: "Loading Failed", class: "m-badge--danger"
                         }
                         , 10: {
                             title: "Depletion", class: "m-badge--brand"
@@ -118,6 +124,9 @@ var DatatableJsonRemoteDemo= {
                         }
                         , 14: {
                             title: "Job Cancelled by System", class: "m-badge--danger"
+                        }
+                        , 15: {
+                            title: " Admin Attention: Pricing specified", class: "m-badge--warn"
                         }
 
                     }

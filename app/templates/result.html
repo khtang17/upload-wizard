@@ -129,7 +129,7 @@
     <script>
      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
-    (function update_status(){
+    $(function update_status(){
         var current_progress = 0;
         var interval = setInterval(function() {
             $.getJSON(
@@ -148,7 +148,7 @@
                     current_progress = 44;
                 if ($("#status").text() == "Prepare for Loading")
                     current_progress = 55;
-                if ($("#status").text() == "Loading Started")
+                if ($("#status").text() == "Loading In Progress")
                     current_progress = 66;
                  if ($("#status").text() == "Loading Completed")
                     current_progress = 77;
@@ -168,7 +168,7 @@
                 }
         );
         }, 3000);
-        })();
+        });
         {#$.getJSON(#}
         {#    $SCRIPT_ROOT+"/api/_get_current_status?history_id={{ history.id }}", // Your AJAX route here#}
         {#    function(data) {#}

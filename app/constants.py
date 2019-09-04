@@ -1,6 +1,7 @@
-from app.data.models.status import StatusModel
 
-# JOB_STATUS = StatusModel.to_dict
+
+
+
 JOB_STATUS = {
         1 : 'File Submitted',
         2 : 'Validation Started',
@@ -14,7 +15,9 @@ JOB_STATUS = {
         10 : 'Depletion',
         11 : 'Finished',
         12 : 'Awaiting System Admin',
-        13 : 'Catalog not found on ZINC'
+        13 : 'Catalog not found on ZINC',
+        14 : ' Failed to Load Catalog',
+        15 : 'Admin Attention: Pricing specified'
 }
 
 CATALOG_TYPE = {

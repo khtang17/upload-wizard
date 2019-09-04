@@ -10,6 +10,7 @@ from app.helpers.upload_tools import print_on_browser
 
 from flask_menu import Menu, register_menu
 from datetime import datetime
+from app.helpers.upload_tools import get_user_job_count
 
 
 from flask import Flask, request, jsonify, send_file, make_response
@@ -38,11 +39,12 @@ def welcome():
     if current_user.has_role("Admin"):
         return redirect(url_for('admin_views.upload_report'))
     else:
+        user_upload_count = get_user_job_count()
         latest_history = UploadHistoryModel.get_last_by_user_id(user_id=user.id)
         if latest_history:
             catalog_type = CATALOG_TYPE.get(latest_history.catalog_type)
             status = JOB_STATUS.get(latest_history.status_id)
-            return render_template('welcome.html', user=user, title='Welcome', latest_history=latest_history, catalog_type=catalog_type, status=status)
+            return render_template('welcome.html', user=user, title='Welcome', latest_history=latest_history, catalog_type=catalog_type, status=status, user_upload_count=user_upload_count)
         else:
             return render_template('welcome.html', user=user, title='Welcome')
 
