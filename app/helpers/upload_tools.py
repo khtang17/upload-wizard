@@ -10,7 +10,7 @@ from datetime import datetime
 
 # example_folder = os.path.join(app.instance_path, 'static/catalog_examples')
 
-
+ZINC_CATALOG_LIST = "/nfs/home/khtang/code/upload_wizard_codes/catalog_shortname.txt"
 def get_catalog_shortname():
     file_name = 'JOB_INFO.txt'
     try:
@@ -50,5 +50,13 @@ def get_user_job_count():
     user_job_count = len(monthly_user_upload_job)
     if user_job_count is None:
         user_job_count = 0
-    #user_job_count = UploadHistoryModel.query.filter(extract('month', UploadHistoryModel.date_uploaded) == this_month).all()
     return user_job_count
+
+def get_catalog_shortname():
+    with open(ZINC_CATALOG_LIST, 'r') as catalog_file:
+        catalogs = catalog_file.readlines()
+        catalog_file.close()
+    shortname_list = []
+    for catalog in catalogs:
+        shortname_list.append(catalog.strip('\n'))
+    return shortname_list

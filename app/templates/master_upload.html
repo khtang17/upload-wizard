@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block content %}
+    <div class="m-portlet m-portlet--mobile ">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">File Upload</h3>
+                </div>
+            </div>
+        </div>
+        <div class="m-portlet__body">
+            <div>
+                <div class="alert alert-danger" style="display: none" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">
+                            <span aria-hidden="true" >&times;</span></button><div class="text"></div></div>
+                <div class="alert alert-success" style="display: none" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close" style="right:0px">
+                    <span aria-hidden="true" >&times;</span></button><div class="text"></div><a href="/last_result">Click to see the result</a></div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="progress" style="display: none">
+                      <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+                           aria-valuemax="100" style="min-width: 2em;">
+                        0%
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if config['ZINC_MODE'] %}
+	<form action="" method="post" class="m-form__group">
+ {#                    {{ wtf.quick_form(form) }}#}
+                        {{ form.hidden_tag() }}
+                        <p><b>{{ form.file.label }}</b><br>
+                            {{ form.file }}</p>
+
+		<div class="row">
+ 		<div class="col-md-6">
+			<b>Catalog Descriptions</b> <br><br>
+                        <p>{{ form.catalog_type.label }}<br>
+                            {{ form.catalog_type }}</p>
+                        <p id="availability_form">{{ form.availability.label }}<br>
+                            {{ form.availability }}</p>
+                        <p>{{ form.upload_type.label }}<br>
+                            {{ form.upload_type }}</p>
+		</div>
+		<div class="col-md-6">
+			<b>Catalog Fields</b><br><br>
+			 <p>{{ form.id_field.label }}<br>
+                            {{ form.id_field }}</p>
+
+			 <p>{{ form.short_name.label }}<br>
+                            {{ form.short_name }}</p>
+			 <div style='position: relative;' id="suggestion_box"></div>
+
+			 <p>{{ form.price_field.label }}<br>
+                            {{ form.price_field }}</p>
+		 </div>
+            </div>
+		  <p>{{ form.submit() }}</p>
+	</form>
+            <br/>
+            <div class="m-section__content">
+                <div class="m-demo" data-code-preview="true" data-code-html="true" data-code-js="false">
+                    <div class="m-demo__preview">
+                        <p class="lead">
+                             <h5>Acceptable file formats:
+                                  {% if config['ZINC_MODE'] %}
+                                      .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi
+                                  {% else %}
+                                      .csv, .tsv, .xls, .xlsx, .xlsm
+                                  {% endif %}
+                                      </h5>
+                            <h5>Special requirements for the <strong>.TXT</strong> file:</h5>
+                            <ul>
+                                <li>
+                                    .TXT file maximum upload size limit: <span class="label label-success">1GB</span>
+                                </li>
+                                <li> File mandatory columns
+                                    <table border="1" style="margin:5px;">
+                                        <tr>
+                                            {% for format in formats %}
+                                            <td style="padding:5px;" > {{ format.title}}(type:{{ format.col_type}}) </td>
+                                            {% endfor %}
+                                        </tr>
+                                    </table>
+                                </li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <form method="post" enctype="multipart/form-data">
+                        <div class="form-group  required"><label class="control-label" for="file">Allowed Files: (.csv, .tsv, .xls, .xlsx, .xlsm)</label>
+                            <input class="form-control btn btn-outline-info" id="file" name="file" required="" type="file">
+                        </div>
+                        <input class="btn btn-success" id="submit" name="submit" type="submit" value="Upload">
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+<script>
+$(function() {
+    $.ajax({
+        url: '{{ url_for("main.get_shortname_list") }}'
+        }).done(function (data) {
+            $('#short_name').autocomplete({
+                appendTo: "#suggestion_box",
+                source: data.json_list,
+                autoFocus: true,
+                minLength: 1
+            });
+        });
+    });
+</script>
+    <script>
+        $(document).ready(function() {
+           $("#catalog_type").change(function(){
+               var catalog_type = $('#catalog_type').val();
+               if(catalog_type == 'bio' || catalog_type == 'np'){
+                 $('#availability_form').hide();
+               } else{
+                     $('#availability_form').show();
+                   }
+
+           }) ;
+        });
+        $(document).ready(function () {
+           $(function() {
+
+                var maxsize = 1024 * 1024 * 1024; // 1GB
+
+                $('form').on('submit', function(event) {
+                    event.preventDefault();
+
+                    $('#progressBar').attr('aria-valuenow', 0).css('width', '0%').text('0%');
+                    $('.progress').show();
+                    $('.alert-danger').hide();
+                    $('.alert-success').hide();
+                    $('#file').hide();
+                    $('#submit').attr('disabled', '');
+
+                    //var form_data = new FormData($('form')[0]);
+                    var form_data = new FormData($('form')[0]);
+                    $.ajax({
+                        xhr: function(){
+                            var xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener('progress', function(e){
+                               if(e.lengthComputable){
+                                   console.log('Bytes Loaded: ' + e.loaded);
+                                   console.log('Total size: ' + e.total);
+                                   console.log('Percentage uploaded: ' + (e.loaded / e.total));
+
+                                   var percent = Math.round((e.loaded / e.total) * 100);
+
+                                   $('#progressBar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
+                               }
+                            });
+                            return xhr;
+                        },
+                        type: 'POST',
+                        url: '/upload',
+                        data: form_data,
+                        contentType: false,
+                        // cache: false,
+                        processData: false,
+                        // async: false,
+                        success: function(data) {
+                            if(data[1] == 200) {
+                                $('#file').val("");
+                                $('.alert-success .text').text(data[0].message);
+                                $('.alert-success').show();
+                            }else if(data[1] == 400 || data[1] == 500){
+                                $('.progress').hide();
+                                $('.alert-danger .text').text(data[0].message);
+                                $('.alert-danger').show();
+                            }else{
+                                $('.progress').hide();
+                                {% if config['ZINC_MODE'] %}
+                                    var err_text = 'Please upload only allowed files! (.bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, ' +
+                                    '.csv, .tsv, .xls, .xlsx, .xlsm)';
+                                {% else %}
+                                    var err_text = 'Please upload only allowed files! (.csv, .tsv, .xls, .xlsx, .xlsm)';
+                                {% endif %}
+
+                                $('.alert-danger .text').text(err_text);
+                                $('.alert-danger').show();
+                            }
+                            $('#file').show();
+                            $('#submit').removeAttr("disabled");
+                        },error: function(jqXHR, status, err){
+                            $('.alert-danger .text').text(err.toLowerCase()+'!');
+                            $('.alert-danger').show();
+                            $('#file').show();
+                            $('#submit').removeAttr("disabled");
+                        }
+                    });
+                });
+
+                $('#file').change(function() {
+
+                    $('#message').empty();
+
+                    var file = this.files[0];
+                    var val = $(this).val().toLowerCase(),
+                        {% if config['ZINC_MODE'] %}
+                            regex = new RegExp("(.*?)\.(bz2|7z|tar|gz|zip|sdf|txt|smi|csv|xls|xlsx|xlsm|tsv)$");
+                        {% else %}
+                            regex = new RegExp("(.*?)\.(csv|xls|xlsx|xlsm|tsv)$");
+                        {% endif %}
+
+
+                    if (!(regex.test(val))) {
+                        $(this).val('');
+                        $('.progress').hide();
+                        {% if config['ZINC_MODE'] %}
+                            var err_text = 'Invalid file format. Allowed formats: ' +
+                                ' .bz2, .7z, .tar, .gz, .zip, .sdf, .txt, .smi, ' +
+                                '.csv, .tsv, .xls, .xlsx, .xlsm';
+                        {% else %}
+                             var err_text = 'Invalid file format. Allowed formats: ' +
+                            '.csv, .tsv, .xls, .xlsx, .xlsm';
+                        {% endif %}
+
+                        $('.alert-danger .text').text(err_text);
+                        $('.alert-danger').show();
+                        $('#submit').attr('disabled', '');
+                        return false;
+                    }
+
+                    if ( file.size > maxsize )
+                    {
+                        $('.progress').hide();
+                        $('.alert-danger .text').text('The size of image you are attempting to upload is ' +
+                            (file.size/1024).toFixed(2) + ' GB, maximum size allowed is ' + (maxsize/1024).toFixed(2));
+                        $('.alert-danger').show();
+                        $('#submit').attr('disabled', '');
+                        return false;
+                    }
+
+                    $('#submit').removeAttr("disabled");
+
+
+                });
+            });
+       });
+    </script>
+{% endblock %}

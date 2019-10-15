@@ -3,7 +3,7 @@ from flask_user import current_user, roles_required, user_confirmed_email, login
 from app.constants import *
 
 from app.data.models.format import FileFormatModel
-from app.data.forms.upload_form import UploadForm
+from app.data.forms.upload_form import UploadForm, MasterUploadForm
 from app.data.forms.company_form import CompanyForm
 from app.data.models.user import UserModel
 from app.data.models.company import CompanyModel
@@ -17,12 +17,13 @@ from app.helpers.validation import validate, excel_validation, s3
 from app.email import notify_new_user_to_admin, send_password_reset_email, email_confirmation
 from app.main import application
 
+
 from flask_menu import Menu, register_menu
 from datetime import timezone
 
 from flask import Flask, request, jsonify, send_file, make_response
 # import flask_excel as excel
-from app.helpers.upload_tools import get_user_job_count
+from app.helpers.upload_tools import get_user_job_count, get_catalog_shortname
 
 def utc_to_local(utc_dt):
     local_time = utc_dt.replace(tzinfo= timezone.utc).astimezone(tz=None).strftime("%B %d %Y %I:%M %p")
@@ -63,7 +64,6 @@ def get_status_update():
     history_id = request.args.get('history_id', type=int)
     history = UploadHistoryModel.query.filter_by(id=history_id)
     status = StatusModel.query.filter_by(status_id = history.status_id)
-    print(status)
     return jsonify({'status_id': status})
 
 
@@ -131,7 +131,7 @@ def upload():
     if current_app.config['ZINC_MODE']:
         form = UploadForm()
         formats = FileFormatModel.find_all()
-        if not current_user.company:
+        if not current_user.company and not current_user.has_role('Admin'):
             flash('Please enter information in Company Profile tab above!', category='warning')
             return render_template('upload.html', title='Upload File', form=form, formats=formats)
         else:
@@ -147,6 +147,37 @@ def upload():
             return jsonify(excel_validation(request))
         return render_template('upload.html', title='Upload File')
 
+@application.route('/master_upload', methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+#@register_menu(application, '.second', 'File Upload', order=2)
+def master_upload():
+    if current_app.config['ZINC_MODE']:
+        form = MasterUploadForm()
+        formats = FileFormatModel.find_all()
+        if not current_user.company and not current_user.has_role('Admin'):
+            flash('Please enter information in Company Profile tab above!', category='warning')
+            return render_template('master_upload.html', title='Upload File', form=form, formats=formats)
+        else:
+            if request.method == 'POST' and form.validate_on_submit():
+                return_msg = validate(form.file.data, form)
+                return jsonify(return_msg)
+            # else:
+            #     # return_msg = validate(form)
+            #     return jsonify(return_msg)
+            return render_template('master_upload.html', title='Upload File', form=form, formats=formats)
+    else:
+        if request.method == 'POST':
+            return jsonify(excel_validation(request))
+        return render_template('master_upload.html', title='Upload File')
+
+@application.route('/get_shortname_list', methods=['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def get_shortname_list():
+    shortname_list = get_catalog_shortname()
+    short_name = request.args.get('short_name')
+    return jsonify(json_list=sorted(shortname_list))
 
 @application.route('/histories', methods=['GET', 'POST'])
 @login_required

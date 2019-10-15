@@ -212,10 +212,10 @@
                                         <td>{{ moment(job.date_uploaded).format('LL')  }}</td>
                                         <td>{{ job.file_name }}</td>
                                         <td>{{ job.catalog_type }}</td>
-                                        {% if job.user.company  %}
-                                            <td>{{ job.user.company.name }}</td>
+                                        {% if job.user.short_name  %}
+                                            <td>{{ job.user.short_name }}</td>
                                         {% else %}
-                                            <td>None</td>
+                                            <td>Admin upload</td>
                                         {% endif  %}
                                         <td>{{ JOB_STATUS[job.status_id] }}</td>
                                     </tr>

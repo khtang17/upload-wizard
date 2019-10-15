@@ -182,6 +182,7 @@ def validate(file, form):
 
 
 
+
 def write_json_file(history, folder):
     job_info = history.json()
     # job_info.update({'company_basename': current_user.short_name})
@@ -227,17 +228,22 @@ def process_delimited_file(delimited_file, job_folder, history):
     except IOError:
         history.delete_from_db()
         remove_job_folder(history.id)
-        return {"message": "1: " + str(sys.exc_info()[0])}, 500
+        # return {"message": "2: " + str(sys.exc_info()[0])}, 500
 
     update_status_cmd = current_app.config['SCRIPT_DIR'] + "/update_zincload_status.pl" + " 4" + " " + job_folder
     os.system(update_status_cmd)
-    return {"message": "Your job has been successfully validated!"}, 200
+    # return {"message": "Your job has been successfully validated!"}, 200
 
 
+def admin_save_file(file, object, filename, id=""):
+    try:
+        if filename.endswith('.txt'):
+            filename = filename.replace("txt", "smi")
+        admin_folder = str(current_user.id) + "_" + current_user.username
 
-
-
-
+    except:
+        pass
+    pass
 
 def save_file(file, object, name, is_logo, id=""):
     try:
@@ -268,16 +274,22 @@ def save_file(file, object, name, is_logo, id=""):
         # print(os.path.join(file_dir, secure_filename(name)))
         print("Saving file to directory")
         file.save(os.path.join(file_dir, secure_filename(name)))
-        if name.endswith(".csv") or name.endswith(".tsv"):
-                print("delimited format catalog")
-                process_delimited_file(name, file_dir, object)
-                print("Saving json file")
-                write_json_file(object, file_dir)
-                return {"message": "Your job has been submitted!"}, 200
-        print("Saving json file")
-        write_json_file(object, file_dir)
+        try:
+            if name.endswith(".csv") or name.endswith(".tsv"):
+                    print("delimited format catalog")
+                    process_delimited_file(name, file_dir, object)
+                    print("Saving json file")
+                    write_json_file(object, file_dir)
+                    return {"message": "Your job has been submitted!"}, 200
+            print("Saving json file")
+            write_json_file(object, file_dir)
+        except:
+
+            return {"message": "4: " + str(sys.exc_info()[0])}, 500
     except:
-        return {"message": "1: " + str(sys.exc_info()[0])}, 500
+        object.delete_from_db()
+        remove_job_folder(object.status_id)
+        return {"message": "3: " + str(sys.exc_info()[0])}, 500
 
     if is_logo:
         return name
