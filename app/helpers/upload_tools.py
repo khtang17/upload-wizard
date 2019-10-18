@@ -5,6 +5,7 @@ from flask_login import current_user
 from sqlalchemy import extract
 from app.data.models.history import UploadHistoryModel
 import codecs
+import logging
 from datetime import datetime
 
 
@@ -16,19 +17,19 @@ def get_catalog_shortname():
     try:
         with open(file_name, 'r') as fh:
             job_info = json.load(fh)
-    except IOError:
-        pass
-    company_basename = job_info['company_basename']
-    catalog_type = job_info['catalog_type']
-    availability = job_info['availability']
+    except IOError as e:
+        logging.error("Unable to open {0}:  ".format(file_name) + e)
+    short_name = job_info['short_name']
+    # catalog_type = job_info['catalog_type']
+    # availability = job_info['availability']
 
-    short_name = ''
-    if catalog_type == 'both' or catalog_type == 'sc':
-        short_name = company_basename
-    else:
-        short_name = company_basename + catalog_type
-    if availability == 'demand':
-        short_name = short_name + '-v'
+    # short_name = ''
+    # if catalog_type == 'both' or catalog_type == 'sc':
+    #     short_name = company_basename
+    # else:
+    #     short_name = company_basename + catalog_type
+    # if availability == 'demand':
+    #     short_name = short_name + '-v'
     return short_name
 
 
@@ -52,7 +53,7 @@ def get_user_job_count():
         user_job_count = 0
     return user_job_count
 
-def get_catalog_shortname():
+def get_shortname_list():
     with open(ZINC_CATALOG_LIST, 'r') as catalog_file:
         catalogs = catalog_file.readlines()
         catalog_file.close()

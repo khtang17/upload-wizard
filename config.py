@@ -1,13 +1,13 @@
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv()
 
 
 class Config(object):
-    SECRET_KEY = os.getenv("SECRET_KEY") or 'secret'
-    SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT")
+    SECRET_KEY = os.getenv("SECRET_KEY") or 'Nuut9tu1huur'
+    SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT") or 'davsalsanNuut9ug'
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     LISTS_PER_PAGE = 20
@@ -30,8 +30,8 @@ class Config(object):
     FILE_VALIDATION_LIMIT = 500000
 
     # Flask-Mail SMTP account settings
-    MAIL_USERNAME = os.getenv("EMAIL") or 'your_email'
-    MAIL_PASSWORD = os.getenv("EMAIL_PASSWORD") or 'your_email_password'
+    MAIL_USERNAME = os.getenv("EMAIL") or 'upload.vendor@gmail.com'
+    MAIL_PASSWORD = os.getenv("EMAIL_PASSWORD") or 'vendortest1'
     MAIL_DEFAULT_SENDER = os.getenv("EMAIL") or 'your_email'
 
     # Flask-User settings
@@ -45,11 +45,12 @@ class Config(object):
     USER_ENABLE_FORGOT_PASSWORD = True
     USER_AFTER_LOGIN_ENDPOINT = 'main.index'
     USER_EMAIL_SENDER_NAME = USER_APP_NAME
-    USER_EMAIL_SENDER_EMAIL = os.getenv("EMAIL")
+    USER_EMAIL_SENDER_EMAIL = os.getenv("EMAIL") or 'upload.vendor@gmail.com'
 
     CSRF_ENABLED = True
 
-    SCRIPT_SOURCE = os.getenv("SCRIPT_SOURCE")
+    SCRIPT_SOURCE = os.getenv("SCRIPT_SOURCE") or '/nfs/home/teague/.virtualenvs/zinc/env.csh'
+
 
 
     S3_BUCKET = os.getenv("S3_BUCKET") or 'S3_BUCKET'
@@ -57,7 +58,7 @@ class Config(object):
     S3_SECRET = os.getenv("S3_SECRET") or 'S3_SECRET'
     S3_LOCATION = os.getenv("S3_LOCATION") or 'S3_LOCATION'
 
-    SCRIPT_DIR = os.getenv("SCRIPT_DIR")
+    SCRIPT_DIR = os.getenv("SCRIPT_DIR") or '/nfs/home/khtang/code/upload_wizard_codes/'
     STATIC_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app/static')
 
 class DevConfig(Config):
@@ -77,7 +78,7 @@ class ProdConfig(Config):
     DEBUG = True
     # SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI_AWS") or 'your_db_URI'
     AWS_REGION = 'us-east-1'
-    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI_GIMEL")
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI_GIMEL") or 'postgresql+psycopg2://uploadwrite:@mem.cluster.ucsf.bkslab.org:5432/uploaddb'
     SQLALCHEMY_POOL_SIZE = 20
     SQLALCHEMY_MAX_OVERFLOW = 5
     SQLALCHEMY_POOL_TIMEOUT = 10
@@ -86,7 +87,7 @@ class ProdConfig(Config):
 
     LOGO_UPLOAD_FOLDER_URL = 'http://files.docking.org/vendorlogos/'
 
-    SCRIPT_DIR = os.getenv("SCRIPT_DIR")
+    SCRIPT_DIR = os.getenv("SCRIPT_DIR") or '/nfs/home/khtang/code/upload_wizard_codes/'
     # SCRIPT_DIR = '/nfs/home/khtang/work/Projects/upload-wizard/app/scripts/'
 
 config = {

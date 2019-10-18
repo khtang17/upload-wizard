@@ -8,6 +8,9 @@ from flask import url_for, jsonify
 from sqlalchemy import extract
 
 
+
+
+
 class PaginatedAPIMixin(object):
     @staticmethod
     def to_collection_dict(query, page, per_page, *endpoint, **kwargs):
@@ -75,6 +78,19 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
                               lazy='dynamic')
 
 
+    def create_shortname(self):
+        basename = current_user.short_name
+        # catalog type
+        if self.catalog_type == 'sc' or self.catalog_type == 'mixed':
+            shortname = basename
+        else:
+            shortname = basename + self.catalog_type
+        # availability
+        if self.upload_type == 'demand':
+            shortname += '-v'
+        return shortname
+
+
     @classmethod
     def get_last_by_user_id(cls, user_id):
         return cls.query.filter_by(user_id=user_id).order_by(cls.id.desc()).first()
@@ -129,9 +145,11 @@ class UploadHistoryModel(PaginatedAPIMixin, db.Model):
         db.session.commit()
 
     def json(self):
+        shortname = self.create_shortname()
         return {'id': self.id,
                 'user_id': self.user_id,
                 'company_basename' : current_user.short_name,
+                'short_name' : shortname,
                 # 'date_uploaded': self.date_uploaded.isoformat() + 'Z',
                 'file_name': self.file_name,
                 'file_size': self.file_size,

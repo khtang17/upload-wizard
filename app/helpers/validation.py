@@ -185,15 +185,28 @@ def validate(file, form):
 
 def write_json_file(history, folder):
     job_info = history.json()
+    shortname = job_info['short_name']
     # job_info.update({'company_basename': current_user.short_name})
     price_tag = history.user.company.price
-    print(price_tag)
     if price_tag:
-        job_info.update({'price_tag': price_tag})
+        if shortname.endswith('-v'):
+            shortname = shortname.strip('-v')
+            econ = shortname + "e-v"
+            std = shortname + '-v'
+            prem = shortname + 'p-v'
+        else:
+            econ = shortname +'e'
+            std = shortname
+            prem = shortname + 'p'
+        shortname_list = [ econ, std, prem ]
+        job_info.update({'short_name': shortname_list})
+        job_info.update({'price_tag' : price_tag})
+    print(job_info)
     file_path = os.path.join(folder, 'JOB_INFO.json')
     with open(file_path, 'w') as fh:
         json.dump(job_info, fh, indent=4)
         fh.close()
+
 
 def check_img_type(file):
     if file.mimetype.startswith('image/jpeg') or file.mimetype.startswith('image/png'):
@@ -284,8 +297,10 @@ def save_file(file, object, name, is_logo, id=""):
             print("Saving json file")
             write_json_file(object, file_dir)
         except:
-
+            object.delete_from_db()
+            remove_job_folder(object.status_id)
             return {"message": "4: " + str(sys.exc_info()[0])}, 500
+
     except:
         object.delete_from_db()
         remove_job_folder(object.status_id)

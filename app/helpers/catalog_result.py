@@ -1,6 +1,7 @@
 from flask import current_app, jsonify
 import os, sys
 import shlex
+import logging
 import subprocess
 from flask_user import current_user
 from app.helpers.upload_tools import get_catalog_shortname
@@ -46,7 +47,13 @@ def get_results(history_id):
     user_folder = str(current_user.id) + "_" +current_user.short_name+"/"+str(history_id)
     folder = os.path.join(current_app.config["UPLOAD_FOLDER"], user_folder)
     os.chdir(folder)
-    short_name = get_catalog_shortname()
+    file_shortname = get_catalog_shortname()
+    if isinstance(file_shortname, list):
+        logging.info("Short name is a list")
+        short_name = file_shortname[1] # get the middle shortname
+    elif isinstance(file_shortname, string):
+        logging.info("Short name is a string")
+        short_name = file_shortname
     load_result = folder +"/" + short_name +"/" + "RESULTS.txt"
 
     with open(load_result, 'r') as fh:
