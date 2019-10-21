@@ -162,6 +162,27 @@ def validate(file, form):
                 history.availability = form.availability.data
             history.upload_type = form.upload_type.data
             history.save_to_db()
+            if current_user.has_role['Admin']:
+                print("Saving additional information specified by admin ... ")
+                info_dict = {}
+                short_name = form.short_name.data
+                if form.price_fiel.data:
+                    if form.availability.data == 'demand':
+                        short_name = short_name.split('-')[0]
+                        econ = short_name + "e-v"
+                        std = short_name + "-v"
+                        prem = short_name +"p-v"
+                    else:
+                        econ = short_name + "e"
+                        std = short_name
+                        prem = short_name + "p"
+                    shortname_list = [ econ, std, prem ]
+                    info_dict.update({'short_name' : shortname_list})
+                else:
+                    info_dict.update({'short_name' : short_name})
+                info_dict.update({''})
+
+
             result = save_file(file, history, history.file_name, False, history.id)
             file_info = "File Uploaded! File Size:{}. ".format(file_size)
             if result is None:
@@ -248,15 +269,23 @@ def process_delimited_file(delimited_file, job_folder, history):
     # return {"message": "Your job has been successfully validated!"}, 200
 
 
-def admin_save_file(file, object, filename, id=""):
-    try:
-        if filename.endswith('.txt'):
-            filename = filename.replace("txt", "smi")
-        admin_folder = str(current_user.id) + "_" + current_user.username
-
-    except:
-        pass
-    pass
+# def admin_save_file(file, object, name, filename, id=""):
+#     try:
+#         if filename.endswith('.txt'):
+#             filename = filename.replace("txt", "smi")
+#         admin_folder = str(current_user.id) + "_" + current_user.username
+#         folder= current_app.config['UPLOAD_FOLDER'] + admin_folder
+#         file_dir = os.path.realpath(os.path.dirname(folder))
+#         pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
+#         file.stream.seek(0)
+#         print("Saving admin upload file to directory")
+#         file.save(os.path.join(file_dir, secure_filename(name)))
+#         try:
+#             if name.endswit
+#
+#     except:
+#         pass
+#     pass
 
 def save_file(file, object, name, is_logo, id=""):
     try:
@@ -273,10 +302,13 @@ def save_file(file, object, name, is_logo, id=""):
             if name.endswith(".smi"):
                 print("Smi format catalog")
             user_folder = str(current_user.id) + "_"
-            if current_user.short_name:
+            if current_user.short_name and current_user.has_role("Vendor"):
                 user_folder += current_user.short_name
             else:
                 user_folder += "vendor"
+            if  current_user.has_role("Admin"):
+                user_folder += current_user.username
+
             user_folder += "/" + str(id) + "/"
             folder = current_app.config['UPLOAD_FOLDER'] + user_folder
         file_dir = os.path.realpath(os.path.dirname(folder))

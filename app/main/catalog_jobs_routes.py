@@ -156,7 +156,7 @@ def master_upload():
         form = MasterUploadForm()
         formats = FileFormatModel.find_all()
         if not current_user.company and not current_user.has_role('Admin'):
-            flash('Please enter information in Company Profile tab above!', category='warning')
+            flash('Permission denied', category='warning')
             return render_template('master_upload.html', title='Upload File', form=form, formats=formats)
         else:
             if request.method == 'POST' and form.validate_on_submit():
