@@ -11,9 +11,9 @@ var FormControls= {
                 , address: {
                     required: !0
                 }
-                , telephone_number: {
-                    required: !0, phoneUS: !0
-                }
+                // , telephone_number: {
+                //     required: !0, phoneUS: !0
+                // }
             }
             , invalidHandler:function(e, r) {
                 var i=$("#m_form_company_msg");

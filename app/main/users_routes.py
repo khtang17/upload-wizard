@@ -33,11 +33,13 @@ def reset_password_request():
     form = ForgotPasswordForm()
     if form.validate_on_submit():
         user = UserModel.query.filter_by(email=form.email.data).first()
+        print(user)
         if user:
             send_password_reset_email(user)
             flash('Check your email for the instructions to reset your password', category='success')
         else:
             flash('Your email not registered in our system', category='danger')
+            return redirect(url_for('main.register'))
         return redirect(url_for('user.login'))
     return render_template('reset_password.html',
                            title='Reset Password', form=form)

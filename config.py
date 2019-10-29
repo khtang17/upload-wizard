@@ -59,7 +59,7 @@ class Config(object):
     S3_LOCATION = os.getenv("S3_LOCATION") or 'S3_LOCATION'
 
     SCRIPT_DIR = os.getenv("SCRIPT_DIR") or '/nfs/home/khtang/code/upload_wizard_codes/'
-    STATIC_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app/static')
+    STATIC_FOLDER = 'app/static/'
 
 class DevConfig(Config):
     DEBUG = True
