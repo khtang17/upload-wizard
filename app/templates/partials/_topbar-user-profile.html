@@ -28,7 +28,7 @@
 					</div>
 					<div class="m-card-user__details">
 						<span class="m-card-user__name m--font-weight-500">
-							{{ current_user.username }}
+							Greetings, {{ current_user.username }}!
 						</span>
 						<div class="m-card-user__email m--font-weight-300">
 							{{ current_user.email }}
@@ -43,6 +43,15 @@
 							<span class="m-nav__section-text">
 								Section
 							</span>
+						</li>
+
+						<li class="m-nav__item">
+							<a href="#" class="m-nav__link">
+								<i class="m-nav__link-icon flaticon-profile"></i>
+								<span class="m-nav__link-text">
+									My Profile
+								</span>
+							</a>
 						</li>
 						<li class="m-nav__item">
 							<a href="/company" class="m-nav__link">
@@ -61,15 +70,8 @@
 								</span>
 							</a>
 						</li>
-						<li class="m-nav__separator m-nav__separator--fit"></li>
-{#						<li class="m-nav__item">#}
-{#							<a href="?page=profile" class="m-nav__link">#}
-{#								<i class="m-nav__link-icon flaticon-info"></i>#}
-{#								<span class="m-nav__link-text">#}
-{#									FAQ#}
-{#								</span>#}
-{#							</a>#}
-{#						</li>#}
+
+                        <li class="m-nav__separator m-nav__separator--fit"></li>
 {#						<li class="m-nav__item">#}
 {#							<a href="?page=profile" class="m-nav__link">#}
 {#								<i class="m-nav__link-icon flaticon-lifebuoy"></i>#}

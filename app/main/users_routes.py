@@ -11,7 +11,7 @@ from app.data.models.job_log import JobLogModel
 from app.data.models.status import StatusModel
 from flask_user.forms import RegisterForm,  ResendConfirmEmailForm, ForgotPasswordForm, ResetPasswordForm
 from app.data.forms.users_form import CustomRegistrationForm
-# from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_file_to_s3, s3
+from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_file_to_s3, s3
 from app.helpers import *
 from app.email import notify_new_user_to_admin, send_password_reset_email, email_confirmation
 from app.main import application
@@ -37,11 +37,12 @@ def reset_password_request():
         if user:
             send_password_reset_email(user)
             flash('Check your email for the instructions to reset your password', category='success')
+            return redirect(url_for('user.login'))
         else:
             flash('Your email not registered in our system', category='danger')
             return redirect(url_for('main.register'))
-        return redirect(url_for('user.login'))
-    return render_template('reset_password.html',
+
+    return render_template('flask_user/reset_password.html',
                            title='Reset Password', form=form)
 
 
@@ -50,8 +51,8 @@ def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('user.login'))
     user = UserModel.verify_reset_password_token(token)
-    if not user:
-        return redirect(url_for('user.login'))
+    # if not user:
+    #     return redirect(url_for('user.login'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.new_password.data)
@@ -153,7 +154,7 @@ def company():
             if form.file.data:
                 if check_img_type(form.file.data):
                     if current_app.config["ZINC_MODE"]:
-                        company.logo = save_file(form.file.data, "{}_{}".format(current_user.id, form.name.data), True)
+                        company.logo = save_file(form.file.data, company, "{}_{}".format(current_user.id, form.name.data), True)
                     else:
                         company.logo = upload_file_to_s3(form.file.data, form.name.data, "company-logos")
                 else:

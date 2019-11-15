@@ -6,9 +6,9 @@
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         {% if current_user.has_role('Vendor') %}
-                            {% if user.company %}
-                                <h3 class="m-portlet__head-text">Hello, {{ user.username }}</h3>
-                            {% endif %}
+{#                            {% if user.company %}#}
+                            <h3 class="m-portlet__head-text">Welcome {{ user.username }}!</h3>
+{#                            {% endif %}#}
                         {% endif %}
                     </div>
                 </div>

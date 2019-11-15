@@ -22,13 +22,23 @@ from app import db
 # @user_confirmed_email.connect_via(application)
 # def _after_confirmed_hook(sender, user, **extra):
 #     notify_new_user_to_admin(user)
+
 @application.route('/')
 @application.route('/home')
 def home():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+    if current_app.config['MODE'] == 'construction':
+        return redirect(url_for('main.be_back_soon'))
     else:
-        return render_template('home.html', title='Home Page')
+        if current_user.is_authenticated:
+            return redirect(url_for('main.index'))
+        else:
+            return render_template('home.html', title='Home Page')
+
+@application.route('/')
+@application.route('/be-back-soon')
+def be_back_soon():
+    return render_template('be_back_soon.html', title='Under Construction')
+
 
 
 @application.route('/welcome')

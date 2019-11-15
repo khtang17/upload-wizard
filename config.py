@@ -6,6 +6,7 @@ load_dotenv()
 
 
 class Config(object):
+    MODE = "development"
     SECRET_KEY = os.getenv("SECRET_KEY") or 'Nuut9tu1huur'
     SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT") or 'davsalsanNuut9ug'
 
