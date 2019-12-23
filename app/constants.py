@@ -1,5 +1,14 @@
 
+## Purchasable dictionary ###
 
+
+PURCHASABLE = {
+                50 : "Premier",
+                40 : "In Stock",
+                30 : "Ask vendors",
+                20 : "On Demand",
+                10 : "Boutique"
+            }
 
 
 JOB_STATUS = {

@@ -1,4 +1,4 @@
-import os, shutil
+import os, shutil, logging, sys, traceback
 from flask import current_app
 from hurry.filesize import size, alternative
 from app.data.models.format import FileFormatModel
@@ -15,6 +15,7 @@ import pathlib
 import sys
 import subprocess
 import numbers
+import pdb
 from app import db, create_app
 from flask import request, jsonify, Response
 
@@ -162,25 +163,25 @@ def validate(file, form):
                 history.availability = form.availability.data
             history.upload_type = form.upload_type.data
             history.save_to_db()
-            if current_user.has_role['Admin']:
-                print("Saving additional information specified by admin ... ")
-                info_dict = {}
-                short_name = form.short_name.data
-                if form.price_fiel.data:
-                    if form.availability.data == 'demand':
-                        short_name = short_name.split('-')[0]
-                        econ = short_name + "e-v"
-                        std = short_name + "-v"
-                        prem = short_name +"p-v"
-                    else:
-                        econ = short_name + "e"
-                        std = short_name
-                        prem = short_name + "p"
-                    shortname_list = [ econ, std, prem ]
-                    info_dict.update({'short_name' : shortname_list})
-                else:
-                    info_dict.update({'short_name' : short_name})
-                info_dict.update({''})
+            # if current_user.has_role['Admin']:
+            #     print("Saving additional information specified by admin ... ")
+            #     info_dict = {}
+            #     short_name = form.short_name.data
+            #     if form.price_fiel.data:
+            #         if form.availability.data == 'demand':
+            #             short_name = short_name.split('-')[0]
+            #             econ = short_name + "e-v"
+            #             std = short_name + "-v"
+            #             prem = short_name +"p-v"
+            #         else:
+            #             econ = short_name + "e"
+            #             std = short_name
+            #             prem = short_name + "p"
+            #         shortname_list = [ econ, std, prem ]
+            #         info_dict.update({'short_name' : shortname_list})
+            #     else:
+            #         info_dict.update({'short_name' : short_name})
+            #     info_dict.update({''})
 
 
             result = save_file(file, history, history.file_name, False, history.id)
@@ -287,6 +288,18 @@ def process_delimited_file(delimited_file, job_folder, history):
 #         pass
 #     pass
 
+
+def save_logo(file):
+    try:
+        logo_folder = current_app.config['LOGO_UPLOAD_FOLDER']
+        name = file.filename
+        name = name.replace(" " , "_")
+        file.save(os.path.join(logo_folder, secure_filename(name)))
+        return name
+    except:
+        traceback.print_exc(file=sys.stdout)
+
+
 def save_file(file, object, name, is_logo, id=""):
     try:
         if is_logo:
@@ -317,7 +330,7 @@ def save_file(file, object, name, is_logo, id=""):
         # print(name)
         # print(secure_filename(name))
         # print(os.path.join(file_dir, secure_filename(name)))
-        print("Saving file to directory")
+        logging.info("Saving file to directory")
         file.save(os.path.join(file_dir, secure_filename(name)))
         try:
             if name.endswith(".csv") or name.endswith(".tsv"):
@@ -326,7 +339,7 @@ def save_file(file, object, name, is_logo, id=""):
                     print("Saving json file")
                     write_json_file(object, file_dir)
                     return {"message": "Your job has been submitted!"}, 200
-            print("Saving json file")
+            logging.info("Saving json file")
             write_json_file(object, file_dir)
         except:
             object.delete_from_db()

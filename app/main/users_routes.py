@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, current_app, app, request, Response
 from flask_user import current_user, roles_required, user_confirmed_email, login_required
-
+import traceback, sys
 from app.data.models.format import FileFormatModel
 from app.data.forms.upload_form import UploadForm
 from app.data.forms.company_form import CompanyForm
@@ -11,7 +11,7 @@ from app.data.models.job_log import JobLogModel
 from app.data.models.status import StatusModel
 from flask_user.forms import RegisterForm,  ResendConfirmEmailForm, ForgotPasswordForm, ResetPasswordForm
 from app.data.forms.users_form import CustomRegistrationForm
-from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_file_to_s3, s3
+from app.helpers.validation import validate, check_img_type, save_file, excel_validation, upload_file_to_s3, s3, save_logo
 from app.helpers import *
 from app.email import notify_new_user_to_admin, send_password_reset_email, email_confirmation
 from app.main import application
@@ -21,7 +21,7 @@ from datetime import datetime
 
 from flask import Flask, request, jsonify, send_file, make_response
 # import flask_excel as excel
-
+import pdb
 from app import db
 
 
@@ -31,19 +31,18 @@ def reset_password_request():
         return redirect(url_for('main.welcome'))
     # form = ResetPasswordRequestForm()
     form = ForgotPasswordForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and request.method == 'POST':
         user = UserModel.query.filter_by(email=form.email.data).first()
         print(user)
         if user:
             send_password_reset_email(user)
             flash('Check your email for the instructions to reset your password', category='success')
             return redirect(url_for('user.login'))
-        else:
-            flash('Your email not registered in our system', category='danger')
-            return redirect(url_for('main.register'))
+    else:
+        print("user not found")
+        flash('Your email not registered in our system. Please sign up.', category='danger')
+        return redirect(url_for('user.register'))
 
-    return render_template('flask_user/reset_password.html',
-                           title='Reset Password', form=form)
 
 
 @application.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -121,31 +120,34 @@ def company():
         if not form.id.data:
             if company_name_duplication:
                 return jsonify({"message": "This company has already registered by other user"}, 400)
-            company = CompanyModel(name=form.name.data,
-                                   description=form.description.data,
-                                   address=form.address.data,
-                                   telephone_number=form.telephone_number.data,
-                                   toll_free_number=form.toll_free_number.data,
-                                   fax_number=form.fax_number.data,
-                                   website=form.website.data,
-                                   sales_email=form.sales_email.data,
-                                   personal_contact_name=form.personal_contact_name.data,
-                                   personal_contact_email=form.personal_contact_email.data,
-                                   idnumber=form.idnumber.data,
-                                   smiles=form.smiles.data,
-                                   cmpdname=form.cmpdname.data,
-                                   cas=form.cas.data,
-                                   price=form.price.data,
-                                   job_notify_email=form.job_notify_email.data)
-            if form.file.data:
-                if check_img_type(form.file.data):
-                    company.logo = save_file(form.file.data, form.name.data, True)
-                else:
-                    return False
-            company.save_to_db()
-            user = UserModel.find_by_email(current_user.email)
-            user.company_id = company.id
-            user.save_to_db()
+            try:
+                company = CompanyModel(name=form.name.data,
+                                       description=form.description.data,
+                                       address=form.address.data,
+                                       telephone_number=form.telephone_number.data,
+                                       toll_free_number=form.toll_free_number.data,
+                                       fax_number=form.fax_number.data,
+                                       website=form.website.data,
+                                       sales_email=form.sales_email.data,
+                                       personal_contact_name=form.personal_contact_name.data,
+                                       personal_contact_email=form.personal_contact_email.data,
+                                       idnumber=form.idnumber.data,
+                                       smiles=form.smiles.data,
+                                       cmpdname=form.cmpdname.data,
+                                       cas=form.cas.data,
+                                       price=form.price.data,
+                                       job_notify_email=form.job_notify_email.data)
+                if form.file.data:
+                    if check_img_type(form.file.data):
+                        company.logo = save_logo(form.file.data)
+                    else:
+                        return False
+                company.save_to_db()
+                user = UserModel.find_by_email(current_user.email)
+                user.company_id = company.id
+                user.save_to_db()
+            except:
+                traceback.print_exc(file=sys.stdout)
         else:
             if company_name_duplication and company_name_duplication.id != int(form.id.data):
                 return jsonify({"message": "This company has already registered by other user"}, 400)
@@ -154,7 +156,7 @@ def company():
             if form.file.data:
                 if check_img_type(form.file.data):
                     if current_app.config["ZINC_MODE"]:
-                        company.logo = save_file(form.file.data, company, "{}_{}".format(current_user.id, form.name.data), True)
+                        company.logo = save_logo(form.file.data)
                     else:
                         company.logo = upload_file_to_s3(form.file.data, form.name.data, "company-logos")
                 else:
